@@ -16,16 +16,21 @@ let frequency_list = {
     [accumulator.toString()]: true,
 };
 
-for (let i = 0; i < input.length; i++) {
-    let value = input[i];
-    accumulator += value;
+let first_duplicated_frequency;
 
-    // If we've seen this frequency before, log out the value and break the loop
-    if (frequency_list[accumulator.toString()]) {
-        console.log(`Frequency ${accumulator} has been seen before!`);
-        return;
+while (!first_duplicated_frequency) {
+    for (let i = 0; i < input.length; i++) {
+        let value = input[i];
+        accumulator += value;
+
+        // If we've seen this frequency before, log out the value and break the loop
+        if (frequency_list[accumulator.toString()]) {
+            console.log(`Frequency ${accumulator} has been seen before!`);
+            first_duplicated_frequency = accumulator.toString();
+            return;
+        }
+
+        // Otherwise, add the frequency to our lookup table
+        frequency_list[accumulator.toString()] = true;
     }
-
-    // Otherwise, add the frequency to our lookup table
-    frequency_list[accumulator.toString()] = true;
 }
