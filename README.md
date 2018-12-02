@@ -7,3 +7,4 @@
 ## Puzzles List
 
 *  [Day 1](1/README.md)
+*  [Day 2](2/README.md)
