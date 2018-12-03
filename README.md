@@ -8,3 +8,4 @@
 
 *  [Day 1](1/README.md)
 *  [Day 2](2/README.md)
+*  [Day 3](3/README.md)
