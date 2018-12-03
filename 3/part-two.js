@@ -16,7 +16,11 @@ let input = raw_input.split('\n').filter(n => n);
 const FABRIC_SIZE = 1000;
 let fabric = Array(FABRIC_SIZE)
     .fill()
-    .map(row => Array(FABRIC_SIZE).fill([]));
+    .map(row =>
+        Array(FABRIC_SIZE)
+            .fill()
+            .map(cell => [])
+    );
 
 // If an attribute is `true`, it means it is not overlapping
 let id_map = {};
