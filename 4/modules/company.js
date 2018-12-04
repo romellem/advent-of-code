@@ -87,7 +87,6 @@ class Company {
             }
         });
 
-        console.log(guard_most_asleep);
         return this.guards[guard_most_asleep.id];
     }
 }

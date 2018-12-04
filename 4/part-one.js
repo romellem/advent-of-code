@@ -8,5 +8,3 @@ let raw_input = fs.readFileSync(path.resolve(__dirname, './input.txt'), 'utf8');
 let input = raw_input.split('\n').filter(n => n);
 
 let c = new Company(input);
-
-console.log(c.log.length);
