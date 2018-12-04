@@ -1,3 +1,9 @@
+# Answers
+
+|                Part 1                |               Part 2              |
+|--------------------------------------|-----------------------------------|
+| ID * minutes = 2441 * 39 = **95199** | ID * minute = 239 * 33 = **7887** |
+
 ## --- Day 4: Repose Record ---
 
 You've sneaked into another supply closet - this time, it's across from the prototype suit manufacturing lab. You need to sneak inside and fix the issues with the suit, but there's a guard stationed outside the lab, so this is as close as you can safely get.
