@@ -7,17 +7,8 @@ class Company {
         this.guards = {};
 
         this.parseLog();
-        let guard_most_asleep = this.getGuardMostAsleep();
-        let time_when_guard_is_asleep_most = guard_most_asleep.getMinuteMostLikelyToBeAsleepDuring();
-
-        console.log(`Guard most asleep is ${guard_most_asleep.id}`);
-        console.log(`Sleeps the most during minute ${time_when_guard_is_asleep_most}`);
-        console.log(
-            `ID * minutes = ${
-                guard_most_asleep.id
-            } * ${time_when_guard_is_asleep_most} = ${guard_most_asleep.id *
-                time_when_guard_is_asleep_most}`
-        );
+        this.guard_most_asleep = this.getGuardMostAsleep();
+        this.time_when_guard_is_asleep_most = this.guard_most_asleep.getMinuteMostLikelyToBeAsleepDuring();
     }
 
     /**
@@ -88,6 +79,20 @@ class Company {
         });
 
         return this.guards[guard_most_asleep.id];
+    }
+
+    outputPartOne() {
+        let guard_most_asleep = this.guard_most_asleep;
+        let time_when_guard_is_asleep_most = this.time_when_guard_is_asleep_most;
+
+        console.log(`Guard most asleep is ${guard_most_asleep.id}`);
+        console.log(`Sleeps the most during minute ${time_when_guard_is_asleep_most}`);
+        console.log(
+            `ID * minutes = ${
+                guard_most_asleep.id
+            } * ${time_when_guard_is_asleep_most} = ${guard_most_asleep.id *
+                time_when_guard_is_asleep_most}`
+        );
     }
 }
 
