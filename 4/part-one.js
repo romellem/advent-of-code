@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const Company = require('./company');
+const Company = require('./modules/company');
 
 let raw_input = fs.readFileSync(path.resolve(__dirname, './input.txt'), 'utf8');
 
