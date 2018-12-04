@@ -18,7 +18,7 @@ class Guard {
     /**
      * @returns {Array}
      */
-    getMinuteMostLikelyToBeAsleepDuring() {
+    getMinuteMostLikelyToBeAsleepDuring(return_duple = false) {
         let times_asleep = {};
         for (let i = 0; i < 60; i++) {
             times_asleep[i] = 0;
@@ -42,8 +42,10 @@ class Guard {
             }
         });
 
-        let [time_most_asleep] = sleep_sorted.pop();
-        return time_most_asleep;
+        let duple = sleep_sorted.pop();
+        let time_most_asleep = duple[0];
+
+        return return_duple ? duple : time_most_asleep;
     }
 }
 
