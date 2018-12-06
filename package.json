@@ -12,5 +12,9 @@
   },
   "keywords": [],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "array.prototype.flat": "^1.2.1",
+    "manhattan": "^1.0.0"
+  }
 }
