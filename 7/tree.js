@@ -5,6 +5,35 @@ const sortArrayOfNodes = (a, b) => {
     else return 0;
 };
 
+class Worker {
+    constructor() {
+        this.node;
+    }
+
+    work() {
+        if (this.node) {
+            this.node.time -= 1;
+            if (this.node.time < 1) {
+                this.node.isCompleted = true;
+            }
+
+            return this.node.isCompleted;
+        }
+    }
+
+    setNode(node) {
+        this.node = node;
+    }
+
+    unsetNode() {
+        this.node = undefined;
+    }
+
+    get isWorking() {
+        return Boolean(this.node);
+    }
+}
+
 class Node {
     constructor(letter) {
         this.letter = letter;
@@ -13,6 +42,8 @@ class Node {
 
         // Initialize to _not_ being added to our order.
         this.isCompleted = false;
+
+        this.time;
     }
 
     addChild(node) {
@@ -27,6 +58,10 @@ class Node {
     addParent(node) {
         this.parents.push(node);
         return this.parents;
+    }
+
+    setTimeToComplete(base_time) {
+        this.time = this.letter.charCodeAt() - 64 + base_time;
     }
 
     get canBeCompleted() {
@@ -104,6 +139,18 @@ class Tree {
         node.isCompleted = true;
     }
 
+    isTimedWorkCompleted() {
+        let nodes = Object.values(this.tree);
+        for (let i = 0; i < nodes.length; i++) {
+            let node = nodes[i];
+            if (!node.isCompleted) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     generateOrder() {
         // Find all elements that have no parents
         let nodes = [];
@@ -115,11 +162,8 @@ class Tree {
 
         this.sortNodes(nodes);
 
-        outerWhileLoop:
-        while (nodes.length) {
-
-            innerForLoop:
-            for (let i = 0; i < nodes.length; i++) {
+        outerWhileLoop: while (nodes.length) {
+            innerForLoop: for (let i = 0; i < nodes.length; i++) {
                 let node = nodes[i];
 
                 // Search for first node that can be added to order
@@ -139,6 +183,58 @@ class Tree {
         }
 
         return this.order;
+    }
+
+    calculateTime(num_workers, min_time) {
+        let workers = Array(num_workers)
+            .fill()
+            .map(n => new Worker());
+
+        Object.values(this.tree).forEach(node => {
+            node.setTimeToComplete(min_time);
+        });
+
+        // Find all elements that have no parents
+        let nodes = [];
+        Object.values(this.tree).forEach(node => {
+            if (!node.parents.length) {
+                nodes.push(node);
+            }
+        });
+
+        let isBeingWorkedOn = {};
+
+        const getFirstWorkerThatIsntWorking = () => {
+            for (let i = 0; i < workers.length; i++) {
+                let worker = workers[i];
+                if (!worker.node) {
+                    return worker;
+                }
+            }
+        };
+
+        this.sortNodes(nodes);
+
+        let total_work = 0;
+        while (!this.isTimedWorkCompleted()) {
+            workers.forEach(worker => {
+                if (!worker.isWorking) {
+                    worker.setNode(nodes.shift());
+                    isBeingWorkedOn[nodes.letter] = true;
+                }
+            });
+
+            // Now that all workers have been assigned, let them do work
+            workers.forEach(worker => {
+                let current_worker_is_done = worker.work();
+                if (current_worker_is_done) {
+                    // Removes
+                }
+            });
+            total_work++;
+
+            // if ()
+        }
     }
 }
 
