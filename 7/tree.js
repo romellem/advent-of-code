@@ -115,24 +115,29 @@ class Tree {
 
         this.sortNodes(nodes);
 
+        outerWhileLoop:
+        while (nodes.length) {
 
+            innerForLoop:
+            for (let i = 0; i < nodes.length; i++) {
+                let node = nodes[i];
 
-        for (let i = 0; i < nodes.length; i++) {
-            let node = nodes[i];
+                // Search for first node that can be added to order
+                if (!node.isCompleted && node.canBeCompleted) {
+                    this.addNodeToOrder(node);
 
-            if (!node.isCompleted && node.canBeCompleted) {
-                this.addNodeToOrder(node);
+                    // Delete the node within our nodes array, it has already been added
+                    nodes.splice(i, 1);
 
-                nodes = nodes.concat(node.children);
-                nodes = this.sortAndUniqueNodes(nodes);
+                    nodes = nodes.concat(node.children);
+                    nodes = this.sortAndUniqueNodes(nodes);
 
-                // This is NOT efficient, rethink this
-                i = 0;
+                    // Break our for loop so we start at the beginning
+                    break innerForLoop;
+                }
             }
         }
 
-
-        console.log(this.order);
         return this.order;
     }
 }

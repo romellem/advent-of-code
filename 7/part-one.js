@@ -9,4 +9,5 @@ let input = raw_input.split('\n').filter(n => n);
 
 let tree = new Tree(input);
 
-tree.generateOrder();
+let order = tree.generateOrder();
+console.log(`Order of our "flow chart" is: ${order}`);
