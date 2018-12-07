@@ -219,8 +219,18 @@ class Tree {
         while (!this.isTimedWorkCompleted()) {
             workers.forEach(worker => {
                 if (!worker.isWorking) {
-                    worker.setNode(nodes.shift());
-                    isBeingWorkedOn[nodes.letter] = true;
+                    // Get first node that can be worked on
+                    for (let i = 0; i < nodes.length; i++) {
+                        let node = nodes[i];
+                        if (node.canBeCompleted) {
+                            worker.setNode(node);
+                            isBeingWorkedOn[node.letter] = true;
+
+                            // Delete the node within our nodes array, it is being worked on
+                            nodes.splice(i, 1);
+                            break;
+                        }
+                    }
                 }
             });
 
@@ -228,13 +238,18 @@ class Tree {
             workers.forEach(worker => {
                 let current_worker_is_done = worker.work();
                 if (current_worker_is_done) {
-                    // Removes
+                    // Adds child nodes to our list
+                    nodes = nodes.concat(worker.node.children);
+                    nodes = this.sortAndUniqueNodes(nodes);
+
+                    // Free up worker for re-assignment
+                    worker.unsetNode();
                 }
             });
             total_work++;
-
-            // if ()
         }
+
+        return total_work;
     }
 }
 
