@@ -8,8 +8,11 @@ const sortArrayOfNodes = (a, b) => {
 class Node {
     constructor(letter) {
         this.letter = letter;
-        this.parent;
+        this.parents = [];
         this.children = [];
+
+        // Initialize to _not_ being added to our order.
+        this.isCompleted = false;
     }
 
     addChild(node) {
@@ -21,8 +24,27 @@ class Node {
         return this.children;
     }
 
-    setParent(node) {
-        return (this.parent = node);
+    addParent(node) {
+        this.parents.push(node);
+        return this.parents;
+    }
+
+    get canBeCompleted() {
+        // If we have no parents, we have no prerequisites, so we can be completed
+        if (!this.parents.length) {
+            return true;
+        }
+
+        for (let i = 0; i < this.parents.length; i++) {
+            let parent = this.parents[i];
+            if (!parent.isCompleted) {
+                // If any parent is not complete, this node can't be completed
+                return false;
+            }
+        }
+
+        // If we are here, all parents are completed, this node can be completed
+        return true;
     }
 }
 
@@ -36,6 +58,8 @@ class Tree {
         this.rawLines = [...lines];
         this.tree = {};
         this.parseLines(lines);
+
+        this.order = '';
     }
 
     parseLines(lines) {
@@ -50,44 +74,10 @@ class Tree {
                 this.tree[post] = new Node(post);
             }
 
+            // Create a doubly-linked list
             this.tree[pre].addChild(this.tree[post]);
-            this.tree[post].setParent(this.tree[pre]);
+            this.tree[post].addParent(this.tree[pre]);
         });
-    }
-
-    generateVisArrays() {
-        let nodes = [];
-        Object.keys(this.tree).forEach((l, i) => {
-            nodes.push({ id: l.charCodeAt() - 64, label: l });
-        });
-
-        // Build edges
-        let edges = [];
-        Object.values(this.tree).forEach(node => {
-            if (node.children.length) {
-                node.children.forEach(child => {
-                    edges.push({
-                        from: node.letter.charCodeAt() - 64,
-                        to: child.letter.charCodeAt() - 64,
-                    });
-                });
-            }
-        });
-
-        console.log('// Nodes');
-        console.log(JSON.stringify(nodes));
-
-        console.log('\n// Edges');
-        console.log(JSON.stringify(edges));
-    }
-
-    generateMermaidConfig() {
-        let nodes = this.rawLines.map(line => {
-            let [match, pre, post] = TREE_LINE_REGEX.exec(line);
-            return `    ${pre}-->${post};`;
-        });
-
-        console.log(`graph TD;\n${nodes.join('\n')}`);
     }
 
     /**
@@ -99,35 +89,51 @@ class Tree {
         return uniqBy(nodes, 'letter');
     }
 
-    generateOrder() {
-        let order = '';
+    /**
+     * Sorts array of Node objects in place
+     * @param {Array} nodes
+     * @returns nodes
+     */
+    sortNodes(nodes) {
+        nodes.sort(sortArrayOfNodes);
+        return nodes;
+    }
 
+    addNodeToOrder(node) {
+        this.order += node.letter;
+        node.isCompleted = true;
+    }
+
+    generateOrder() {
         // Find all elements that have no parents
         let nodes = [];
         Object.values(this.tree).forEach(node => {
-            if (!node.parent) {
+            if (!node.parents.length) {
                 nodes.push(node);
             }
         });
 
-        nodes = this.sortAndUniqueNodes(nodes);
+        this.sortNodes(nodes);
 
-        while (nodes.length) {
-            let current_node;
-            do {
-                current_node = nodes.shift();
-            } while (order.includes(current_node.letter));
 
-            order += current_node.letter;
 
-            if (current_node.children.length) {
-                nodes = nodes.concat(current_node.children);
+        for (let i = 0; i < nodes.length; i++) {
+            let node = nodes[i];
+
+            if (!node.isCompleted && node.canBeCompleted) {
+                this.addNodeToOrder(node);
+
+                nodes = nodes.concat(node.children);
                 nodes = this.sortAndUniqueNodes(nodes);
+
+                // This is NOT efficient, rethink this
+                i = 0;
             }
         }
 
-        console.log(order);
-        return order;
+
+        console.log(this.order);
+        return this.order;
     }
 }
 

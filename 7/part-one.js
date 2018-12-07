@@ -9,4 +9,4 @@ let input = raw_input.split('\n').filter(n => n);
 
 let tree = new Tree(input);
 
-tree.generateMermaidConfig();
+tree.generateOrder();
