@@ -1,4 +1,5 @@
 const { uniqBy } = require('lodash');
+const { table, getBorderCharacters } = require('table');
 const sortArrayOfNodes = (a, b) => {
     if (a.letter < b.letter) return -1;
     else if (a.letter > b.letter) return 1;
@@ -202,8 +203,6 @@ class Tree {
             }
         });
 
-        let isBeingWorkedOn = {};
-
         const getFirstWorkerThatIsntWorking = () => {
             for (let i = 0; i < workers.length; i++) {
                 let worker = workers[i];
@@ -216,6 +215,10 @@ class Tree {
         this.sortNodes(nodes);
 
         let total_work = 0;
+
+        let done_str = '';
+
+        let table_of_work = [['S', 'W1', 'W2', 'W3', 'W4', 'W5', 'Done']];
         while (!this.isTimedWorkCompleted()) {
             workers.forEach(worker => {
                 if (!worker.isWorking) {
@@ -224,7 +227,6 @@ class Tree {
                         let node = nodes[i];
                         if (node.canBeCompleted) {
                             worker.setNode(node);
-                            isBeingWorkedOn[node.letter] = true;
 
                             // Delete the node within our nodes array, it is being worked on
                             nodes.splice(i, 1);
@@ -234,11 +236,19 @@ class Tree {
                 }
             });
 
+            // Build row (for output)
+            let row = [total_work]
+                .concat(workers.map(w => (w.node ? w.node.letter : '.')))
+                .concat([done_str || ' ']);
+            table_of_work.push(row);
+
             // Now that all workers have been assigned, let them do work
             workers.forEach(worker => {
                 let current_worker_is_done = worker.work();
                 if (current_worker_is_done) {
-                    // Adds child nodes to our list
+                    done_str += worker.node.letter;
+
+                    // Add it's child nodes to our list
                     nodes = nodes.concat(worker.node.children);
                     nodes = this.sortAndUniqueNodes(nodes);
 
@@ -248,6 +258,25 @@ class Tree {
             });
             total_work++;
         }
+
+        // Build last row (for output)
+        let row = [total_work]
+            .concat(workers.map(w => (w.node ? w.node.letter : '.')))
+            .concat([done_str || ' ']);
+        table_of_work.push(row);
+
+        console.log(
+            table(table_of_work, {
+                border: getBorderCharacters(`void`),
+                columnDefault: {
+                    paddingLeft: 1,
+                    paddingRight: 1,
+                },
+                drawHorizontalLine: () => {
+                    return false;
+                },
+            })
+        );
 
         return total_work;
     }
