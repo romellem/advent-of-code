@@ -4,6 +4,7 @@ class Node {
         this.children = children;
     }
 
+    // Part one
     getMetaSum() {
         let self_meta_sum = this.meta.reduce((a, b) => a + b, 0);
 
@@ -13,6 +14,26 @@ class Node {
         }
 
         return self_meta_sum + child_sum.reduce((a, b) => a + b, 0);
+    }
+
+    // Part two
+    getValue() {
+        let self_meta_sum = this.meta.reduce((a, b) => a + b, 0);
+        if (!this.children.length) {
+            return self_meta_sum;
+        }
+
+        // Otherwise, get values of its children
+        let child_sum = this.meta.map(index => {
+            let child = this.children[index - 1];
+            if (child) {
+                return child.getValue();
+            } else {
+                return 0;
+            }
+        });
+
+        return child_sum.reduce((a, b) => a + b, 0);
     }
 }
 
