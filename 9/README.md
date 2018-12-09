@@ -1,3 +1,9 @@
+# Answers
+
+|   Part 1  |     Part 2      |
+|-----------|-----------------|
+| `388,131` | `3,239,376,988` |
+
 ## --- Day 9: Marble Mania ---
 
 You talk to the Elves while you wait for your navigation system to initialize. To pass the time, they introduce you to their favorite [marble](https://en.wikipedia.org/wiki/Marble_(toy)) game.
