@@ -1,6 +1,6 @@
 ### Advent of Code
 
-{% assign posts_2018 = site.pages | where: "year", 2018 %}
+{% assign posts_2018 = site.pages | where: "year", 2018 | sort:"day" %}
 <ul>
     <li>2018
         <ul>
