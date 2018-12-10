@@ -63,7 +63,11 @@ class Grid {
 
         // Normalize our points around 0, 0
         this.normalize();
-        // this.groupPoints();
+
+
+        // Then, translate up and to the left ~54,000
+        // I got 54,000 by drawing my points "scaled" and seeing that they end up grouping around 54000
+        this.points.forEach(p => p.translate(-54000, -54000));
 
         let { xs, ys } = this.getSortedPoints();
         this.intial_max = {
@@ -201,16 +205,17 @@ class Grid {
     }
 
     paint() {
-        let { width, height } = this.canvas_size;
+        // let { width, height } = this.canvas_size;
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         
-        const x_scale = width / this.intial_max.x;
-        const y_scale = height / this.intial_max.y;
+        // const x_scale = width / this.intial_max.x;
+        // const y_scale = height / this.intial_max.y;
         // console.log('scales: ', x_scale, y_scale);
         this.points.forEach(p => {
             // console.log('Painting ',p.x * x_scale, p.y * y_scale)
-            this.ctx.fillRect(p.x * x_scale, p.y * y_scale, 1, 1);
+            // this.ctx.fillRect(p.x * x_scale, p.y * y_scale, 1, 1);
+            this.ctx.fillRect(p.x, p.y, 1, 1);
         });
     }
 }
