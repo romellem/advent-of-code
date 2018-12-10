@@ -5,7 +5,7 @@
     <li>2018
         <ul>
             {% for page in posts_2018 %}
-                <li><a href="{{ page.path | relative_url }}">Day {{ page.day }}</a></li>
+                <li><a href="{{ page.url | relative_url }}">Day {{ page.day }}</a></li>
             {% endfor %}
         </ul>
     </li>
