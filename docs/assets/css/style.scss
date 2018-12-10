@@ -1,0 +1,30 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+details {
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: #444;
+
+    padding: 1rem;
+    margin: 0 -1rem;
+
+    &[open] {
+        background: #fafafa;
+        border-radius: 4px;
+    }
+
+    summary {
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 1em;
+        font-weight: bold;
+        font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+    }
+
+    & + p {
+        margin-top: 16px;
+    }
+}
