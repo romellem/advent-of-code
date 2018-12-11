@@ -15,6 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "array.prototype.flat": "^1.2.1",
+    "concurrently": "^4.1.0",
     "lodash": "^4.17.11",
     "manhattan": "^1.0.0",
     "table": "^5.1.1"
