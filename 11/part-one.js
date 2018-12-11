@@ -7,6 +7,7 @@ let input = require('./input');
 // // let sample_grid2 = new Grid([300, 300], 39);
 // // let sample_grid2 = new Grid([300, 300], 71);
 
+console.log('Starting part one')
 let grid = new Grid([300, 300], input);
 
 // // Should be 233,93, power of 13??

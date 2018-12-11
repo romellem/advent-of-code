@@ -70,6 +70,7 @@ class Grid {
                 coords = max_square.coords;
                 power = max_square.power;
                 size = i;
+                console.log('');
                 console.log('New Largest!');
                 console.log({
                     coords,
