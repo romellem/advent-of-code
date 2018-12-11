@@ -36,12 +36,12 @@ class Grid {
             );
     }
 
-    getMostPowerfulSquare(square_x = 3, square_y = 3) {
+    getMostPowerfulSquare(size = 3) {
         let square_at_coords_power = {};
-        for (let y = 0; y < this.grid.length - square_y; y++) {
-            for (let x = 0; x < this.grid.length - square_x; x++) {
-                let square = this.getFlatSquare(x, y).map(s => s.power_level);
-                square_at_coords_power[(x + 1) + ',' + (y + 1)] = square.reduce((a, b) => a + b, 0);
+        for (let y = 0; y < this.grid.length - size + 1; y++) {
+            for (let x = 0; x < this.grid.length - size + 1; x++) {
+                let square_sum = this.getSquareSum(x, y, size);
+                square_at_coords_power[x + 1 + ',' + (y + 1)] = square_sum;
             }
         }
 
@@ -58,16 +58,58 @@ class Grid {
         };
     }
 
-    getFlatSquare(x_coord, y_coord, size_x = 3, size_y = 3) {
+    getMostPowerfulSquareOfAnySize(range_min = 1, range_max = this.grid.length) {
+        let coords = '';
+        let power = -Infinity;
+        let size = 0;
+
+        for (let i = range_min; i <= range_max; i++) {
+            process.stdout.write(i + ' ');
+            let max_square = this.getMostPowerfulSquare(i);
+            if (max_square.power > power) {
+                coords = max_square.coords;
+                power = max_square.power;
+                size = i;
+                console.log('New Largest!');
+                console.log({
+                    coords,
+                    size,
+                    power,
+                });
+                console.log('');
+            }
+        }
+        console.log('\n==== DONE ====\n');
+
+        return {
+            coords,
+            size,
+            power,
+        };
+    }
+
+    getFlatSquare(x_coord, y_coord, size = 3) {
         let flat_square = [];
-        for (let y = y_coord; y < y_coord + size_y; y++) {
-            for (let x = x_coord; x < x_coord + size_x; x++) {
+        for (let y = y_coord; y < y_coord + size; y++) {
+            for (let x = x_coord; x < x_coord + size; x++) {
                 let cell = this.grid[y][x];
                 flat_square.push(cell);
             }
         }
 
         return flat_square;
+    }
+
+    getSquareSum(x_coord, y_coord, size = 3) {
+        let accumulator = 0;
+        for (let y = y_coord; y < y_coord + size; y++) {
+            for (let x = x_coord; x < x_coord + size; x++) {
+                let cell = this.grid[y][x];
+                accumulator += cell.power_level;
+            }
+        }
+
+        return accumulator;
     }
 
     getFuelCellAt(x, y) {
