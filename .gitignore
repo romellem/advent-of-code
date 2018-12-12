@@ -112,3 +112,6 @@ Temporary Items
 .apdisk
 
 # End of https://www.gitignore.io/api/osx,node
+
+# Don't save VSCode specific settings (debugging setups, etc.)
+.vscode/
