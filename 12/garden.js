@@ -116,15 +116,22 @@ class Garden {
                 plants.push(end_plant);
             }
 
-            // Now that any "padding" plants are in place, tick them forward to their next state
+            // Don't update `this.garden` because that'll affect the state and how a plant grows
+            let next_garden_state = {};
+
+            // Now that any "padding" plants are in place, compute each one's next state (but don't update garden just yet!)
             plants.forEach(plant => {
                 if (!this.garden[plant.id]) {
                     this.garden[plant.id] = plant;
                 }
 
                 let plant_state_string = this.buildStateStringFromPlant(plant);
-                let plant_next_alive_state = this.spread_rules[plant_state_string];
-                plant.alive = plant_next_alive_state;
+                next_garden_state[plant.id] = this.spread_rules[plant_state_string];
+            });
+
+            // Now that we've computed each plants next state, actually update its internal state from our cached `next_garden_state`
+            plants.forEach(plant => {
+                plant.alive = next_garden_state[plant.id];
             });
         }
     }
