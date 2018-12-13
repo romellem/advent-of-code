@@ -10,13 +10,7 @@ module.exports = {
         return garden;
     },
 
-    /**
-     * @param {bool} force_null_death When true, the rule `.....` will always result in a death => `.`.
-     *                                This leads to more interesting visualizations. Otherwise,
-     *                                they just grow really fast outward.
-     * @param {bool} force_semi_null_death See above, but for rule `#....`. Again, makes this more interesting.
-     */
-    getRandomSpreadRules(force_null_death = true, force_semi_null_death = true) {
+    getRandomSpreadRules() {
         let rules = [];
 
         let num_rules = 0b11111;
@@ -25,14 +19,6 @@ module.exports = {
             let rule = rule_binary.split('').map(n => n === '1' ? '#' : '.').join('');
 
             let result = Math.random() > .5 ? '#' : '.';
-
-            if (i === 0 && force_null_death) {
-                result = '.';
-            }
-
-            if (i === 0b10000 && force_semi_null_death) {
-                result = '.';
-            }
 
             rules.push(`${rule} => ${result}`);
         }

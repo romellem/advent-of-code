@@ -155,7 +155,7 @@ class Garden {
         // return plants.map(p => p.alive ? '#' : '.').join('');
 
         return {
-            string: plants.map(p => p.id === 0 ? '+' : (p.alive ? '#' : '.')).join(''),
+            string: plants.map(p => p.id === 0 ? (p.alive ? '+' : '-') : (p.alive ? '#' : '.')).join(''),
             min: plants[0].id,
             max: plants[plants.length - 1].id,
         };

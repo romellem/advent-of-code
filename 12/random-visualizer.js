@@ -69,14 +69,21 @@ if (total_days >= MAX_DAYS_SIMULATING) {
 }
 
 let max_pad_start = Math.abs(Math.min.apply(null, unpadded_pixel_rows.map(r => r.min)));
-let half_padded_pixel_rows = unpadded_pixel_rows.map(row => row.string.padStart(max_pad_start, '.'));
+let half_padded_pixel_rows = unpadded_pixel_rows.map(row => {
+    let zero_index = Math.abs(row.min);
+    let left_empty_pots = Array(max_pad_start - zero_index).fill('.').join('');
+    return left_empty_pots + row.string;
+});
 
 let max_row_lenth = Math.max.apply(null, half_padded_pixel_rows.map(r => r.length));
 let padded_pixel_rows = half_padded_pixel_rows.map(row => row.padEnd(max_row_lenth, '.'));
 
 const BLACK = Jimp.rgbaToInt(0, 0, 0, 255);
 const RED = Jimp.rgbaToInt(255, 0, 0, 255);
-const CYAN = Jimp.rgbaToInt(0, 255, 255, 255);
+// const CYAN = Jimp.rgbaToInt(0, 255, 255, 255);
+// const NAVY = Jimp.rgbaToInt(0, 0, 128, 255);
+const GOLD = Jimp.cssColorToHex('#FFD700');
+const DARK_GOLD = Jimp.cssColorToHex('#564800');
 
 new Jimp(max_row_lenth, padded_pixel_rows.length, BLACK, (err, image) => {
     for (let y = 0; y < padded_pixel_rows.length; y++) {
@@ -86,8 +93,11 @@ new Jimp(max_row_lenth, padded_pixel_rows.length, BLACK, (err, image) => {
             if (cell === '#') {
                 image.setPixelColor(RED, x, y);
             } else if (cell === '+') {
-                // ID 0
-                image.setPixelColor(CYAN, x, y);
+                // ID 0, on
+                image.setPixelColor(GOLD, x, y);
+            } else if (cell === '-') {
+                // ID 0, but off
+                image.setPixelColor(DARK_GOLD, x, y);
             }
         }
     }
