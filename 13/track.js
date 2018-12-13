@@ -129,6 +129,10 @@ class Cart {
                 return '<';
         }
     }
+
+    get coords() {
+        return `${this.x},${this.y}`;
+    }
 }
 
 const CART_DIRECTION_LOOKUP = {
@@ -187,8 +191,37 @@ class Track {
     }
 
     tick() {
-        this.carts.forEach(cart => cart.move());
+        // this.carts.forEach(cart => cart.move());
+        for (let i = 0; i < this.carts.length; i++) {
+            let cart = this.carts[i];
+            cart.move();
+
+            let other_carts = this.carts.filter(c => c.id !== cart.id);
+            if (other_carts.map(c => c.coords).includes(cart.coords)) {
+                // WE HAVE A COLLISTION
+                console.log('MID COLLISION')
+                console.log(cart.coords)
+                process.exit(1)
+            }
+        }
+
+        this.carts.sort((a, b) => {
+            if (a.y < b.y) {
+                return -1;
+            } else if (a.y > b.y) {
+                return 1;
+            } else {
+                if (a.x > b.x) {
+                    return 1;
+                } else if (a.x < b.x) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        })
     }
+
 
     getStateString() {
         let populated_track = this.track.slice(0);
