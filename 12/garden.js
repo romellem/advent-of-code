@@ -143,6 +143,17 @@ class Garden {
             return a + (b.alive ? b.id : 0);
         }, 0);
     }
+
+    getGardenAsString() {
+        let plants = Object.values(this.garden);
+        plants.sort((a, b) => {
+            if (a.id < b.id) return -1;
+            else if (a.id > b.id) return 1;
+            else return 0;
+        });
+
+        return plants.map(p => p.alive ? '#' : '.').join('');
+    }
 }
 
 module.exports = Garden;
