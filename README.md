@@ -16,3 +16,6 @@
 *  [Day 8](8/README.md)
 *  [Day 9](9/README.md)
 *  [Day 10](10/README.md)
+*  [Day 11](11/README.md)
+*  [Day 12](12/README.md)
+*  [Day 13](13/README.md)
