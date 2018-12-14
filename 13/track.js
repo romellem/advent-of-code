@@ -17,6 +17,8 @@ class Cart {
 
         this.track = track;
 
+        this.crashed = false;
+
         // Number of times we've turned
         this.turns = 0;
     }
@@ -69,7 +71,6 @@ class Cart {
 
         let next_track;
         try {
-
             next_track = this.track[next_coord[1]][next_coord[0]];
         } catch (e) {
             debugger;
@@ -77,7 +78,7 @@ class Cart {
 
         if (TURNS.includes(next_track)) {
             if (next_track === '+') {
-                let turn = CART_TURNS[(this.turns++) % CART_TURNS.length];
+                let turn = CART_TURNS[this.turns++ % CART_TURNS.length];
                 this.setDirectionAfterTurn(turn);
             } else if (next_track === '/') {
                 switch (this.direction) {
@@ -190,18 +191,38 @@ class Track {
         }
     }
 
-    tick() {
+    tick(remove_carts_on_crash = false) {
+        // this.carts.forEach(cart => cart.move());
+        let crashed = false;
         for (let i = 0; i < this.carts.length; i++) {
             let cart = this.carts[i];
-            cart.move();
+            if (cart) {
+                cart.move();
 
-            let other_carts = this.carts.filter(c => c.id !== cart.id);
-            if (other_carts.map(c => c.coords).includes(cart.coords)) {
-                // WE HAVE A COLLISTION
-                console.log(cart.coords)
-                process.exit(0)
+                let other_carts = this.carts.filter(c => c.id !== cart.id);
+                for (let j = 0; j < other_carts.length; j++) {
+                    let other_cart = other_carts[j];
+
+                    if (cart.coords === other_cart.coords) {
+                        crashed = true;
+                        if (remove_carts_on_crash) {
+                            console.log('Crash!');
+                            this.carts.forEach(c => {
+                                if (c.id === cart.id || c.id === other_cart.id) {
+                                    // Set cart to null if it crashed, will be filtered out later
+                                    c.crashed = true;
+                                }
+                            });
+                        } else {
+                            console.log(cart.coords);
+                            process.exit(0);
+                        }
+                    }
+                }
             }
         }
+
+        this.carts = this.carts.filter(c => !c.crashed);
 
         this.carts.sort((a, b) => {
             if (a.y < b.y) {
@@ -217,15 +238,14 @@ class Track {
                     return 0;
                 }
             }
-        })
+        });
     }
-
 
     getStateString() {
         let populated_track = this.track.slice(0);
         this.carts.forEach(cart => {
             let icon = cart.getIcon();
-            
+
             let new_row = populated_track[cart.y].split('');
             new_row[cart.x] = icon;
             populated_track[cart.y] = new_row.join('');

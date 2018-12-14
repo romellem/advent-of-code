@@ -12,8 +12,13 @@ let track = new Track(input);
 
 let ticks = 0;
 while (true) {
-    // `track.tick()` will `process.exit()` when it finds a collision... sorry.
-    track.tick();
+    track.tick(true);
     ticks++;
+
+    if (track.carts.length <= 1) {
+        break;
+    }
 }
+
+console.log(track.carts.map(c => c.coords), 'after ' + ticks + ' ticks');
 
