@@ -1,8 +1,8 @@
 # Answers
 
-| Part 1 |           Part 2          |
-|--------|---------------------------|
-|   5704 | umdryabviapkozistwcnihjqx |
+| Part 1 |            Part 2           |
+|--------|-----------------------------|
+| `5704` | `umdryabviapkozistwcnihjqx` |
 
 ## --- Day 2: Inventory Management System ---
 

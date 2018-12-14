@@ -1,8 +1,8 @@
 # Answers
 
-| Part 1 | Part 2 |
-|--------|--------|
-| 101196 |    243 |
+|  Part 1  | Part 2 |
+|----------|--------|
+| `101196` |  `243` |
 
 ## --- Day 3: No Matter How You Slice It ---
 
