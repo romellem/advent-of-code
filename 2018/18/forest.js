@@ -67,7 +67,7 @@ class Forest {
         this.grid = new_grid;
     }
 
-    partOne() {
+    getTotalResources() {
         let num_trees = 0;
         let num_lumberyards = 0;
 

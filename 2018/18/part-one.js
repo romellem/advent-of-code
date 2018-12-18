@@ -7,4 +7,4 @@ for (let i = 0; i < 10; i++) {
     forest.tick();
 }
 
-console.log(forest.partOne());
+console.log(forest.getTotalResources());
