@@ -1,3 +1,9 @@
+# Answers
+
+|  Part 1  |  Part 2  |
+|----------|----------|
+| `614812` | `212176` |
+
 ## --- Day 18: Settlers of The North Pole ---
 
 On the outskirts of the North Pole base construction project, many Elves are collecting lumber.
@@ -154,3 +160,11 @@ For example, suppose the lumber collection area is instead only 10 by 10 acres w
 After 10 minutes, there are `37` wooded acres and `31` lumberyards. Multiplying the number of wooded acres by the number of lumberyards gives the total _resource value_ after ten minutes: `37 * 31 = _1147_`.
 
 _What will the total resource value of the lumber collection area be after 10 minutes?_
+
+-----------------
+
+## --- Part Two ---
+
+This important natural resource will need to last for at least thousands of years. Are the Elves collecting this lumber sustainably?
+
+_What will the total resource value of the lumber collection area be after 1000000000 minutes?_
