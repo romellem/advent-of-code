@@ -10,16 +10,26 @@ class Forest {
     }
 
     getAdjacent(x, y) {
-        return [
-            this.grid[y - 1][x],
-            this.grid[y - 1][x + 1],
-            this.grid[y][x + 1],
-            this.grid[y + 1][x + 1],
-            this.grid[y + 1][x],
-            this.grid[y + 1][x - 1],
-            this.grid[y][x - 1],
-            this.grid[y - 1][x - 1],
-        ];
+        let adjacents = [];
+
+        if (this.grid[y - 1]) {
+            if (this.grid[y - 1][x]) adjacents.push(this.grid[y - 1][x]);
+            if (this.grid[y - 1][x + 1]) adjacents.push(this.grid[y - 1][x + 1]);
+            if (this.grid[y - 1][x - 1]) adjacents.push(this.grid[y - 1][x - 1]);
+        }
+
+        if (this.grid[y + 1]) {
+            if (this.grid[y + 1][x]) adjacents.push(this.grid[y + 1][x]);
+            if (this.grid[y + 1][x + 1]) adjacents.push(this.grid[y + 1][x + 1]);
+            if (this.grid[y + 1][x - 1]) adjacents.push(this.grid[y + 1][x - 1]);
+        }
+
+        if (this.grid[y]) {
+            if (this.grid[y][x + 1]) adjacents.push(this.grid[y][x + 1]);
+            if (this.grid[y][x - 1]) adjacents.push(this.grid[y][x - 1]);
+        }
+
+        return adjacents;
     }
 
     tick() {
@@ -46,7 +56,7 @@ class Forest {
                     // An acre containing a lumberyard will remain a lumberyard if it was adjacent
                     // to at least one other lumberyard and at least one acre containing trees.
                     // Otherwise, it becomes open.
-                    if (!(adjacents.includes(LUMBERYARD) && adjacents.includes(TREE))) {
+                    if (!(adjacents.includes(LUMBERYARD) && adjacents.includes(TREES))) {
                         new_grid[y][x] = OPEN_GROUND;
                     }
                 }
