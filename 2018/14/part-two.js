@@ -1,5 +1,4 @@
-const fs = require('fs');
-const SEARCH_FOR = 580741;
+const SEARCH_FOR = require('./input');
 
 class Recipes {
     constructor(SEARCH_FOR, initial_recipes = [3, 7]) {
@@ -48,6 +47,7 @@ class Recipes {
             }
         }
 
+        // Clear out the screen
         console.log(String(this.recipes.length).split('').map(n => ' ').join('') + ' \n')
 
         // Trim our recipes array to make sure the last items are our search_for string exactly
@@ -66,17 +66,6 @@ class Recipes {
 
         return this.recipes.length - this.search_for.length;
     }
-
-    generate(n = 10) {
-        while (this.recipes.length < n) {
-            this.createNewRecipes();
-            if (this.recipes.length % 4463 === 0) {
-                process.stdout.write((this.recipes.length / n) + '\r');
-            }
-        }
-        fs.writeFileSync(n + '.txt', this.recipes.join(''));
-        console.log('\n\nWrote ' + n + '.txt')
-    }
 }
 
 let recipes = new Recipes(SEARCH_FOR);
@@ -84,7 +73,5 @@ let recipes = new Recipes(SEARCH_FOR);
 // let recipes = new Recipes(59414); // 2018
 
 let length = recipes.getLengthWhenSearchForIsFirstFound();
-// recipes.generate(40330674);
 
 console.log(length);
-

@@ -1,4 +1,4 @@
-const MIN_LENGTH = 580741;
+const MIN_LENGTH = require('./input');
 
 class Recipes {
     constructor(min_length, recipes_after = 10, initial_recipes = [3, 7]) {
@@ -52,7 +52,4 @@ let recipes = new Recipes(MIN_LENGTH);
 
 let ten = recipes.getNextTenAfterPosition();
 
-
-
-console.log(ten);
 console.log(ten.join(''));
