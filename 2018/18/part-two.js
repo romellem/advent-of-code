@@ -1,5 +1,6 @@
 const input = require('./input');
 const Forest = require('./forest');
+const getLongestCycle = require('./find-cycle-array')
 
 let forest = new Forest(input);
 
@@ -24,8 +25,37 @@ let forest = new Forest(input);
  * 
  * **212176**
  */
+
+let max_cycle_legth = 0;
+let minutes_with_max_cycle = 0;
+
+let cycle_to_repeat, index_where_cycle_starts;
+
+let resources = [];
 for (let i = 0; i < 1000000000; i++) {
     forest.tick();
-    console.log(forest.getTotalResources());
+    resources.push(forest.getTotalResources());
+
+    let { cycle, index } = getLongestCycle(resources);
+    if (cycle.length > max_cycle_legth) {
+        max_cycle_legth = cycle.length;
+        minutes_with_max_cycle = 0;
+    } else {
+        minutes_with_max_cycle++;
+    }
+
+    // console.log(`${i} : ${cycle.length} (Max: ${max_cycle_legth}, for ${minutes_with_max_cycle})`)
+
+    if (max_cycle_legth > 9 && minutes_with_max_cycle > 9) {
+        console.log(`Found a large enough steady cycle for at least 10 minutes...\n`)
+        cycle_to_repeat = cycle.slice(0);
+        index_where_cycle_starts = index;
+        break;
+    }
 }
+
+// (1000000000 - index_where_cycle_starts) % cycle.length =
+//     index within cycle that is the answer to forest resources after 1000000000 minutes
+let index_answer = (1000000000 - (index_where_cycle_starts + 1)) % cycle_to_repeat.length;
+console.log(cycle_to_repeat[index_answer]);
 
