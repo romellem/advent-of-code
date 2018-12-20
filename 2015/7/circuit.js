@@ -6,10 +6,10 @@ class Gate {
     }
 
     get value() {
-        if (typeof this.input !== 'object') {
-            return this.input;
+        if (/^\d+$/.test(this.id)) {
+            return parseInt(this.id);
         } else {
-            let { gates, operator, not } = this.input;
+            let { gates, operator, not } = this.input || {};
 
             // This is a simplification, `NOT $gate` never has an operator
             if (not) {
@@ -26,6 +26,7 @@ class Gate {
                         return gates[0].value << gates[1].value;
                 }
             } else {
+                console.log(this)
                 // Just a plain gate
                 return this.input.value;
             }
@@ -72,19 +73,6 @@ class Circuit {
                     not: true,
                     gates: [input_gate]
                 };
-            } else if (/^\d+$/.test(input)) {
-                // Input is just a number, start of the circuit!
-                output_gate.input = parseInt(input);
-            } else if (/^[a-z]+$/.test(input)) {
-                // Input is just a plain gate
-                let input_gate;
-                if (gates_map_of_ids[input]) {
-                    input_gate = gates_map_of_ids[input];
-                } else {
-                    input_gate = new Gate(input);
-                }
-
-                output_gate.input = input_gate;
             } else {
                 // AND, OR, LSHIRT, RSHIFT, nothing, just a gate into another gate
                 if (input.includes(' LSHIFT ')) {
@@ -165,6 +153,16 @@ class Circuit {
                         gates: [input_left, input_right],
                         operator: 'OR'
                     };
+                } else {
+                    // Input is just a plain gate
+                    let input_gate;
+                    if (gates_map_of_ids[input]) {
+                        input_gate = gates_map_of_ids[input];
+                    } else {
+                        input_gate = new Gate(input);
+                    }
+    
+                    output_gate.input = input_gate;
                 }
             }
         });
