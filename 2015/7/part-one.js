@@ -9,4 +9,4 @@ let input = raw_input.split('\n').filter(n => n);
 
 let circuit = new Circuit(input);
 
-console.log(circuit.gates['a'].value);
+console.log(circuit.gates['a'].getValue());

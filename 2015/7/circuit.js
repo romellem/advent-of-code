@@ -3,33 +3,73 @@ class Gate {
         this.id = id;
 
         this.input;
+
+        /**
+         * Cache our value after we calculate it.
+         * 
+         * This part is key, otherwise the program never finishes? Also
+         * it works because we don't call the `getValue()` method until
+         * all gates are parsed.
+         */
+        this.calculatedValue;
     }
 
-    get value() {
-        if (/^\d+$/.test(this.id)) {
-            return parseInt(this.id);
+    getValue() {
+        if (this.calculatedValue !== undefined) {
+            return this.calculatedValue;
+        }
+
+        if (typeof this.input !== 'object') {
+            this.calculatedValue = this.input;
         } else {
-            let { gates, operator, not } = this.input || {};
+            let { gates, operator, not } = this.input;
 
             // This is a simplification, `NOT $gate` never has an operator
+            let val;
             if (not) {
-                return ~gates[0].value;
+                val = ~gates[0].getValue();
+                this.calculatedValue = val;
             } else if (operator) {
+                let l, r;
                 switch (operator) {
                     case 'AND':
-                        return gates[0].value & gates[1].value;
+                        l = gates[0].getValue();
+                        r = gates[1].getValue();
+                        val =l & r;
+                        this.calculatedValue = val;
+                        break;
                     case 'OR':
-                        return gates[0].value | gates[1].value;
+                        l = gates[0].getValue();
+                        r = gates[1].getValue();
+                        val =l | r;
+                        this.calculatedValue = val;
+                        break;
                     case 'RSHIFT':
-                        return gates[0].value >> gates[1].value;
+                        l = gates[0].getValue();
+                        r = gates[1].getValue();
+                        val =l >> r;
+                        this.calculatedValue = val;
+                        break;
                     case 'LSHIFT':
-                        return gates[0].value << gates[1].value;
+                        l = gates[0].getValue();
+                        r = gates[1].getValue();
+                        val =l << r;
+                        this.calculatedValue = val;
+                        break;
                 }
+
+                return this.calculatedValue;
+
+                // if we are here, something went wrong
+                console.error(this);
+                process.exit(1);
             } else {
-                console.log(this)
                 // Just a plain gate
-                return this.input.value;
+                val = this.input.getValue();
+                this.calculatedValue = val;
             }
+
+            return this.calculatedValue;
         }
     }
 }
@@ -71,8 +111,22 @@ class Circuit {
 
                 output_gate.input = {
                     not: true,
-                    gates: [input_gate]
+                    gates: [input_gate],
                 };
+            } else if (/^\d+$/.test(input)) {
+                // Input is just a number, start of the circuit!
+                output_gate.input = parseInt(input);
+            } else if (/^[a-z]+$/.test(input)) {
+                // Input is just a plain gate
+                let input_gate;
+                if (gates_map_of_ids[input]) {
+                    input_gate = gates_map_of_ids[input];
+                } else {
+                    input_gate = new Gate(input);
+                    gates_map_of_ids[input] = input_gate;
+                }
+
+                output_gate.input = input_gate;
             } else {
                 // AND, OR, LSHIRT, RSHIFT, nothing, just a gate into another gate
                 if (input.includes(' LSHIFT ')) {
@@ -88,8 +142,8 @@ class Circuit {
                     }
 
                     output_gate.input = {
-                        gates: [input_left, { value: parseInt(input_right.trim()) }],
-                        operator: 'LSHIFT'
+                        gates: [input_left, { getValue: () => parseInt(input_right.trim()) }],
+                        operator: 'LSHIFT',
                     };
                 } else if (input.includes(' RSHIFT ')) {
                     // This code isn't DRY, oh well
@@ -104,14 +158,16 @@ class Circuit {
                     }
 
                     output_gate.input = {
-                        gates: [input_left, { value: parseInt(input_right.trim()) }],
-                        operator: 'RSHIFT'
+                        gates: [input_left, { getValue: () => parseInt(input_right) }],
+                        operator: 'RSHIFT',
                     };
                 } else if (input.includes(' AND ')) {
                     let [input_left_id, input_right_id] = input.split(' AND ');
 
                     let input_left;
-                    if (gates_map_of_ids[input_left_id]) {
+                    if (/^\d+$/.test(input_left_id)) {
+                        input_left = { getValue: () => parseInt(input_left_id) };
+                    } else if (gates_map_of_ids[input_left_id]) {
                         input_left = gates_map_of_ids[input_left_id];
                     } else {
                         input_left = new Gate(input_left_id);
@@ -119,7 +175,9 @@ class Circuit {
                     }
 
                     let input_right;
-                    if (gates_map_of_ids[input_right_id]) {
+                    if (/^\d+$/.test(input_right_id)) {
+                        input_right = { getValue: () => parseInt(input_right_id) };
+                    } else if (gates_map_of_ids[input_right_id]) {
                         input_right = gates_map_of_ids[input_right_id];
                     } else {
                         input_right = new Gate(input_right_id);
@@ -128,13 +186,15 @@ class Circuit {
 
                     output_gate.input = {
                         gates: [input_left, input_right],
-                        operator: 'AND'
+                        operator: 'AND',
                     };
                 } else if (input.includes(' OR ')) {
                     let [input_left_id, input_right_id] = input.split(' OR ');
 
                     let input_left;
-                    if (gates_map_of_ids[input_left_id]) {
+                    if (/^\d+$/.test(input_left_id)) {
+                        input_left = { getValue: () => parseInt(input_left_id) };
+                    } else if (gates_map_of_ids[input_left_id]) {
                         input_left = gates_map_of_ids[input_left_id];
                     } else {
                         input_left = new Gate(input_left_id);
@@ -142,7 +202,9 @@ class Circuit {
                     }
 
                     let input_right;
-                    if (gates_map_of_ids[input_right_id]) {
+                    if (/^\d+$/.test(input_right_id)) {
+                        input_right = { getValue: () => parseInt(input_right_id) };
+                    } else if (gates_map_of_ids[input_right_id]) {
                         input_right = gates_map_of_ids[input_right_id];
                     } else {
                         input_right = new Gate(input_right_id);
@@ -151,18 +213,8 @@ class Circuit {
 
                     output_gate.input = {
                         gates: [input_left, input_right],
-                        operator: 'OR'
+                        operator: 'OR',
                     };
-                } else {
-                    // Input is just a plain gate
-                    let input_gate;
-                    if (gates_map_of_ids[input]) {
-                        input_gate = gates_map_of_ids[input];
-                    } else {
-                        input_gate = new Gate(input);
-                    }
-    
-                    output_gate.input = input_gate;
                 }
             }
         });
