@@ -46,7 +46,7 @@ while (device.run()) {
     if (device.registers[instruction_pointer] === 28) {
         if (!stops[d]) {
             stops[d] = true;
-            console.log(d + '\t' + num_of_executions + '\t' + (new Date()))
+            console.log(d + '\t' + num_of_executions + '\t' + (new Date()).toTimeString())
             stops_length++;
         }
         // } else {
