@@ -2,6 +2,12 @@ const ROCKY = 0;
 const WET = 1;
 const NARROW = 2;
 
+let TYPES_LOOKUP = {
+    [ROCKY]: '.',
+    [WET]: '=',
+    [NARROW]: '|',
+};
+
 const colors = require('colors');
 const distance = require('manhattan');
 class Cave {
@@ -84,6 +90,30 @@ class Cave {
         return sum;
     }
 
+    printGrid(size_x, size_y) {
+        size_x = size_x === undefined ? this.depth - 1 : size_x;
+        size_y = size_y === undefined ? this.depth - 1 : size_y;
+
+        let grid_str = '';
+
+        for (let y = 0; y < size_y; y++) {
+            for (let x = 0; x < size_x; x++) {
+                let cell = this.grid[y][x];
+                if (x === 0 && y === 0) {
+                    grid_str += 'M';
+                } else if (x === this.target_x && y === this.target_y) {
+                    grid_str += 'T';
+                } else {
+                    grid_str += TYPES_LOOKUP[cell.type];
+                }
+            }
+
+            grid_str += '\n';
+        }
+
+        return grid_str;
+    }
+
     walkToTarget() {
         let x = 0,
             y = 0,
@@ -154,17 +184,30 @@ class Cave {
                     };
                 });
 
+            // movements.sort((a, b) => {
+            //     if (a.value < b.value) return -1;
+            //     else if (a.value > b.value) return 1;
+            //     else {
+            //         if (a.distance < b.distance) return -1;
+            //         else if (a.distance > b.distance) return 1;
+            //         else return 0;
+            //     }
+            // });
+
             movements.sort((a, b) => {
-                if (a.value < b.value) return -1;
-                else if (a.value > b.value) return 1;
+                if (a.distance < b.distance) return -1;
+                else if (a.distance > b.distance) return 1;
                 else {
-                    if (a.distance < b.distance) return -1;
-                    else if (a.distance > b.distance) return 1;
+                    if (a.value < b.value) return -1;
+                    else if (a.value > b.value) return 1;
                     else return 0;
                 }
             });
+
             console.log(
-                'With '.yellow + equipped.toUpperCase().magenta + ' equipped, available directions are: '.yellow
+                'With '.yellow +
+                    equipped.toUpperCase().magenta +
+                    ' equipped, available directions are: '.yellow
             );
             console.log(
                 movements
