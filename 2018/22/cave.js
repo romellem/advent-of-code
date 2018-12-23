@@ -18,7 +18,7 @@ let TYPES_LOOKUP = {
 };
 
 class Cave {
-    constructor(depth, target_coords) {
+    constructor(depth, target_coords, x_padding = 40, y_padding = 1) {
         /**
          * Originally has memory issues when creating a grid that was `depth by depth`
          * size, but was able to fix that with.
@@ -26,8 +26,8 @@ class Cave {
          *     node --max_old_space_size=4096 ./part-one.js`
          *
          * However, I don't actually need the full grid, so
-         * I'm creating a grid of largest by largest, with some buffer
-         * around the edges (50 cells).
+         * I'm creating a grid of largest by largest, with some
+         * buffer / padding around the edges.
          *
          */
         // let grid_size = target_coords[0] + target_coords[1] + 2;
@@ -38,9 +38,9 @@ class Cave {
         this.target_x = target_coords[0];
         this.target_y = target_coords[1];
 
-        this.grid = Array(this.target_y + 50)
+        this.grid = Array(this.target_y + y_padding)
             .fill()
-            .map(row => Array(this.target_x + 50).fill());
+            .map(row => Array(this.target_x + x_padding).fill());
 
         this.fillGrid();
 
