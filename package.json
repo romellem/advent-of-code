@@ -21,6 +21,7 @@
     "generatorics": "^1.1.0",
     "get-divisors": "^1.0.0",
     "jimp": "^0.6.0",
+    "jsnetworkx": "^0.3.4",
     "lodash": "^4.17.11",
     "manhattan": "^1.0.0",
     "table": "^5.1.1",

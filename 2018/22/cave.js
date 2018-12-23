@@ -1,6 +1,15 @@
+const colors = require('colors');
+const distance = require('manhattan');
+const jsnx = require('jsnetworkx');
+const { intersection } = require('lodash');
+
 const ROCKY = 0;
 const WET = 1;
 const NARROW = 2;
+
+const NEITHER = 0;
+const GEAR = 1;
+const TORCH = 2;
 
 let TYPES_LOOKUP = {
     [ROCKY]: '.',
@@ -8,14 +17,17 @@ let TYPES_LOOKUP = {
     [NARROW]: '|',
 };
 
-const colors = require('colors');
-const distance = require('manhattan');
 class Cave {
     constructor(depth, target_coords) {
         /**
-         * Used the below code for Part One, due to memory issues, but that can be fixed with
+         * Originally has memory issues when creating a grid that was `depth by depth`
+         * size, but was able to fix that with.
          *
          *     node --max_old_space_size=4096 ./part-one.js`
+         *
+         * However, I don't actually need the full grid, so
+         * I'm creating a grid of largest by largest, with some buffer
+         * around the edges (50 cells).
          *
          */
         // let grid_size = target_coords[0] + target_coords[1] + 2;
@@ -30,53 +42,93 @@ class Cave {
         this.target_y = target_coords[1];
 
         this.fillGrid();
+
+        this.directedGraph = this.createDirectedGraphFromGrid();
+    }
+
+    allowedTools(x, y) {
+        let { type } = this.grid[y][x];
+        if (type === ROCKY) return [GEAR, TORCH];
+        if (type === WET) return [NEITHER, GEAR];
+        if (type === NARROW) return [NEITHER, TORCH];
+    }
+
+    getValidNeighborCoords(x, y) {
+        let left = x > 0 ? [x - 1, y] : null,
+            right = x < this.grid.length - 1 ? [x + 1, y] : null,
+            up = y > 0 ? [x, y - 1] : null,
+            down = y < this.grid.length - 1 ? [x, y + 1] : null;
+
+        return [left, right, up, down].filter(n => n);
     }
 
     fillGrid() {
         // Zig zag walk
 
-        let i = 1,
-            j = 1;
-        for (let e = 0; e < this.grid.length * this.grid.length; e++) {
-            let x = i - 1;
-            let y = j - 1;
+        for (let y = 0; y < this.grid.length; y++) {
+            // Our grid is a square, so we can use the height for this inner loop and it'll work out
+            for (let x = 0; x < this.grid.length; x++) {
+                // console.log(`${x},${y}`);
 
-            // console.log(`${x},${y}`);
+                let index;
+                if (x === 0 && y === 0) {
+                    index = 0;
+                } else if (x === this.target_x && y === this.target_y) {
+                    index = 0;
+                } else if (y === 0) {
+                    index = x * 16807;
+                } else if (x === 0) {
+                    index = y * 48271;
+                } else {
+                    index = this.grid[y - 1][x].erosion * this.grid[y][x - 1].erosion;
+                }
 
-            let index;
-            if (x === 0 && y === 0) {
-                index = 0;
-            } else if (x === this.target_x && y === this.target_y) {
-                index = 0;
-            } else if (y === 0) {
-                index = x * 16807;
-            } else if (x === 0) {
-                index = y * 48271;
-            } else {
-                index = this.grid[y - 1][x].erosion * this.grid[y][x - 1].erosion;
-            }
+                let erosion = (index + this.depth) % 20183;
+                let type = erosion % 3;
 
-            let erosion = (index + this.depth) % 20183;
-            let type = erosion % 3;
-
-            this.grid[y][x] = {
-                index,
-                erosion,
-                type,
-            };
-
-            if ((i + j) % 2 === 0) {
-                // Even stripes
-                if (j < this.grid.length) j++;
-                else i += 2;
-                if (i > 1) i--;
-            } else {
-                // Odd stripes
-                if (i < this.grid.length) i++;
-                else j += 2;
-                if (j > 1) j--;
+                this.grid[y][x] = {
+                    index,
+                    erosion,
+                    type,
+                };
             }
         }
+    }
+
+    createDirectedGraphFromGrid() {
+        const G = new jsnx.DiGraph();
+        for (let y = 0; y < this.grid.length; y++) {
+            for (let x = 0; x < this.grid.length; x++) {
+                // First, add "switching tools" edge
+                let allowed_tools = this.allowedTools(x, y);
+                let [tool_a, tool_b] = allowed_tools;
+
+                // Switch tools (moving in third dimension) has a weight of 7
+                G.addEdge(`${x},${y},${tool_a}`, `${x},${y},${tool_b}`, { weight: 7 });
+                G.addEdge(`${x},${y},${tool_b}`, `${x},${y},${tool_a}`, { weight: 7 });
+
+                // Next, add regular movement between neighbors where it is allowed
+
+                let neighbors = this.getValidNeighborCoords(x, y);
+                neighbors.forEach(neighbor => {
+                    let [neighbor_x, neighbor_y] = neighbor;
+
+                    //
+                    let valid_tools_between_current_and_neighbor = intersection(
+                        allowed_tools,
+                        this.allowedTools(neighbor_x, neighbor_y)
+                    );
+
+                    valid_tools_between_current_and_neighbor.forEach(tool => {
+                        G.addEdge(`${x},${y},${tool}`, `${neighbor_x},${neighbor_y},${tool}`, {
+                            weight: 1,
+                        });
+                    });
+                });
+            }
+        }
+
+        return G;
     }
 
     getSumOfTypesFromOriginToTarget() {
@@ -115,176 +167,12 @@ class Cave {
         return grid_str;
     }
 
-    walkToTarget() {
-        let x = 0,
-            y = 0,
-            previous_cell_x,
-            previous_cell_y;
-        let equipped = 'torch';
-        let current_cell;
-
-        let time_moving = 0;
-
-        const target_coords = [this.target_x, this.target_y];
-
-        let q = 0;
-        while (`${x},${y}` !== `${this.target_x},${this.target_y}` && ++q < 60) {
-            current_cell = this.grid[y][x];
-            const current_distance = distance([x, y], target_coords);
-
-            let left = x > 0 ? (x - 1 === previous_cell_x ? null : [x - 1, y]) : null,
-                right =
-                    x < this.grid.length - 1
-                        ? x + 1 === previous_cell_x
-                            ? null
-                            : [x + 1, y]
-                        : null,
-                up = y > 0 ? (y - 1 === previous_cell_y ? null : [x, y - 1]) : null,
-                down =
-                    y < this.grid.length - 1
-                        ? y + 1 === previous_cell_y
-                            ? null
-                            : [x, y + 1]
-                        : null;
-
-            let movements = [
-                { coords: left, direction: 'left' },
-                { coords: right, direction: 'right' },
-                { coords: up, direction: 'up' },
-                { coords: down, direction: 'down' },
-            ]
-                .filter(n => n.coords)
-                .map(({ coords, direction }) => {
-                    let [to_x, to_y] = coords;
-                    let move_to_cell = this.grid[to_y][to_x];
-
-                    let value;
-                    if (equipped === 'torch') {
-                        // move between rocky (0) and narrow (2) regions
-                        value = move_to_cell.type === WET ? 8 : 1;
-                    } else if (equipped === 'gear') {
-                        // move between rocky (0) and wet (1)
-                        value = move_to_cell.type === NARROW ? 8 : 1;
-                    } else {
-                        // Neither equipped,
-                        // move between wet (1) and narrow (2)
-                        value = move_to_cell.type === ROCKY ? 8 : 1;
-                    }
-
-                    return {
-                        coords,
-                        distance: distance(coords, target_coords),
-                        value,
-                        direction,
-                        moveToType:
-                            move_to_cell.type === ROCKY
-                                ? 'ROCKY'
-                                : move_to_cell.type === WET
-                                ? 'WET'
-                                : 'NARROW',
-                    };
-                });
-
-            // movements.sort((a, b) => {
-            //     if (a.value < b.value) return -1;
-            //     else if (a.value > b.value) return 1;
-            //     else {
-            //         if (a.distance < b.distance) return -1;
-            //         else if (a.distance > b.distance) return 1;
-            //         else return 0;
-            //     }
-            // });
-
-            movements.sort((a, b) => {
-                if (a.distance < b.distance) return -1;
-                else if (a.distance > b.distance) return 1;
-                else {
-                    if (a.value < b.value) return -1;
-                    else if (a.value > b.value) return 1;
-                    else return 0;
-                }
-            });
-
-            console.log(
-                'With '.yellow +
-                    equipped.toUpperCase().magenta +
-                    ' equipped, available directions are: '.yellow
-            );
-            console.log(
-                movements
-                    .map(m => {
-                        let new_distance = m.distance;
-                        return (
-                            '' +
-                            m.direction.cyan +
-                            ' to [' +
-                            m.coords.join(', ').blue +
-                            '], a ' +
-                            m.moveToType.magenta +
-                            ' type with value of ' +
-                            m.value.toString().magenta +
-                            ' (' +
-                            (new_distance < current_distance ? 'CLOSER'.green : 'FURTHER'.red) +
-                            ' by ' +
-                            Math.abs(new_distance - current_distance).toString().green +
-                            ')'
-                        );
-                    })
-                    .join('\n')
-            );
-            console.log('');
-
-            // Will this work? I don't know, but take the best movement and see if we have to switch
-            let best_movement = movements[0];
-            console.log(
-                `${best_movement.direction.toUpperCase()} to [${best_movement.coords.join(', ')}]`
-            );
-
-            if (best_movement.value > 1) {
-                let previously_equipped = equipped;
-                // We have to switch, but what to switch to?
-                // Some switching is not allowed
-                // e.g., For example, if you are in a ROCKY region, you can switch from
-                //       the TORCH to the GEAR, but you cannot switch to NEITHER.
-
-                if (equipped === 'torch') {
-                    // Switch to NEITHER or GEAR
-                    if (current_cell.type === ROCKY) {
-                        equipped = 'gear';
-                    } else {
-                        equipped = 'neither';
-                    }
-                } else if (equipped === 'gear') {
-                    // Switch to TORCH or NEITHER
-                    if (current_cell.type === ROCKY) {
-                        equipped = 'torch';
-                    } else {
-                        equipped = 'neither';
-                    }
-                } else {
-                    // Switch to TORCH or GEAR
-                    if (current_cell.type === WET) {
-                        equipped = 'gear';
-                    } else {
-                        equipped = 'torch';
-                    }
-                }
-
-                console.log(`\tSwitching from ${previously_equipped} to ${equipped}`);
-            }
-
-            time_moving += best_movement.value;
-
-            previous_cell_x = x;
-            previous_cell_y = y;
-
-            x = best_movement.coords[0];
-            y = best_movement.coords[1];
-
-            console.log('================');
-        }
-
-        return time_moving;
+    getShortestPathToTarget() {
+        return jsnx.dijkstraPathLength(this.directedGraph, {
+            // From 0,0 with Torch equipped, to are target, also with the torch equipped
+            source: `0,0,${TORCH}`,
+            target: `${this.target_x},${this.target_y},${TORCH}`,
+        });
     }
 }
 
