@@ -6,4 +6,4 @@ let cave = new Cave(5616, [10, 785]);
 
 // console.log(cave.printGrid(16, 16))
 
-console.log(cave.getShortestPathToTarget())
+console.log(cave.getShortestPathLengthToTarget())

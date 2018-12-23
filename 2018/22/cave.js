@@ -32,14 +32,15 @@ class Cave {
          */
         // let grid_size = target_coords[0] + target_coords[1] + 2;
         // let grid_size = depth;
-        let grid_size = Math.max.apply(null, target_coords) + 50;
+        // let grid_size = Math.max.apply(null, target_coords) + 50;
 
         this.depth = depth;
-        this.grid = Array(grid_size)
-            .fill()
-            .map(row => Array(grid_size).fill());
         this.target_x = target_coords[0];
         this.target_y = target_coords[1];
+
+        this.grid = Array(this.target_y + 50)
+            .fill()
+            .map(row => Array(this.target_x + 50).fill());
 
         this.fillGrid();
 
@@ -55,7 +56,7 @@ class Cave {
 
     getValidNeighborCoords(x, y) {
         let left = x > 0 ? [x - 1, y] : null,
-            right = x < this.grid.length - 1 ? [x + 1, y] : null,
+            right = x < this.grid[0].length - 1 ? [x + 1, y] : null,
             up = y > 0 ? [x, y - 1] : null,
             down = y < this.grid.length - 1 ? [x, y + 1] : null;
 
@@ -66,8 +67,7 @@ class Cave {
         // Zig zag walk
 
         for (let y = 0; y < this.grid.length; y++) {
-            // Our grid is a square, so we can use the height for this inner loop and it'll work out
-            for (let x = 0; x < this.grid.length; x++) {
+            for (let x = 0; x < this.grid[0].length; x++) {
                 // console.log(`${x},${y}`);
 
                 let index;
@@ -98,7 +98,7 @@ class Cave {
     createDirectedGraphFromGrid() {
         const G = new jsnx.DiGraph();
         for (let y = 0; y < this.grid.length; y++) {
-            for (let x = 0; x < this.grid.length; x++) {
+            for (let x = 0; x < this.grid[0].length; x++) {
                 // First, add "switching tools" edge
                 let allowed_tools = this.allowedTools(x, y);
                 let [tool_a, tool_b] = allowed_tools;
@@ -144,8 +144,8 @@ class Cave {
     }
 
     printGrid(size_x, size_y) {
-        size_x = size_x === undefined ? this.depth - 1 : size_x;
-        size_y = size_y === undefined ? this.depth - 1 : size_y;
+        size_x = size_x === undefined ? this.grid[0].length : size_x;
+        size_y = size_y === undefined ? this.grid.length : size_y;
 
         let grid_str = '';
 
@@ -167,12 +167,28 @@ class Cave {
         return grid_str;
     }
 
-    getShortestPathToTarget() {
+    getShortestPathLengthToTarget() {
         return jsnx.dijkstraPathLength(this.directedGraph, {
-            // From 0,0 with Torch equipped, to are target, also with the torch equipped
+            // From 0,0 with Torch equipped, to our target, also with the torch equipped
             source: `0,0,${TORCH}`,
             target: `${this.target_x},${this.target_y},${TORCH}`,
         });
+    }
+
+    getShortestPathToTarget() {
+        return jsnx.dijkstraPath(this.directedGraph, {
+            // From `0,0 with Torch equipped`, to our `target, also with the torch equipped`
+            source: `0,0,${TORCH}`,
+            target: `${this.target_x},${this.target_y},${TORCH}`,
+        });
+    }
+
+    getGraphNodes(optData = false) {
+        return this.directedGraph.nodes(optData);
+    }
+
+    getGraphEdges(optData) {
+        return this.directedGraph.edges(optData);
     }
 }
 
