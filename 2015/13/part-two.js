@@ -12,10 +12,11 @@ unique_people.forEach(person => {
 });
 
 // Add in yourself
-unique_people.push('you');
-happiness_lookup['you'] = { happinessChangeSittingNextTo: {} };
+const YOURSELF = 'You';
+unique_people.push(YOURSELF);
+happiness_lookup[YOURSELF] = { happinessChangeSittingNextTo: {} };
 unique_people.forEach(person => {
-    happiness_lookup['you'].happinessChangeSittingNextTo[person] = 0;
+    happiness_lookup[YOURSELF].happinessChangeSittingNextTo[person] = 0;
 });
 
 input.forEach(info => {
@@ -23,7 +24,7 @@ input.forEach(info => {
     happiness_lookup[person].happinessChangeSittingNextTo[sittingNextTo] = happinessChange;
 
     // This gets set multiple times, but that is OK
-    happiness_lookup[person].happinessChangeSittingNextTo['you'] = 0;
+    happiness_lookup[person].happinessChangeSittingNextTo[YOURSELF] = 0;
 });
 
 let max_happiness = 0;
