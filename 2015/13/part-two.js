@@ -1,48 +1,62 @@
+const G = require('generatorics');
+const { uniq } = require('lodash');
 const input = require('./input');
-const traverse = require('traverse');
 
-let paths_that_contain_red_lookup = {};
+let unique_people = uniq(input.map(p => p.person));
+const happiness_lookup = {};
 
-let traversed = traverse(input);
-
-// Use a regular function so it can have its `this` keyword bound!
-traversed.forEach(function(val) {
-    // Don't blacklist a path if the parent is an array
-    if (val === 'red' && !Array.isArray(this.parent.node)) {
-        // Make a copy so we can modify it
-        let parent_path = this.path.slice(0);
-
-        // Remove the current node so we only have the parent path
-        parent_path.pop();
-
-        paths_that_contain_red_lookup[parent_path.join(',')] = true;
-    }
+unique_people.forEach(person => {
+    happiness_lookup[person] = {
+        happinessChangeSittingNextTo: {},
+    };
 });
 
-// Now that we know all the paths with 'red', traverse our whole tree again,
-// but skip any paths that contain 'red'
-
-let paths_that_contain_red = Object.keys(paths_that_contain_red_lookup);
-
-let sum = 0;
-traversed.forEach(function(val) {
-    // If we have a number, check that its sibling / parent doesn't have 'red' anywhere
-    if (typeof val === 'number') {
-        let path = this.path.join(',');
-
-        let val_has_bad_parent_or_sibling = false;
-        for (let i = 0; i < paths_that_contain_red.length; i++) {
-            let bad_path = paths_that_contain_red[i];
-            if (path.indexOf(bad_path) === 0) {
-                val_has_bad_parent_or_sibling = true;
-                break;
-            }
-        }
-
-        if (!val_has_bad_parent_or_sibling) {
-            sum += val;
-        }
-    }
+// Add in yourself
+unique_people.push('you');
+happiness_lookup['you'] = { happinessChangeSittingNextTo: {} };
+unique_people.forEach(person => {
+    happiness_lookup['you'].happinessChangeSittingNextTo[person] = 0;
 });
 
-console.log(sum);
+input.forEach(info => {
+    let { person, happinessChange, sittingNextTo } = info;
+    happiness_lookup[person].happinessChangeSittingNextTo[sittingNextTo] = happinessChange;
+
+    // This gets set multiple times, but that is OK
+    happiness_lookup[person].happinessChangeSittingNextTo['you'] = 0;
+});
+
+let max_happiness = 0;
+let best_seating_arrangement = '';
+for (let seating_arrangement of G.permutation(unique_people)) {
+    let total_happiness = 0;
+    seating_arrangement.forEach((person, index) => {
+        let left, right;
+        if (index === 0) {
+            // First person
+            left = seating_arrangement[seating_arrangement.length - 1];
+            right = seating_arrangement[index + 1];
+        } else if (index === seating_arrangement.length - 1) {
+            // Last person
+            left = seating_arrangement[index - 1];
+            right = seating_arrangement[0];
+        } else {
+            left = seating_arrangement[index - 1];
+            right = seating_arrangement[index + 1];
+        }
+
+        let left_change = happiness_lookup[person].happinessChangeSittingNextTo[left];
+        let right_change = happiness_lookup[person].happinessChangeSittingNextTo[right];
+
+        total_happiness += left_change + right_change;
+    });
+
+    if (total_happiness > max_happiness) {
+        max_happiness = total_happiness;
+        best_seating_arrangement = seating_arrangement.join(',');
+    }
+}
+
+console.log(
+    `With a seating arrangment of ${best_seating_arrangement}, we max the hapiness at\n${max_happiness}`
+);
