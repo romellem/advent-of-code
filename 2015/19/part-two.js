@@ -1,20 +1,21 @@
-const { sampleInput, splitMolecule } = require('./input');
-let { rules, initialState } = sampleInput;
+// const { sampleInput, splitMolecule } = require('./input');
+// let { rules, initialState } = sampleInput;
 // initialState = 'HOHOHO'.split('');
 
-// const { input, splitMolecule } = require('./input');
-// const { rules, initialState } = input;
-const trampoline = fn => (...args) => {
-    let result = fn(...args);
-
-    while (typeof result === 'function') {
-        result = result();
-    }
-
-    return result;
-};
+const { input, splitMolecule } = require('./input');
+const { rules, initialState } = input;
 
 let valid_solutions_length = {};
+let fn_stack = [];
+const trampoline = fn => (...args) => {
+    // Run our function
+    fn(...args);
+
+    while (fn_stack.length) {
+        let result = fn_stack.pop();
+        result();
+    }
+};
 
 // const growMoleculesFromSeedRec = (seed = ['e'], step = 0) => {
 const growMoleculesFromSeedRec = (seed, step) => {
@@ -28,13 +29,12 @@ const growMoleculesFromSeedRec = (seed, step) => {
         for (let i = 0; i < seed.length; i++) {
             let element = seed[i];
             if (rules[element]) {
-                let paths = rules[element];
-                for (let e = 0; e < paths.length; e++) {
-                    let grow_to = paths[e];
+                for (let e = 0; e < rules[element].length; e++) {
+                    let grow_to = rules[element][e];
                     let growth = seed.slice(0);
                     growth[i] = grow_to;
                     growth = splitMolecule(growth.join(''));
-                    return () => growMoleculesFromSeedRec(growth, step + 1);
+                    fn_stack.push(() => growMoleculesFromSeedRec(growth, step + 1));
                 }
             }
         }
