@@ -6,6 +6,8 @@ const input_map = require('./input');
 
 const input = Object.keys(input_map).map(ingredient => {
     let ingredient_stats = JSON.parse(JSON.stringify(input_map[ingredient]));
+
+    // Adds name for completeness sake
     ingredient_stats['name'] = ingredient;
 
     return ingredient_stats;
@@ -47,18 +49,21 @@ for (amounts_range of G.combination(ingredients, NUMBER_OF_INGREDIENTS - 1)) {
 
     assert.strictEqual(total_ingredients_verification, TOTAL_TEASPOONS);
 
-    // let total_calories = input.map((v, i) => v.calories * amounts[i]).reduce((a, b) => a + b);
-    // if (total_calories === CALORIES_PER_COOKIE) {
-        let total_score = ['capacity', 'durability', 'flavor', 'texture']
-            .map(quality => input.map((v, i) => v[quality] * amounts[i]).reduce((a, b) => a + b))
-            .map(v => (v < 0 ? 0 : v))
-            .reduce((a, b) => a * b);
+    /**
+     * Part one doesn't care about calories, so don't bother computing it
+     * and checking if it is a requirement for computing the score
+     * of the recipe
+     */
 
-        if (total_score > best_recipe_score) {
-            // console.log(`New best of ${total_score} with breakdown of ${amounts.join(',')}`);
-            best_recipe_score = total_score;
-        }
-    // }
+    let total_score = ['capacity', 'durability', 'flavor', 'texture']
+        .map(quality => input.map((v, i) => v[quality] * amounts[i]).reduce((a, b) => a + b))
+        .map(v => (v < 0 ? 0 : v))
+        .reduce((a, b) => a * b);
+
+    if (total_score > best_recipe_score) {
+        // console.log(`New best of ${total_score} with breakdown of ${amounts.join(',')}`);
+        best_recipe_score = total_score;
+    }
 }
 
 console.log('===========');
