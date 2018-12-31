@@ -44,9 +44,9 @@ const plain_rules = [
     ['e', 'OMg'],
 ];
 
+const isUpperCase = /[A-Z]/;
 const splitMolecule = (molecule) => {
     let mol_arr = [];
-    const isUpperCase = /[A-Z]/;
     let acc = molecule[0];
     for (let i = 1; i < molecule.length; i++) {
         let char = molecule[i];

@@ -7,18 +7,22 @@ const { rules, initialState } = input;
 
 let valid_solutions_length = {};
 let fn_stack = [];
+let growMoleculesFromSeedRec;
 const trampoline = fn => (...args) => {
     // Run our function
     fn(...args);
 
     while (fn_stack.length) {
         let result = fn_stack.pop();
-        result();
+        let [growth, step] = result.split('|');
+        growth = splitMolecule(growth);
+        step = +step;
+        growMoleculesFromSeedRec(growth, step);
     }
 };
 
 // const growMoleculesFromSeedRec = (seed = ['e'], step = 0) => {
-const growMoleculesFromSeedRec = (seed, step) => {
+growMoleculesFromSeedRec = (seed, step) => {
     // If we are at the max length, test our growth to break out of our recursive loop
     if (seed.length === initialState.length) {
         if (seed.join('') === initialState.join('')) {
@@ -33,8 +37,7 @@ const growMoleculesFromSeedRec = (seed, step) => {
                     let grow_to = rules[element][e];
                     let growth = seed.slice(0);
                     growth[i] = grow_to;
-                    growth = splitMolecule(growth.join(''));
-                    fn_stack.push(() => growMoleculesFromSeedRec(growth, step + 1));
+                    fn_stack.push(`${growth.join('')}|${step + 1}`);
                 }
             }
         }
