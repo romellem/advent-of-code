@@ -8,24 +8,32 @@ const { rules, initialState } = input;
 let valid_solutions_length = {};
 let fn_stack = [];
 let growMoleculesFromSeedRec;
+
+let loop = 0;
 const trampoline = fn => (...args) => {
     // Run our function
     fn(...args);
 
     while (fn_stack.length) {
+        ++loop;
+        
         let result = fn_stack.pop();
         let [growth, step] = result.split('|');
         growth = splitMolecule(growth);
         step = +step;
         growMoleculesFromSeedRec(growth, step);
+
+        if (loop % 2473 === 0) {
+            process.stdout.write(loop.toLocaleString() + '\r');
+        }
     }
 };
 
 // const growMoleculesFromSeedRec = (seed = ['e'], step = 0) => {
 growMoleculesFromSeedRec = (seed, step) => {
     // If we are at the max length, test our growth to break out of our recursive loop
-    if (seed.length === initialState.length) {
-        if (seed.join('') === initialState.join('')) {
+    if (seed.length >= initialState.length) {
+        if (seed.length === initialState.length && seed.join('') === initialState.join('')) {
             // We only care about how many steps, not what those steps were
             valid_solutions_length[step] = true;
         }
@@ -46,6 +54,8 @@ growMoleculesFromSeedRec = (seed, step) => {
 
 const growMoleculesFromSeed = trampoline(growMoleculesFromSeedRec);
 growMoleculesFromSeed(['e'], 0);
+
+console.log('\n\nAfter ' + loop.toLocaleString() + ' loops...\n\n');
 
 let valid_solutions = Object.keys(valid_solutions_length).map(n => +n);
 valid_solutions.sort((a, b) => a - b);
