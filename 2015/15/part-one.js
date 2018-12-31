@@ -16,7 +16,7 @@ const NUMBER_OF_INGREDIENTS = input.length;
  * OK, this is a bit confusing, but I remember this back in my college stats class.
  * Essentially, we use a trick of combinations [e.g. (k choose n)], to help us
  * iterate all the possible ways we can split a number into finite groups.
- * 
+ *
  * Let's simplify it: pretend we have 10 total teaspoons to work with, and 3 ingredients.
  * How many different ways
  */
@@ -36,6 +36,12 @@ for (amounts_range of G.combination(ingredients, NUMBER_OF_INGREDIENTS - 1)) {
             ingredients.length - perm_of_amounts[2] - 2,
         ];
 
+        let temp_total_igredients = amounts.reduce((a, b) => a + b);
+        if (temp_total_igredients !== TOTAL_TEASPOONS) {
+            console.log('ERROR with amount breakdown:');
+            console.log(amounts);
+        }
+
         // Part one ignores calories
         let total_score = ['capacity', 'durability', 'flavor', 'texture']
             .map(quality => input.map((v, i) => v[quality] * amounts[i]).reduce((a, b) => a + b))
@@ -43,9 +49,15 @@ for (amounts_range of G.combination(ingredients, NUMBER_OF_INGREDIENTS - 1)) {
             .reduce((a, b) => a * b);
 
         if (total_score > best_recipe_score) {
+            console.log(
+                `New best of ${total_score} with breakdown of ${amounts.join(
+                    ','
+                )} (total ${temp_total_igredients})`
+            );
             best_recipe_score = total_score;
         }
     }
 }
 
+console.log('===========');
 console.log(best_recipe_score);
