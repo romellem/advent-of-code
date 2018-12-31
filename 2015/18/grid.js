@@ -2,8 +2,27 @@ const ON = '#';
 const OFF = '.';
 
 class Grid {
-    constructor(initial_grid_state) {
+    constructor(initial_grid_state, stuck_corners = false) {
         this.grid = JSON.parse(JSON.stringify(initial_grid_state));
+        this.stuck_corners = stuck_corners;
+
+        if (this.stuck_corners) {
+            let y = this.grid.length - 1;
+            let x = this.grid[0].length - 1;
+
+            this.grid[0][0] = true;
+            this.grid[y][0] = true;
+            this.grid[y][x] = true;
+            this.grid[0][x] = true;
+        }
+    }
+
+    coordIsCorner(x, y) {
+        if (y === 0 || y === this.grid.length - 1) {
+            return x === 0 || x === this.grid[0].length - 1;
+        }
+
+        return false;
     }
 
     getNeighbors(x, y) {
@@ -41,7 +60,10 @@ class Grid {
                         else neighbors_off++;
                     });
 
-                    if (cell) {
+                    // For part two, the four corner are always in the ON state
+                    if (this.stuck_corners && this.coordIsCorner(x, y)) {
+                        new_grid_state[y][x] = true;
+                    } else if (cell) {
                         // A light which is _on_ stays on when 2 or 3 neighbors are on,
                         // and turns off otherwise.
                         new_grid_state[y][x] = neighbors_on === 2 || neighbors_on === 3;
@@ -73,7 +95,7 @@ class Grid {
     }
 
     printGrid() {
-        let grid_str = this.grid.map(row => row.map(c => c ? ON : OFF).join('')).join('\n');
+        let grid_str = this.grid.map(row => row.map(c => (c ? ON : OFF)).join('')).join('\n');
 
         console.log(grid_str + '\n');
     }
