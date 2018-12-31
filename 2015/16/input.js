@@ -1,6 +1,3 @@
-// Note, for my answers, I'll need to add `1` to the index
-// (in the problem, the Aunts are numbers 1 - 500, while here they
-// are of course zero-indexed).
 const SUES = [
     {number: 1, goldfish: 6, trees: 9, akitas: 0},
     {number: 2, goldfish: 7, trees: 1, akitas: 0},
