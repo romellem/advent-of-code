@@ -1,5 +1,5 @@
 class Reindeer {
-    constructor(name, stats) {
+    constructor(name, stats = {}) {
         this.name = name;
 
         this.speed = stats.speed;
@@ -12,6 +12,9 @@ class Reindeer {
 
         this.resting = false;
         this.timeLeftResting = 0;
+
+        // Part two is based on score
+        this.score = 0;
     }
 
     rest() {
@@ -40,6 +43,10 @@ class Reindeer {
             this.move();
         }
     }
+
+    increaseScore() {
+        this.score++;
+    }
 }
 class Race {
     constructor(reindeer_original, race_time) {
@@ -53,6 +60,18 @@ class Race {
     tick() {
         this.racers.forEach(r => r.tick());
         this.time++;
+
+        this.sortRunners();
+        let best_distance = this.racers[this.racers.length - 1].distance;
+
+        // This loop could be improved, starting at the back and breaking once
+        // we are in 2nd place. Oh well, the whole program runs pretty quickly
+        // without this optimization anyways.
+        this.racers.forEach(r => {
+            if (r.distance === best_distance) {
+                r.increaseScore();
+            }
+        });
     }
 
     run() {
@@ -61,22 +80,27 @@ class Race {
         }
     }
 
-    getPositions() {
-        let sorted_racers = [];
-        this.racers.forEach(r => sorted_racers.push(r));
+    sortRunners(by_score = false) {
+        let key = by_score ? 'score' : 'distance';
 
-        sorted_racers.sort((a, b) => {
-            if (a.distance < b.distance) return -1;
-            else if (a.distance > b.distance) return 1;
+        this.racers.sort((a, b) => {
+            if (a[key] < b[key]) return -1;
+            else if (a[key] > b[key]) return 1;
             else return 0;
         });
 
-        return sorted_racers;
+        return this.racers;
     }
 
     get winner() {
-        let sorted_racers = this.getPositions();
-        return sorted_racers.pop();
+        this.sortRunners();
+        return this.racers[this.racers.length - 1];
+    }
+
+    get winnerByScore() {
+        this.sortRunners(true);
+
+        return this.racers[this.racers.length - 1];
     }
 }
 
