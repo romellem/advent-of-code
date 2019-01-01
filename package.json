@@ -19,10 +19,10 @@
     "concurrently": "^4.1.0",
     "double-ended-queue": "^2.1.0-0",
     "generatorics": "^1.1.0",
+    "get-divisors": "^1.0.0",
     "jimp": "^0.6.0",
     "lodash": "^4.17.11",
     "manhattan": "^1.0.0",
-    "primes-and-factors": "^1.1.0",
     "table": "^5.1.1",
     "traverse": "^0.6.6"
   }

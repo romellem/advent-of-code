@@ -533,6 +533,11 @@ get-caller-file@^1.0.1:
   resolved "https://registry.yarnpkg.com/get-caller-file/-/get-caller-file-1.0.3.tgz#f978fa4c90d1dfe7ff2d6beda2a515e713bdcf4a"
   integrity sha512-3t6rVToeoZfYSGd8YoLFR2DJkiQrIiUrGcjvFX2mDw3bn6k2OtwHN0TNCLbBO+w8qTvimhDkv+LSscbJY1vE6w==
 
+get-divisors@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/get-divisors/-/get-divisors-1.0.0.tgz#b093c8bbb57843221119ee28d2046c0ac33504d7"
+  integrity sha1-sJPIu7V4QyIRGe4o0gRsCsM1BNc=
+
 get-stream@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/get-stream/-/get-stream-3.0.0.tgz#8e943d1358dc37555054ecbe2edb05aa174ede14"
@@ -906,11 +911,6 @@ pngjs@^3.0.0, pngjs@^3.3.3:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/pngjs/-/pngjs-3.3.3.tgz#85173703bde3edac8998757b96e5821d0966a21b"
   integrity sha512-1n3Z4p3IOxArEs1VRXnZ/RXdfEniAUS9jb68g58FIXMNkPJeZd+Qh4Uq7/e0LVxAQGos1eIUrqrt4FpjdnEd+Q==
-
-primes-and-factors@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/primes-and-factors/-/primes-and-factors-1.1.0.tgz#683902b5699c6390b99b151c8d2030b8d01fe262"
-  integrity sha512-zhj23iq9PiF2uGp1s4O6uRCaqzNMtsk6SzZf0r1bdpNNp/1SrOWo/xWurhg/TtTN/4dcZdL8u0xeSTbvfqcBrQ==
 
 process@~0.5.1:
   version "0.5.2"
