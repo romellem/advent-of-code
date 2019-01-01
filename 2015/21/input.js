@@ -1,4 +1,6 @@
 const G = require('generatorics');
+const HeroSet = require('./hero-set');
+
 /**
  * Weapons:    Cost  Damage  Armor
  * Dagger        8     4       0
@@ -167,26 +169,23 @@ for (let weapon of WEAPONS) {
             if (ring_names.includes('none2') && !ring_names.includes('none1')) {
                 // Then skip this set of rings so we don't duplicate the 1-ring instance
             } else {
-                HERO_SETS.push({
-                    weapon,
-                    armor,
-                    ringLeft: ring[0],
-                    ringRight: ring[1],
-                });
+                HERO_SETS.push(
+                    new HeroSet({
+                        weapon,
+                        armor,
+                        ringLeft: ring[0],
+                        ringRight: ring[1],
+                    })
+                );
             }
         }
     }
 }
 
-// Set total cost on each set to make things easier
-HERO_SETS.forEach(set => {
-    set.totalCost = set.weapon.cost + set.armor.cost + set.ringLeft.cost + set.ringRight.cost;
-});
-
 const BOSS_STATS = {
     hp: 103,
     damage: 9,
-    armor: 2
+    armor: 2,
 };
 
 module.exports = {
@@ -194,5 +193,5 @@ module.exports = {
     ARMOR,
     RINGS,
     HERO_SETS,
-    BOSS_STATS
+    BOSS_STATS,
 };
