@@ -533,6 +533,11 @@ get-caller-file@^1.0.1:
   resolved "https://registry.yarnpkg.com/get-caller-file/-/get-caller-file-1.0.3.tgz#f978fa4c90d1dfe7ff2d6beda2a515e713bdcf4a"
   integrity sha512-3t6rVToeoZfYSGd8YoLFR2DJkiQrIiUrGcjvFX2mDw3bn6k2OtwHN0TNCLbBO+w8qTvimhDkv+LSscbJY1vE6w==
 
+get-divisors@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/get-divisors/-/get-divisors-1.0.0.tgz#b093c8bbb57843221119ee28d2046c0ac33504d7"
+  integrity sha1-sJPIu7V4QyIRGe4o0gRsCsM1BNc=
+
 get-stream@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/get-stream/-/get-stream-3.0.0.tgz#8e943d1358dc37555054ecbe2edb05aa174ede14"
