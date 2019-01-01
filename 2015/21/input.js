@@ -170,16 +170,29 @@ for (let weapon of WEAPONS) {
                 HERO_SETS.push({
                     weapon,
                     armor,
-                    ring,
+                    ringLeft: ring[0],
+                    ringRight: ring[1],
                 });
             }
         }
     }
 }
 
+// Set total cost on each set to make things easier
+HERO_SETS.forEach(set => {
+    set.totalCost = set.weapon.cost + set.armor.cost + set.ringLeft.cost + set.ringRight.cost;
+});
+
+const BOSS_STATS = {
+    hp: 103,
+    damage: 9,
+    armor: 2
+};
+
 module.exports = {
     WEAPONS,
     ARMOR,
     RINGS,
     HERO_SETS,
+    BOSS_STATS
 };
