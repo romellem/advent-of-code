@@ -2,7 +2,7 @@
 
 |  Part 1  |  Part 2  |
 |----------|----------|
-| `665280` | ` ` |
+| `665280` | `705600` |
 
 ## --- Day 20: Infinite Elves and Infinite Houses ---
 
