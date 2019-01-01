@@ -1,8 +1,8 @@
 # Answers
 
-|  Part 1  |  Part 2  |
-|----------|----------|
-| ` ` | ` ` |
+| Part 1 | Part 2 |
+|--------|--------|
+|  `121` | ` ` |
 
 ## --- Day 21: RPG Simulator 20XX ---
 
@@ -54,3 +54,11 @@ For example, suppose you have `8` hit points, `5` damage, and `5` armor, and tha
 In this scenario, the player wins! (Barely.)
 
 You have _100 hit points_. The boss's actual stats are in your puzzle input. What is _the least amount of gold you can spend_ and still win the fight?
+
+-----------------
+
+## --- Part Two ---
+
+Turns out the shopkeeper is working with the boss, and can persuade you to buy whatever items he wants. The other rules still apply, and he still only has one of each item.
+
+What is the _most_ amount of gold you can spend and still _lose_ the fight?
