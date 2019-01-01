@@ -5,10 +5,17 @@
 const { input, splitMolecule } = require('./input');
 const { rules, initialState } = input;
 
+let which_e = process.argv[2] || '0';
+which_e = parseInt(which_e);
+
+let new_e = [rules['e'][which_e]];
+rules['e'] = new_e;
+
+console.log('Using the "e" rule at index ' + which_e + '...')
+console.log(rules['e'])
+
 let valid_solutions_length = {};
 let fn_stack = [];
-let growMoleculesFromSeedRec;
-
 let loop = 0;
 const trampoline = fn => (...args) => {
     // Run our function
@@ -16,13 +23,8 @@ const trampoline = fn => (...args) => {
 
     while (fn_stack.length) {
         ++loop;
-        
         let result = fn_stack.pop();
-        let [growth, step] = result.split('|');
-        growth = splitMolecule(growth);
-        step = +step;
-        growMoleculesFromSeedRec(growth, step);
-
+        result();
         if (loop % 2473 === 0) {
             process.stdout.write(loop.toLocaleString() + '\r');
         }
@@ -30,12 +32,14 @@ const trampoline = fn => (...args) => {
 };
 
 // const growMoleculesFromSeedRec = (seed = ['e'], step = 0) => {
-growMoleculesFromSeedRec = (seed, step) => {
+const growMoleculesFromSeedRec = (seed, step) => {
     // If we are at the max length, test our growth to break out of our recursive loop
     if (seed.length >= initialState.length) {
         if (seed.length === initialState.length && seed.join('') === initialState.join('')) {
             // We only care about how many steps, not what those steps were
             valid_solutions_length[step] = true;
+
+            console.log('                   \nSolution found! Took steps: ' + step);
         }
     } else {
         for (let i = 0; i < seed.length; i++) {
@@ -45,7 +49,8 @@ growMoleculesFromSeedRec = (seed, step) => {
                     let grow_to = rules[element][e];
                     let growth = seed.slice(0);
                     growth[i] = grow_to;
-                    fn_stack.push(`${growth.join('')}|${step + 1}`);
+                    growth = splitMolecule(growth.join(''));
+                    fn_stack.push(() => growMoleculesFromSeedRec(growth, step + 1));
                 }
             }
         }
