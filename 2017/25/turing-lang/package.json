@@ -1,0 +1,57 @@
+{
+  "_from": "turing-lang",
+  "_id": "turing-lang@0.0.1",
+  "_inBundle": false,
+  "_integrity": "sha1-HQofaNLyf1EIZQG6vMz9B5QFjNY=",
+  "_location": "/turing-lang",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "turing-lang",
+    "name": "turing-lang",
+    "escapedName": "turing-lang",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "https://registry.npmjs.org/turing-lang/-/turing-lang-0.0.1.tgz",
+  "_shasum": "1d0a1f68d2f27f51086501babcccfd0794058cd6",
+  "_spec": "turing-lang",
+  "_where": "/Users/matt.wade/git-repos/playground/npm-installs",
+  "author": {
+    "name": "Braulio Valdivielso"
+  },
+  "bugs": {
+    "url": "https://github.com/BraulioVM/turing-lang/issues"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "A turing machine interpreter",
+  "devDependencies": {
+    "babelify": "^6.1.0",
+    "grunt": "^0.4.5",
+    "grunt-babel": "^5.0.0",
+    "grunt-browserify": "^3.8.0",
+    "grunt-contrib-jshint": "^0.11.2",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-mocha-test": "^0.12.7",
+    "mocha": "^2.2.4",
+    "should": "^6.0.1"
+  },
+  "homepage": "https://github.com/BraulioVM/turing-lang#readme",
+  "license": "ISC",
+  "main": "lib/turing-lang.js",
+  "name": "turing-lang",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BraulioVM/turing-lang.git"
+  },
+  "scripts": {
+    "test": "grunt"
+  },
+  "version": "0.0.1"
+}
