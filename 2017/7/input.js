@@ -1,4 +1,4 @@
-const DATA = [
+const input = [
     { id: 'fjkfpm', weight: 69, children: ['kohxzh', 'liwvq', 'eqkio', 'xvoyybs'] },
     { id: 'dsiixv', weight: 52, children: [] },
     { id: 'fhimhm', weight: 66, children: [] },
@@ -1125,4 +1125,23 @@ const DATA = [
     { id: 'mwhraq', weight: 86, children: ['lwysj', 'lmgxknk'] },
 ];
 
-module.exports = DATA;
+const sampleInput = [
+    { id:'pbga', weight: 66, children: [] },
+    { id:'xhth', weight: 57, children: [] },
+    { id:'ebii', weight: 61, children: [] },
+    { id:'havc', weight: 66, children: [] },
+    { id:'ktlj', weight: 57, children: [] },
+    { id:'fwft', weight: 72, children: ['ktlj', 'cntj', 'xhth'] },
+    { id:'qoyq', weight: 66, children: [] },
+    { id:'padx', weight: 45, children: ['pbga', 'havc', 'qoyq'] },
+    { id:'tknk', weight: 41, children: ['ugml', 'padx', 'fwft'] },
+    { id:'jptl', weight: 61, children: [] },
+    { id:'ugml', weight: 68, children: ['gyxo', 'ebii', 'jptl'] },
+    { id:'gyxo', weight: 61, children: [] },
+    { id:'cntj', weight: 57, children: [] },
+];
+
+module.exports = {
+    sampleInput,
+    input
+};

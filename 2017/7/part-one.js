@@ -1,4 +1,4 @@
-const input = require('./input');
+const { input } = require('./input');
 const Tree = require('./tree');
 
 let tree = new Tree(input);
