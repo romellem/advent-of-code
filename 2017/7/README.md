@@ -2,7 +2,7 @@
 
 | Part 1  | Part 2 |
 |---------|--------|
-| `cqmvs` |  `265` |
+| `cqmvs` | `2310` |
 
 ## --- Day 7: Recursive Circus ---
 
