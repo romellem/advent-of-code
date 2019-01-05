@@ -99,8 +99,9 @@ class Program {
         this.instructions.forEach(instruction => {
             this.executeLine(instruction);
 
-            // Not very efficient but ¯\_(ツ)_/¯
-            let temp_max = Math.max.apply(null, Object.values(this.registers));
+            let { reg, cond_reg } = instruction;
+
+            let temp_max = Math.max(this.registers[reg], this.registers[cond_reg]);
             if (temp_max > largest) {
                 largest = temp_max;
             }
