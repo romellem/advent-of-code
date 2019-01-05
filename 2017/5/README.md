@@ -1,8 +1,8 @@
 # Answers
 
-|  Part 1  |  Part 2  |
-|----------|----------|
-| `391540` | ` ` |
+|  Part 1  |   Part 2   |
+|----------|------------|
+| `391540` | `30513679` |
 
 ## --- Day 5: A Maze of Twisty Trampolines, All Alike ---
 
