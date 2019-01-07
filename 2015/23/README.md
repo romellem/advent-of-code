@@ -2,7 +2,7 @@
 
 | Part 1 | Part 2 |
 |--------|--------|
-| ` ` | ` ` |
+|  `170` |  `247` |
 
 ## --- Day 23: Opening the Turing Lock ---
 
@@ -30,3 +30,9 @@ For example, this program sets `a` to `2`, because the `jio` instruction causes 
     
 
 What is _the value in register `b`_ when the program in your puzzle input is finished executing?
+
+-----------------
+
+## --- Part Two ---
+
+The unknown benefactor is _very_ thankful for releasi-- er, helping little Jane Marie with her computer. Definitely not to distract you, what is the value in register `b` after the program is finished executing if register `a` starts as `1` instead?
