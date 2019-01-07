@@ -1,24 +1,60 @@
+let { difference } = require('lodash');
 let { input, sampleInput } = require('./input');
 const G = require('generatorics');
 
 let presents = sampleInput;
 
-const arrayToMap = (arr) => {
-    let obj = {};
-    arr.map(v => obj[v] = true);
+const sum = (a, b) => a + b;
 
-    return obj;
-}
+const solutions = [];
 
 let g1, g2, g3;
 for (let g1_num = 1; g1_num <= presents.length - 2; g1_num++) {
     for (g1 of G.combination(presents, g1_num)) {
-        let g1_map = arrayToMap(g1);
+        let remaining_presents1 = difference(presents, g1);
 
-        let remaining_presents = 
+        for (let g2_num = 1; g2_num <= remaining_presents1.length - 1; g2_num++) {
+            for (g2 of G.combination(remaining_presents1, g2_num)) {
+                let remaining_presents2 = difference(remaining_presents1, g2);
+                for (let g3_num = 1; g3_num <= remaining_presents2.length; g3_num++) {
+                    for (g3 of G.combination(remaining_presents2, g3_num)) {
+                        if (g1_num + g2_num + g3_num === presents.length) {
+                            let g1_weight = g1.reduce(sum);
+                            let g2_weight = g2.reduce(sum);
+                            let g3_weight = g3.reduce(sum);
 
-        for (g2 of G.combination(presents, g1_num)) {
+                            if (g1_weight === g2_weight && g1_weight === g3_weight) {
+                                let g1_copy = g1.join(',');
+                                let g2_copy = g2.join(',');
+                                let g3_copy = g3.join(',');
 
+                                let sol = {
+                                    g1: g1_copy,
+                                    g2: g2_copy,
+                                    g3: g3_copy,
+                                    qe: g1.reduce((a, b) => a * b, 1),
+                                    g1_size: g1.length,
+                                };
+
+                                solutions.push(sol);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
+
+solutions.sort((a, b) => {
+    if (a.g1_size < b.g1_size) return -1;
+    else if (a.g1_size > b.g1_size) return 1;
+    else {
+        if (a.qe < b.qe) return -1;
+        else if (a.qe > b.qe) return 1;
+        else return 0;
+    }
+});
+
+console.log(solutions[0]);
+console.log(solutions[0].qe);
