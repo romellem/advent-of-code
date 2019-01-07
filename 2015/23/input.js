@@ -1,41 +1,56 @@
 module.exports = {
-    program: [
-        ['#ip', 4],
-        ['addi', 4, 16, 4],
-        ['seti', 1, 1, 1],
-        ['seti', 1, 7, 3],
-        ['mulr', 1, 3, 2],
-        ['eqrr', 2, 5, 2],
-        ['addr', 2, 4, 4],
-        ['addi', 4, 1, 4],
-        ['addr', 1, 0, 0],
-        ['addi', 3, 1, 3],
-        ['gtrr', 3, 5, 2],
-        ['addr', 4, 2, 4],
-        ['seti', 2, 3, 4],
-        ['addi', 1, 1, 1],
-        ['gtrr', 1, 5, 2],
-        ['addr', 2, 4, 4],
-        ['seti', 1, 6, 4],
-        ['mulr', 4, 4, 4],
-        ['addi', 5, 2, 5],
-        ['mulr', 5, 5, 5],
-        ['mulr', 4, 5, 5],
-        ['muli', 5, 11, 5],
-        ['addi', 2, 1, 2],
-        ['mulr', 2, 4, 2],
-        ['addi', 2, 6, 2],
-        ['addr', 5, 2, 5],
-        ['addr', 4, 0, 4],
-        ['seti', 0, 0, 4],
-        ['setr', 4, 5, 2],
-        ['mulr', 2, 4, 2],
-        ['addr', 4, 2, 2],
-        ['mulr', 4, 2, 2],
-        ['muli', 2, 14, 2],
-        ['mulr', 2, 4, 2],
-        ['addr', 5, 2, 5],
-        ['seti', 0, 5, 0],
-        ['seti', 0, 2, 4],
+    sampleInput: [
+        { op: 'inc', register: 'a' },   // 0
+{ op: 'jio', register: 'a', jump: +2 }, // 1
+        { op: 'tpl', register: 'a' },   // 2
+        { op: 'inc', register: 'a' },   // 3
+    ],
+    input: [
+        { op: 'jio', register: 'a', jump: +16 },  // 0
+        { op: 'inc', register: 'a' }, // . . . . . . 1
+        { op: 'inc', register: 'a' }, // . . . . . . 2
+        { op: 'tpl', register: 'a' }, // . . . . . . 3
+        { op: 'tpl', register: 'a' }, // . . . . . . 4
+        { op: 'tpl', register: 'a' }, // . . . . . . 5
+        { op: 'inc', register: 'a' }, // . . . . . . 6
+        { op: 'inc', register: 'a' }, // . . . . . . 7
+        { op: 'tpl', register: 'a' }, // . . . . . . 8
+        { op: 'inc', register: 'a' }, // . . . . . . 9
+        { op: 'inc', register: 'a' }, // . . . . . . 10
+        { op: 'tpl', register: 'a' }, // . . . . . . 11
+        { op: 'tpl', register: 'a' }, // . . . . . . 12
+        { op: 'tpl', register: 'a' }, // . . . . . . 13
+        { op: 'inc', register: 'a' }, // . . . . . . 14
+        { op: 'jmp', jump: +23 },     // . . . . . . 15
+        { op: 'tpl', register: 'a' }, // . . . . . . 16
+        { op: 'inc', register: 'a' }, // . . . . . . 17
+        { op: 'inc', register: 'a' }, // . . . . . . 18
+        { op: 'tpl', register: 'a' }, // . . . . . . 19
+        { op: 'inc', register: 'a' }, // . . . . . . 20
+        { op: 'inc', register: 'a' }, // . . . . . . 21
+        { op: 'tpl', register: 'a' }, // . . . . . . 22
+        { op: 'tpl', register: 'a' }, // . . . . . . 23
+        { op: 'inc', register: 'a' }, // . . . . . . 24
+        { op: 'inc', register: 'a' }, // . . . . . . 25
+        { op: 'tpl', register: 'a' }, // . . . . . . 26
+        { op: 'inc', register: 'a' }, // . . . . . . 27
+        { op: 'tpl', register: 'a' }, // . . . . . . 28
+        { op: 'inc', register: 'a' }, // . . . . . . 29
+        { op: 'tpl', register: 'a' }, // . . . . . . 30
+        { op: 'inc', register: 'a' }, // . . . . . . 31
+        { op: 'inc', register: 'a' }, // . . . . . . 32
+        { op: 'tpl', register: 'a' }, // . . . . . . 33
+        { op: 'inc', register: 'a' }, // . . . . . . 34
+        { op: 'tpl', register: 'a' }, // . . . . . . 35
+        { op: 'tpl', register: 'a' }, // . . . . . . 36
+        { op: 'inc', register: 'a' }, // . . . . . . 37
+        { op: 'jio', register: 'a', jump: +8 }, // . 38
+        { op: 'inc', register: 'b' }, // . . . . . . 39
+        { op: 'jie', register: 'a', jump: +4 }, // . 40
+        { op: 'tpl', register: 'a' }, // . . . . . . 41
+        { op: 'inc', register: 'a' }, // . . . . . . 42
+        { op: 'jmp', jump: +2 },      // . . . . . . 43
+        { op: 'hlf', register: 'a' }, // . . . . . . 44
+        { op: 'jmp', jump: -7 },      // . . . . . . 45
     ],
 };

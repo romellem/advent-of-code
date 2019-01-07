@@ -1,14 +1,21 @@
 // const { program } = require('./sample-input');
-const { program } = require('./input');
-const DeviceInstructions = require('./device-instructions');
+const { sampleInput, input } = require('./input');
+const CPU = require('./cpu');
 
-let instruction_pointer = program.shift();
+let cpu = new CPU(input);
 
-let device = new DeviceInstructions(program);
-device.setInputPointer(instruction_pointer[1]);
+let iter = 0;
+while (cpu.run() !== false) {
+    console.log(cpu.instruction);
+    iter++;
 
-while (device.run()) {
-    // Do nothing...
+    // if (iter % 4457 === 0) {
+    //     process.stdout.write(iter + '\r');
+    // }
+    if (cpu.instruction === 38) {
+        process.stdout.write(`${cpu.registers.a}\t${cpu.registers.b}\r`);
+    }
 }
 
-console.log(device.registers[0])
+console.log('                             \n');
+console.log(cpu.registers)
