@@ -15,31 +15,26 @@ for (let g1_num = 1; g1_num <= presents.length - 2; g1_num++) {
 
         for (let g2_num = 1; g2_num <= remaining_presents1.length - 1; g2_num++) {
             for (g2 of G.combination(remaining_presents1, g2_num)) {
-                let remaining_presents2 = difference(remaining_presents1, g2);
-                for (let g3_num = 1; g3_num <= remaining_presents2.length; g3_num++) {
-                    for (g3 of G.combination(remaining_presents2, g3_num)) {
-                        if (g1_num + g2_num + g3_num === presents.length) {
-                            let g1_weight = g1.reduce(sum);
-                            let g2_weight = g2.reduce(sum);
-                            let g3_weight = g3.reduce(sum);
+                let g3 = difference(remaining_presents1, g2);
 
-                            if (g1_weight === g2_weight && g1_weight === g3_weight) {
-                                let g1_copy = g1.join(',');
-                                let g2_copy = g2.join(',');
-                                let g3_copy = g3.join(',');
+                let g1_weight = g1.reduce(sum);
+                let g2_weight = g2.reduce(sum);
+                let g3_weight = g3.reduce(sum);
 
-                                let sol = {
-                                    g1: g1_copy,
-                                    g2: g2_copy,
-                                    g3: g3_copy,
-                                    qe: g1.reduce((a, b) => a * b, 1),
-                                    g1_size: g1.length,
-                                };
+                if (g1_weight === g2_weight && g1_weight === g3_weight) {
+                    let g1_copy = g1.join(',');
+                    let g2_copy = g2.join(',');
+                    let g3_copy = g3.join(',');
 
-                                solutions.push(sol);
-                            }
-                        }
-                    }
+                    let sol = {
+                        g1: g1_copy,
+                        g2: g2_copy,
+                        g3: g3_copy,
+                        qe: g1.reduce((a, b) => a * b, 1),
+                        g1_size: g1.length,
+                    };
+
+                    solutions.push(sol);
                 }
             }
         }
