@@ -1,4 +1,3 @@
-let { difference } = require('lodash');
 let { input, sampleInput } = require('./input');
 const G = require('generatorics');
 
