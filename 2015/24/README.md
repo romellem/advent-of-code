@@ -1,8 +1,8 @@
 # Answers
 
-| Part 1 | Part 2 |
-|--------|--------|
-|  ` ` |  ` ` |
+|    Part 1     |   Part 2   |
+|---------------|------------|
+| `10723906903` | `74850409` |
 
 ## --- Day 24: It Hangs in the Balance ---
 
@@ -37,3 +37,28 @@ For example, suppose you have ten packages with weights `1` through `5` and `7` 
 Of these, although `10 9 1` has the smallest quantum entanglement (`90`), the configuration with only two packages, `11 9`, in the passenger compartment gives Santa the most legroom and wins. In this situation, the quantum entanglement for the ideal configuration is therefore `99`. Had there been two configurations with only two packages in the first group, the one with the smaller quantum entanglement would be chosen.
 
 What is the _quantum entanglement_ of the first group of packages in the ideal configuration?
+
+-----------------
+
+## --- Part Two ---
+
+That's weird... the sleigh still isn't balancing.
+
+"Ho ho ho", Santa muses to himself. "I forgot the trunk".
+
+Balance the sleigh again, but this time, separate the packages into _four groups_ instead of three. The other constraints still apply.
+
+Given the example packages above, this would be some of the new unique first groups, their quantum entanglements, and one way to divide the remaining packages:
+
+    
+    11 4    (QE=44); 10 5;   9 3 2 1; 8 7
+    10 5    (QE=50); 11 4;   9 3 2 1; 8 7
+    9 5 1   (QE=45); 11 4;   10 3 2;  8 7
+    9 4 2   (QE=72); 11 3 1; 10 5;    8 7
+    9 3 2 1 (QE=54); 11 4;   10 5;    8 7
+    8 7     (QE=56); 11 4;   10 5;    9 3 2 1
+    
+
+Of these, there are three arrangements that put the minimum (two) number of packages in the first group: `11 4`, `10 5`, and `8 7`. Of these, `11 4` has the lowest quantum entanglement, and so it is selected.
+
+Now, what is the _quantum entanglement_ of the first group of packages in the ideal configuration?
