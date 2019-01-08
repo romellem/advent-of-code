@@ -1,14 +1,30 @@
-class Keypad {
-    constructor(keypad_size = 3) {
-        this.grid = Array(keypad_size)
-            .fill()
-            .map(row => Array(keypad_size).fill());
+// prettier-ignore
+const SQUARE = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9],
+];
 
-        for (let n = 1; n <= keypad_size ** 2; n++) {
-            let y = Math.floor((n - 1) / keypad_size);
-            let x = (n - 1) % keypad_size;
-            this.grid[y][x] = n;
-        }
+const A = 'A';
+const B = 'B';
+const C = 'C';
+const D = 'D';
+
+// prettier-ignore
+const DIAMOND = [
+    [ ,  , 1,  ,  ],
+    [ , 2, 3, 4,  ],
+    [5, 6, 7, 8, 9],
+    [ , A, B, C,  ],
+    [ ,  , D,  ,  ],
+];
+
+class Keypad {
+    constructor({ type } = {}) {
+        this.grid =
+            type === 'diamond'
+                ? JSON.parse(JSON.stringify(DIAMOND))
+                : JSON.parse(JSON.stringify(SQUARE));
     }
 
     press(instructions, starting_point = [1, 1]) {
@@ -18,19 +34,19 @@ class Keypad {
         steps.forEach(step => {
             switch (step) {
                 case 'U':
-                    if (y > 0) y--;
+                    if (this.grid[y - 1] && this.grid[y - 1][x]) y--;
                     break;
 
                 case 'D':
-                    if (y < this.grid.length - 1) y++;
+                    if (this.grid[y + 1] && this.grid[y + 1][x]) y++;
                     break;
 
                 case 'L':
-                    if (x > 0) x--;
+                    if (this.grid[y] && this.grid[y][x - 1]) x--;
                     break;
 
                 case 'R':
-                    if (x < this.grid[0].length - 1) x++;
+                    if (this.grid[y] && this.grid[y][x + 1]) x++;
                     break;
             }
         });
@@ -38,7 +54,7 @@ class Keypad {
         return {
             x,
             y,
-            num: this.grid[y][x]
+            num: this.grid[y][x],
         };
     }
 
