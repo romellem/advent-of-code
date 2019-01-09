@@ -17,7 +17,18 @@ const sampleInputs = {
     '{{<a!>},{<a!>},{<a!>},{<ab>}}': 3, // 1 + 2 = 3
 };
 
+const sampleInputsPartTwo = {
+    '<>': 0,
+    '<random characters>':17,
+    '<<<<>': 3,
+    '<{!>}>': 2,
+    '<!!>': 0,
+    '<!!!>>': 0,
+    '<{o"i!a,<{i<a>': 10,
+}
+
 module.exports = {
     input: STREAM,
-    sampleInputs
+    sampleInputs,
+    sampleInputsPartTwo
 };
