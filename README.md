@@ -68,7 +68,7 @@
 *  [✅ Day 4](2016/4/README.md)
 *  [✅ Day 5](2016/5/README.md)
 *  [✅ Day 6](2016/6/README.md)
-*  Day 7
+*  [✅ Day 7](2016/7/README.md)
 *  Day 8
 *  Day 9
 *  Day 10
