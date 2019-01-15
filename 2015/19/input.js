@@ -1,3 +1,5 @@
+const assert = require('assert');
+
 const plain_rules = [
     ['Al', 'ThF'],
     ['Al', 'ThRnFAr'],
@@ -45,7 +47,7 @@ const plain_rules = [
 ];
 
 const isUpperCase = /[A-Z]/;
-const splitMolecule = (molecule) => {
+const splitMolecule = molecule => {
     let mol_arr = [];
     let acc = molecule[0];
     for (let i = 1; i < molecule.length; i++) {
@@ -63,14 +65,25 @@ const splitMolecule = (molecule) => {
     }
 
     return mol_arr;
-}
+};
 
-// Create rules map
+// Create rules (and reverse) map
+// @example rules['e'] = ['HF', 'NAl', 'OMg']
+// @example reverse_rules['HF'] = 'e'; reverse_rules['NAl'] = 'e'; reverse_rules['OMg'] = 'e';
 let rules = {};
+let reverse_rules = {};
 plain_rules.forEach(([start, end]) => {
     if (!rules[start]) {
         rules[start] = [];
     }
+
+    // The reverse lookup require that each 'end' is unique. This assertion to to double check that
+    assert.strictEqual(Boolean(reverse_rules[end]), false);
+    if (start !== 'e') {
+        // Don't store the 'e' rules, once we get
+        reverse_rules[end] = start;
+    }
+    
 
     rules[start].push(end);
 });
@@ -83,11 +96,34 @@ module.exports = {
             H: ['HO', 'OH'],
             O: ['HH'],
         },
+        reverseRules: {
+            // H: 'e',
+            // O: 'e',
+            HO: 'H',
+            OH: 'H',
+            HH: 'O',
+        },
         initialState: ['H', 'O', 'H'],
+    },
+    sampleInput2: {
+        rules: {
+            e: ['H', 'O'],
+            H: ['HO', 'OH'],
+            O: ['HH'],
+        },
+        reverseRules: {
+            // H: 'e',
+            // O: 'e',
+            HO: 'H',
+            OH: 'H',
+            HH: 'O',
+        },
+        initialState: splitMolecule('HOHOHO'),
     },
 
     input: {
         rules: rules,
+        reverseRules: reverse_rules,
 
         initialState: [
             'C',
