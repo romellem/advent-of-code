@@ -13,8 +13,16 @@ const reverseABAMatch = str => {
     return b + a + b;
 };
 const strContainsABA = str => {
-    let matches = str.match(ABA_RE) || [];
-    matches = matches.filter(m => m[0] !== m[1]);
+    let matches = [];
+    for (let i = 0; i < str.length - 2; i++) {
+        let a = str[i];
+        let b = str[i + 1];
+        let _a = str[i + 2];
+
+        if (a === _a && a !== b) {
+            matches.push(a + b + a);
+        }
+    }
 
     return matches.length ? matches : false;
 };
@@ -40,7 +48,7 @@ const supportSSL = ip => {
             for (let j = 0; j < bracket_chunks_aba.length; j++) {
                 let b = bracket_chunks_aba[j];
 
-                if (a.reverse === b.match) {
+                if (reverseABAMatch(a) === b) {
                     return true;
                 }
             }
