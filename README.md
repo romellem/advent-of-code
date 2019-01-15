@@ -108,7 +108,7 @@
 *  [✅ Day 16](2015/16/README.md)
 *  [✅ Day 17](2015/17/README.md)
 *  [✅ Day 18](2015/18/README.md)
-*  Day 19
+*  [✅ Day 19](2015/19/README.md)
 *  [✅ Day 20](2015/20/README.md)
 *  [✅ Day 21](2015/21/README.md)
 *  Day 22
