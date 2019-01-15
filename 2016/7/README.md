@@ -2,10 +2,9 @@
 
 | Part 1 | Part 2 |
 |--------|--------|
-|  `110` | ` ` |
+|  `110` |  `242` |
 
-\--- Day 7: Internet Protocol Version 7 ---
--------------------------------------------
+## --- Day 7: Internet Protocol Version 7 ---
 
 While snooping around the local network of EBHQ, you compile a list of [IP addresses](https://en.wikipedia.org/wiki/IP_address) (they're IPv7, of course; [IPv6](https://en.wikipedia.org/wiki/IPv6) is much too limited). You'd like to figure out which IPs support _TLS_ (transport-layer snooping).
 
