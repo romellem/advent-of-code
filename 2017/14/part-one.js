@@ -3,5 +3,8 @@ const input = require('./input');
 const { getBitGridOfKeyString, countUsedBits } = require('./grid');
 
 // Tests
-let bit_count = countUsedBits(getBitGridOfKeyString('flqrgnkx'));
-console.log(bit_count)
+assert.strictEqual(countUsedBits(getBitGridOfKeyString('flqrgnkx')), 8108);
+
+let bit_count = countUsedBits(getBitGridOfKeyString(input));
+
+console.log(bit_count);
