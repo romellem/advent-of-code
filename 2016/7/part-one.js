@@ -1,6 +1,6 @@
 const assert = require('assert');
 const { input } = require('./input');
-const supportTLS = require('./supports-protocols');
+const { supportTLS } = require('./supports-protocols');
 
 assert.strictEqual(supportTLS('abba[mnop]qrst'), true);
 assert.strictEqual(supportTLS('abcd[bddb]xyyx'), false);
