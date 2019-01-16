@@ -1,8 +1,8 @@
 # Answers
 
-| Part 1 | Part 2 |
-|--------|--------|
-| ` ` | ` ` |
+|       Part 1       |       Part 2       |
+|--------------------|--------------------|
+| `kgdchlfniambejop` | `fjpmholcibdgeakn` |
 
 ## --- Day 16: Permutation Promenade ---
 
@@ -25,3 +25,19 @@ For example, with only five programs standing in a line (`abcde`), they could do
 After finishing their dance, the programs end up in order `baedc`.
 
 You watch the dance for a while and record their dance moves (your puzzle input). _In what order are the programs standing_ after their dance?
+
+-----------------
+
+## --- Part Two ---
+
+Now that you're starting to get a feel for the dance moves, you turn your attention to _the dance as a whole_.
+
+Keeping the positions they ended up in from their previous dance, the programs perform it again and again: including the first dance, a total of _one billion_ (`1000000000`) times.
+
+In the example above, their second dance would _begin_ with the order `baedc`, and use the same dance moves:
+
+*   `s1`, a spin of size `1`: `cbaed`.
+*   `x3/4`, swapping the last two programs: `cbade`.
+*   `pe/b`, swapping programs `e` and `b`: `ceadb`.
+
+_In what order are the programs standing_ after their billion dances?
