@@ -1,63 +1,113 @@
-// Copied from 2018 - Day 9 code!
-class Marble {
-    constructor(value, is_first_marble = false) {
+class CirclularListItem {
+    constructor(value, is_first = false) {
         this.value = value;
 
-        // Clockwise
-        this.next_marble;
-
-        // Counter clockwise
-        this.prev_marble;
+        // Pointers to other CirclularListItems
+        this.next;
+        this.prev;
 
         // Set next and prev to itself
-        if (is_first_marble) {
-            this.next_marble = this;
-            this.prev_marble = this;
+        if (is_first) {
+            this.next = this;
+            this.prev = this;
         }
     }
 
     next(n = 1) {
-        let marble = this;
+        let current = this;
         do {
-            marble = marble.next_marble;
+            current = current.next;
         } while (--n);
-        return marble;
+        return current;
     }
 
     prev(n = 1) {
-        let marble = this;
+        let current = this;
         do {
-            marble = marble.prev_marble;
+            current = current.prev;
         } while (--n);
-        return marble;
+        return current;
     }
 
-    // Insert Counter Clockwise
-    insertNext(marble) {
-        this.next_marble.prev_marble = marble;
-        marble.next_marble = this.next_marble;
+    insertNext(item) {
+        this.next.prev = item;
+        item.next = this.next;
 
-        this.next_marble = marble;
-        marble.prev_marble = this;
+        this.next = item;
+        item.prev = this;
 
-        return marble;
+        return item;
     }
 
-    // Insert Counter Clockwise
-    insertPrev(marble) {
-        this.prev_marble.next_marble = marble;
-        marble.next_marble = this;
+    insertPrev(item) {
+        this.prev.next = item;
+        item.next = this;
 
-        this.prev_marble = marble;
-        marble.prev_marble = this.prev_marble;
+        item.prev = this.prev;
+        this.prev = item;
 
-        return marble;
+        return item;
     }
 
     removeSelf() {
-        this.next_marble.prev_marble = this.prev_marble;
-        this.prev_marble.next_marble = this.next_marble;
+        this.next.prev = this.prev;
+        this.prev.next = this.next;
+
+        return this;
     }
 }
 
-module.exports = Marble;
+class CirclularList {
+    constructor(value) {
+        this.head = undefined;
+        if (typeof value !== 'undefined') {
+            this.init(value);
+        }
+    }
+
+    init(value) {
+        this.head = new CirclularListItem(value, true);
+
+        return this;
+    }
+
+    move(steps = 1) {
+        // Steps can be negative to move backwards
+        let direction = steps > 0 ? 'next' : 'prev';
+
+        steps = Math.abs(steps);
+        this.head = this.head[direction](steps);
+
+        return this;
+    }
+
+    insertNext(item) {
+        this.head = this.head.insertNext(item);
+
+        return this;
+    }
+
+    insertPrev(item) {
+        this.head = this.head.insertPrev(item);
+
+        return this;
+    }
+
+    popHeadMoveNext() {
+        let next = this.head.next;
+        let old_head = this.head.removeSelf();
+        this.head = next;
+
+        return old_head;
+    }
+
+    popHeadMovePrev() {
+        let prev = this.head.prev;
+        let old_head = this.head.removeSelf();
+        this.head = prev;
+
+        return old_head;
+    }
+}
+
+module.exports = CirclularList;
