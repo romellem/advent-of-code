@@ -2,7 +2,7 @@
 
 | Part 1 | Part 2 |
 |--------|--------|
-| ` ` | ` ` |
+| `1914` | ` ` |
 
 ## --- Day 17: Spinlock ---
 
@@ -37,3 +37,17 @@ Eventually, after 2017 insertions, the section of the circular buffer near the l
 Perhaps, if you can identify the value that will ultimately be _after_ the last value written (`2017`), you can short-circuit the spinlock. In this example, that would be `638`.
 
 _What is the value after `2017`_ in your completed circular buffer?
+
+-----------------
+
+## --- Part Two ---
+
+The spinlock does not short-circuit. Instead, it gets _more_ angry. At least, you assume that's what happened; it's spinning significantly faster than it was a moment ago.
+
+You have good news and bad news.
+
+The good news is that you have improved calculations for how to stop the spinlock. They indicate that you actually need to identify _the value after `0`_ in the current state of the circular buffer.
+
+The bad news is that while you were determining this, the spinlock has just finished inserting its fifty millionth value (`50000000`).
+
+_What is the value after `0`_ the moment `50000000` is inserted?

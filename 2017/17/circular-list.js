@@ -3,12 +3,12 @@ class CirclularListItem {
         this.value = value;
 
         // Pointers to other CirclularListItems
-        this.next;
-        this.prev;
+        this.next_item;
+        this.prev_item;
 
         // Set next and prev to itself
         if (is_first) {
-            this.next = this;
+            this.next_item = this;
             this.prev = this;
         }
     }
@@ -16,7 +16,7 @@ class CirclularListItem {
     next(n = 1) {
         let current = this;
         do {
-            current = current.next;
+            current = current.next_item;
         } while (--n);
         return current;
     }
@@ -24,34 +24,34 @@ class CirclularListItem {
     prev(n = 1) {
         let current = this;
         do {
-            current = current.prev;
+            current = current.prev_item;
         } while (--n);
         return current;
     }
 
     insertNext(item) {
-        this.next.prev = item;
-        item.next = this.next;
+        this.next_item.prev_item = item;
+        item.next_item = this.next_item;
 
-        this.next = item;
-        item.prev = this;
+        this.next_item = item;
+        item.prev_item = this;
 
         return item;
     }
 
     insertPrev(item) {
-        this.prev.next = item;
-        item.next = this;
+        this.prev_item.next_item = item;
+        item.next_item = this;
 
-        item.prev = this.prev;
-        this.prev = item;
+        item.prev_item = this.prev_item;
+        this.prev_item = item;
 
         return item;
     }
 
     removeSelf() {
-        this.next.prev = this.prev;
-        this.prev.next = this.next;
+        this.next_item.prev_item = this.prev_item;
+        this.prev_item.next_item = this.next_item;
 
         return this;
     }
@@ -59,14 +59,19 @@ class CirclularListItem {
 
 class CirclularList {
     constructor(value) {
+        // Keep head unset if we didn't pass in a value
         this.head = undefined;
         if (typeof value !== 'undefined') {
+            // This sets `this.head`
             this.init(value);
         }
     }
 
     init(value) {
-        this.head = new CirclularListItem(value, true);
+        if (!(value instanceof CirclularListItem)) {
+            value = new CirclularListItem(value, true);
+        }
+        this.head = value;
 
         return this;
     }
@@ -82,29 +87,35 @@ class CirclularList {
     }
 
     insertNext(item) {
+        if (!(item instanceof CirclularListItem)) {
+            item = new CirclularListItem(item);
+        }
         this.head = this.head.insertNext(item);
 
         return this;
     }
 
     insertPrev(item) {
+        if (!(item instanceof CirclularListItem)) {
+            item = new CirclularListItem(item);
+        }
         this.head = this.head.insertPrev(item);
 
         return this;
     }
 
     popHeadMoveNext() {
-        let next = this.head.next;
+        let next_item = this.head.next_item;
         let old_head = this.head.removeSelf();
-        this.head = next;
+        this.head = next_item;
 
         return old_head;
     }
 
     popHeadMovePrev() {
-        let prev = this.head.prev;
+        let prev_item = this.head.prev_item;
         let old_head = this.head.removeSelf();
-        this.head = prev;
+        this.head = prev_item;
 
         return old_head;
     }
