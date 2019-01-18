@@ -2,7 +2,7 @@
 
 | Part 1 | Part 2 |
 |--------|--------|
-|  `121` |  `201` |
+|  ` ` |  ` ` |
 
 ## --- Day 22: Wizard Simulator 20XX ---
 
@@ -116,3 +116,13 @@ Now, suppose the same initial conditions, except that the boss has `14` hit poin
     
 
 You start with _50 hit points_ and _500 mana points_. The boss's actual stats are in your puzzle input. What is the _least amount of mana_ you can spend and still win the fight? (Do not include mana recharge effects as "spending" negative mana.)
+
+-----
+
+## Part Two
+
+On the next run through the game, you increase the difficulty to hard.
+
+At the start of each player turn (before any other effects apply), you lose 1 hit point. If this brings you to or below 0 hit points, you lose.
+
+With the same starting stats for you and the boss, what is the least amount of mana you can spend and still win the fight?
