@@ -50,7 +50,7 @@
 *  [✅ Day 14](2017/14/README.md)
 *  Day 15
 *  [✅ Day 16](2017/16/README.md)
-*  Day 17
+*  [✅ Day 17](2017/17/README.md)
 *  Day 18
 *  Day 19
 *  Day 20
