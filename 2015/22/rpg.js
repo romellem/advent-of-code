@@ -1,13 +1,4 @@
-class GameState {
-    constructor(player, boss, shield, poison, recharge) {
-        this.player = Object.assign({}, player);
-        this.boss = Object.assign({}, boss);
-
-        this.poison = Object.assign({}, poison);
-        this.shield = Object.assign({}, shield);
-        this.recharge = Object.assign({}, recharge);
-    }
-}
+const jsnx = require('jsnetworkx');
 
 /*
 {
@@ -28,15 +19,15 @@ class GameState {
 */
 
 const SPELLS = {
-    missle: { cost: 53, damage: 4 },
-    drain: { cost: 73, heal: 2, damage: 2 },
-    shield: { cost: 113, armor: 7, timer: 6 },
-    poison: { cost: 173, damage: 3, timer: 6 },
-    recharge: { cost: 229, mana: 101, time: 5 },
+    missle: { name: 'missle', cost: 53, damage: 4 },
+    drain: { name: 'drain', cost: 73, heal: 2, damage: 2 },
+    shield: { name: 'shield', cost: 113, armor: 7, timer: 6 },
+    poison: { name: 'poison', cost: 173, damage: 3, timer: 6 },
+    recharge: { name: 'recharge', cost: 229, mana: 101, timer: 5 },
 };
 
 class Game {
-    constructor({ isPlayersTurn = true, player, boss, shield = 0, poison = 0, recharge = 0 } = {}) {
+    constructor({ player, boss, isPlayersTurn = true, shield = 0, poison = 0, recharge = 0 } = {}) {
         this.isPlayersTurn = isPlayersTurn;
 
         this.player = Object.assign({}, player);
@@ -45,6 +36,20 @@ class Game {
         this.poison = poison;
         this.shield = shield;
         this.recharge = recharge;
+
+        this.game_paths = new jsnx.DiGraph();
+        this.turn = 0;
+
+        // Leaf nodes, wins and losses
+        this.wins = [];
+        this.losses = [];
+    }
+
+    run() {
+        let moves = this.getNextMoves();
+        if (moves === true) {
+            
+        }
     }
 
     getNextMoves() {
@@ -106,19 +111,34 @@ class Game {
 
             // Otherwise, return our choices
             return player_choices;
-        } else { // Boss's turn
-            return this.boss.damage - player_armor > 0 ? this.boss.damage - player_armor : 1;
+        } else {
+            // Boss's turn
+            return {
+                bossTurn: true,
+                damage: this.boss.damage - player_armor > 0 ? this.boss.damage - player_armor : 1,
+            };
         }
+    }
+
+    resetState(state) {
+        this.isPlayersTurn = state.isPlayersTurn;
+        this.player = Object.assign({}, state.player);
+        this.boss = Object.assign({}, state.boss);
+        this.poison = state.poison;
+        this.shield = state.shield;
+        this.recharge = state.recharge;
+        this.turn = state.turn;
     }
 
     getState() {
         return {
-            turn: this.turn,
+            isPlayersTurn: this.isPlayersTurn,
             player: Object.assign({}, this.player),
             boss: Object.assign({}, this.boss),
             poison: this.poison,
             shield: this.shield,
             recharge: this.recharge,
+            turn: this.turn,
         };
     }
 }
