@@ -24,6 +24,7 @@
     "jsnetworkx": "^0.3.4",
     "lodash": "^4.17.11",
     "manhattan": "^1.0.0",
+    "pathfinding": "^0.4.18",
     "table": "^5.1.1",
     "traverse": "^0.6.6"
   }
