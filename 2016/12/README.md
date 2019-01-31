@@ -1,8 +1,8 @@
 # Answers
 
-|  Part 1  |  Part 2  |
-|----------|----------|
-| `318003` | ` ` |
+|  Part 1  |  Part 2   |
+|----------|-----------|
+| `318003` | `9227657` |
 
 ## --- Day 12: Leonardo's Monorail ---
 
@@ -36,3 +36,11 @@ For example:
 The above code would set register `a` to `41`, increase its value by `2`, decrease its value by `1`, and then skip the last `dec a` (because `a` is not zero, so the `jnz a 2` skips it), leaving register `a` at `42`. When you move past the last instruction, the program halts.
 
 After executing the assembunny code in your puzzle input, _what value is left in register `a`?_
+
+-----------------
+
+## --- Part Two ---
+
+As you head down the fire escape to the monorail, you notice it didn't start; register `c` needs to be initialized to the position of the ignition key.
+
+If you instead _initialize register `c` to be `1`_, what value is now left in register `a`?
