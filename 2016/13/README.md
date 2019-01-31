@@ -2,7 +2,7 @@
 
 | Part 1 | Part 2 |
 |--------|--------|
-|  ` ` |  ` ` |
+|   `86` |  ` ` |
 
 ## --- Day 13: A Maze of Twisty Little Cubicles ---
 
