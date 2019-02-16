@@ -8,4 +8,9 @@ module.exports = {
         value: '10011111011011001',
         size: 272,
     },
+
+    partTwoInput: {
+        value: '10011111011011001',
+        size: 35651584,
+    },
 };

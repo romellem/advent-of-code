@@ -1,8 +1,8 @@
 # Answers
 
-| Part 1 | Part 2 |
-|--------|--------|
-|   ` ` |  ` ` |
+|       Part 1        |       Part 2        |
+|---------------------|---------------------|
+| `10111110010110110` | `01101100001100100` |
 
 ## --- Day 16: Dragon Checksum ---
 
@@ -53,3 +53,7 @@ Combining all of these steps together, suppose you want to fill a disk of length
 In this example, the correct checksum would therefore be `01100`.
 
 The first disk you have to fill has length `272`. Using the initial state in your puzzle input, _what is the correct checksum_?
+
+## --- Part Two ---
+
+The second disk you have to fill has length `35651584`. Again using the initial state in your puzzle input, _what is the correct checksum_ for this disk?
