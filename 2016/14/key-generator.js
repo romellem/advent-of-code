@@ -1,11 +1,6 @@
 const crypto = require('crypto');
-const md5 = str =>
-    crypto
-        .createHash('md5')
-        .update(str)
-        .digest('hex');
 
-const THREE_CHARS_REGEX = /(\w)\1\1/g;
+const THREE_CHARS_REGEX = /(\w)\1\1/;
 
 class KeyGenerator {
     constructor(salt) {
@@ -13,29 +8,38 @@ class KeyGenerator {
         this.index = 0;
 
         this.keys = [];
+        this.hashCache = {};
     }
 
-    static testHashForValidity(salt, index, matches) {
-        // Take our matches and convert them to 5 char strings
-        matches = matches.map(s =>
-            Array(5)
-                .fill(s[0])
-                .join('')
-        );
+    testHashForValidity(match) {
+        // Take our 3 char match and convert it to a 5 char match
+        match = match + match[0] + match[0];
 
         for (let i = 0; i < 1000; i++) {
-            let input = `${salt}${index + i}`;
-            let hash = md5(input);
+            let input = `${this.salt}${this.index + i}`;
+            let hash = this.md5(input);
 
-            for (let m = 0; m < matches.length; m++) {
-                let match = matches[m];
-                if (hash.includes(match)) {
-                    return true;
-                }
+            if (hash.includes(match)) {
+                return true;
             }
         }
 
         return false;
+    }
+
+    static MD5(str) {
+        return crypto
+            .createHash('md5')
+            .update(str)
+            .digest('hex');
+    }
+
+    md5(str) {
+        if (!this.hashCache[str]) {
+            this.hashCache[str] = KeyGenerator.MD5(str);
+        }
+
+        return this.hashCache[str];
     }
 
     generateNextKeys(n = 64) {
@@ -44,16 +48,16 @@ class KeyGenerator {
 
             while (found_key === false) {
                 let input = `${this.salt}${this.index++}`;
-                let hash = md5(input);
+                let hash = this.md5(input);
 
                 if (THREE_CHARS_REGEX.test(hash)) {
                     // Hash has three repeating characters in a row!
-                    let matches = hash.match(THREE_CHARS_REGEX);
+                    let [match] = hash.match(THREE_CHARS_REGEX);
 
-                    if (KeyGenerator.testHashForValidity(this.salt, this.index, matches)) {
+                    if (this.testHashForValidity(match)) {
                         this.keys.push({
                             hash,
-                            index: this.index - 1
+                            index: this.index - 1,
                         });
                         found_key = true;
                     }
