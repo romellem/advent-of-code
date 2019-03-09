@@ -26,4 +26,22 @@ module.exports = {
             decompressedStr: `X(3x3)ABC(3x3)ABCY`,
         },
     ],
+    sampleInputsPartTwo: [
+        {
+            str: `(3x3)XYZ`,
+            decompressedLength: 9,
+        },
+        {
+            str: `X(8x2)(3x3)ABCY`,
+            decompressedLength: 20,
+        },
+        {
+            str: `(27x12)(20x12)(13x14)(7x10)(1x12)A`,
+            decompressedLength: 241920,
+        },
+        {
+            str: `(25x3)(3x3)ABC(2x3)XY(5x2)PQRSTX(18x9)(3x2)TWO(5x7)SEVEN`,
+            decompressedLength: 445,
+        },
+    ],
 };
