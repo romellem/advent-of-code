@@ -1,8 +1,8 @@
 # Answers
 
-| Part 1 | Part 2 |
-|--------|--------|
-| ` ` | ` ` |
+| Part 1 |   Part 2   |
+|--------|------------|
+| `1951` | `20002936` |
 
 ## --- Day 18: Like a Rogue ---
 
@@ -58,3 +58,9 @@ Here's a larger example with ten tiles per row and ten rows:
 In ten rows, this larger example has `38` safe tiles.
 
 Starting with the map in your puzzle input, in a total of `40` rows (including the starting row), _how many safe tiles_ are there?
+
+-----------------
+
+## --- Part Two ---
+
+_How many safe tiles_ are there in a total of `400000` rows?
