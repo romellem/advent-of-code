@@ -1,4 +1,3 @@
-const assert = require('assert');
 const { partTwoInput } = require('./input');
 const Disks = require('./disks');
 
