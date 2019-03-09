@@ -1,17 +1,19 @@
 {
-  "name": "advent-of-code-2018",
+  "name": "advent-of-code",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "description": "JS Solutions to Advent of Code puzzles (adventofcode.com)",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/romellem/advent-of-code-2018.git"
+    "url": "git+https://github.com/romellem/advent-of-code.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "aoc",
+    "puzzles"
+  ],
+  "engines": {
+    "node": ">=8.12.0"
+  },
+  "author": "romellem",
   "license": "MIT",
   "dependencies": {
     "array.prototype.flat": "^1.2.1",
