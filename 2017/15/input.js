@@ -9,5 +9,5 @@ module.exports = {
         factor: 48271,
         divideBy: 2147483647,
     },
-    partOneInterations: 40_000_000,
+    partOneInterations: 40000000,
 };
