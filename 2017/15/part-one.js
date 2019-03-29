@@ -1,9 +1,10 @@
 const { A, B, partOneInterations } = require('./input');
 const Generator = require('./generator');
-const assert = require('assert');
 
 let generator_a = new Generator(A);
 let generator_b = new Generator(B);
+
+// Test cases
 
 // let generator_a = new Generator({
 //     startsWith: 65,
