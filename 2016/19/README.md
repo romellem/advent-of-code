@@ -1,8 +1,8 @@
 # Answers
 
-|  Part 1  |  Part 2  |
-|----------|----------|
-| ` ` | ` ` |
+|  Part 1   |  Part 2  |
+|-----------|----------|
+| `1834471` | ` ` |
 
 ## --- Day 19: An Elephant Named Joseph ---
 
