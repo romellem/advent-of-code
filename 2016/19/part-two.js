@@ -10,7 +10,8 @@ const loopElves = arr => {
      * I realized, I don't need to check if the next elf is the same
      * as the current elf, just loop a preset number of times.
      */
-    while (length--) {
+    while ((length--) > 1) {
+        process.stdout.write(length + '\r');
         let current_elf = list.head;
         /**
          * Elf "across the circle" is the length divided by two,
@@ -32,10 +33,12 @@ const loopElves = arr => {
 
 // Tests
 assert.strictEqual(loopElves([1, 2, 3, 4, 5]), 2);
-console.log('Tests passed')
+console.log('Tests passed');
 
 const elves = Array(NUMBER_OF_ELVES)
     .fill()
     .map((c, i) => i + 1);
 
-console.log(loopElves(elves));
+const answer = loopElves(elves);
+console.log('                 ');
+console.log(answer);
