@@ -62,6 +62,7 @@ const scramble = (password, instructions) => {
             case 'rotate':
                 if (instruction.left !== undefined) {
                     let steps = instruction.left;
+                    steps %= password.length;
                     let left_half = password.substr(0, steps);
                     let right_half = password.substr(steps);
 
@@ -71,12 +72,14 @@ const scramble = (password, instructions) => {
                     let steps;
                     if (instruction.letter) {
                         let position = password.indexOf(instruction.letter);
-                        steps = 1 + position;
+                        steps = 1 + position + (position >= 4 ? 1 : 0);
                     } else {
                         steps = instruction.right;
                     }
+                    steps %= password.length;
+
                     let right_half = password.substr(-1 * steps);
-                    let left_half = password.substr(0, steps + 1);
+                    let left_half = password.substr(0, password.length - steps);
 
                     password = right_half + left_half;
                 }
