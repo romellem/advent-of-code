@@ -78,10 +78,12 @@ const scramble = (password, instructions) => {
                     }
                     steps %= password.length;
 
-                    let right_half = password.substr(-1 * steps);
-                    let left_half = password.substr(0, password.length - steps);
+                    if (steps > 0) {
+                        let right_half = password.substr(-1 * steps);
+                        let left_half = password.substr(0, password.length - steps);
 
-                    password = right_half + left_half;
+                        password = right_half + left_half;
+                    }
                 }
                 break;
 
@@ -89,6 +91,12 @@ const scramble = (password, instructions) => {
                 let error = `Unknown type ${type}`;
                 console.log(instruction);
                 throw error;
+        }
+
+        if (password.length !== orig_password.length) {
+            console.log(instruction);
+            let error = `Password increased from "${orig_password}" to "${password}"`;
+            throw error;
         }
     }
 
