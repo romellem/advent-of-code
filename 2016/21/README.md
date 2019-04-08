@@ -31,3 +31,11 @@ For example, suppose you start with `abcde` and perform the following operations
 After these steps, the resulting scrambled password is `decab`.
 
 Now, you just need to generate a new scrambled password and you can access the system. Given the list of scrambling operations in your puzzle input, _what is the result of scrambling `abcdefgh`_?
+
+-----------------
+
+## --- Part Two ---
+
+You scrambled the password correctly, but you discover that you [can't actually modify](https://en.wikipedia.org/wiki/File_system_permissions) the [password file](https://en.wikipedia.org/wiki/Passwd) on the system. You'll need to un-scramble one of the existing passwords by reversing the scrambling process.
+
+What is the un-scrambled version of the scrambled password `fbgdceah`?

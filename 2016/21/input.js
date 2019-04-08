@@ -119,7 +119,10 @@ const input = {
     ],
 };
 
+const partTwoPassword = 'fbgdceah';
+
 module.exports = {
     sampleInput,
     input,
+    partTwoPassword,
 };
