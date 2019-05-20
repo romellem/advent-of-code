@@ -1001,4 +1001,10 @@ const PARTICLES = [
     { position: [-886, 2415, 982], velocity: [-129, 344, 142], acceleration: [9, -29, -12] },
 ];
 
-module.exports = PARTICLES;
+module.exports = {
+    input: PARTICLES,
+    sampleInput: [
+        { position: [3, 0, 0], velocity: [2, 0, 0], acceleration: [-1, 0, 0] },
+        { position: [4, 0, 0], velocity: [0, 0, 0], acceleration: [-2, 0, 0] },
+    ],
+};

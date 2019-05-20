@@ -41,17 +41,24 @@ class PointCloud {
         this.closest_point_index = undefined;
     }
 
-    tick() {
+    getClosestPointIndexToOrigin() {
         let shortest_distance = Number.MAX_SAFE_INTEGER;
-
+        let closest_point_index = undefined;
         this.points.forEach((point, index) => {
-            point.updateSpace();
             let distance = point.getDistanceFromOrigin();
 
             if (distance < shortest_distance) {
                 shortest_distance = distance;
-                this.closest_point_index = index;
+                closest_point_index = index;
             }
+        });
+
+        return closest_point_index;
+    }
+
+    tick() {
+        this.points.forEach((point, index) => {
+            point.updateSpace();
         });
     }
 
@@ -62,11 +69,17 @@ class PointCloud {
     runUntilClosestPointIsStable(min_stable_runs = 1000) {
         let stable_runs = 0;
         while (stable_runs < min_stable_runs) {
+            // Save previous closest point
             let old_closest_point_index = this.closest_point_index;
 
+            // Update all points
             this.tick();
-            let new_closest_point_index = this.closest_point_index;
 
+            // Get new closest point
+            let new_closest_point_index = this.getClosestPointIndexToOrigin();
+            this.closest_point_index = new_closest_point_index;
+
+            // COmpare the indeces, and reset our "stable runs" if the point changes
             if (old_closest_point_index !== new_closest_point_index) {
                 stable_runs = 0;
             } else {
