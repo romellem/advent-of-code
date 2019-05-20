@@ -59,7 +59,7 @@ class PointCloud {
      * @param {Number} min_stable_runs 
      * @returns {Number} - Returns the index of the partible that eventually is closest to the origin
      */
-    runUntilClosestPointIsStable(min_stable_runs = 50) {
+    runUntilClosestPointIsStable(min_stable_runs = 1000) {
         let stable_runs = 0;
         while (stable_runs < min_stable_runs) {
             let old_closest_point_index = this.closest_point_index;
