@@ -2,7 +2,7 @@
 
 | Part 1 | Part 2 |
 |--------|--------|
-| ` ` | ` ` |
+|  `144` |  `477` |
 
 ## --- Day 20: Particle Swarm ---
 
@@ -39,3 +39,36 @@ For example, suppose you are only given two particles, both of which stay entire
 At this point, particle `1` will never be closer to `<0,0,0>` than particle `0`, and so, in the long run, particle `0` will stay closest.
 
 _Which particle will stay closest to position `<0,0,0>`_ in the long term?
+
+-----------------
+
+## --- Part Two ---
+
+To simplify the problem further, the GPU would like to remove any particles that _collide_. Particles collide if their positions ever _exactly match_. Because particles are updated simultaneously, _more than two particles_ can collide at the same time and place. Once particles collide, they are removed and cannot collide with anything else after that tick.
+
+For example:
+
+    p=<-6,0,0>, v=< 3,0,0>, a=< 0,0,0>    
+    p=<-4,0,0>, v=< 2,0,0>, a=< 0,0,0>    -6 -5 -4 -3 -2 -1  0  1  2  3
+    p=<-2,0,0>, v=< 1,0,0>, a=< 0,0,0>    (0)   (1)   (2)            (3)
+    p=< 3,0,0>, v=<-1,0,0>, a=< 0,0,0>
+    
+    p=<-3,0,0>, v=< 3,0,0>, a=< 0,0,0>    
+    p=<-2,0,0>, v=< 2,0,0>, a=< 0,0,0>    -6 -5 -4 -3 -2 -1  0  1  2  3
+    p=<-1,0,0>, v=< 1,0,0>, a=< 0,0,0>             (0)(1)(2)      (3)   
+    p=< 2,0,0>, v=<-1,0,0>, a=< 0,0,0>
+    
+    p=< 0,0,0>, v=< 3,0,0>, a=< 0,0,0>    
+    p=< 0,0,0>, v=< 2,0,0>, a=< 0,0,0>    -6 -5 -4 -3 -2 -1  0  1  2  3
+    p=< 0,0,0>, v=< 1,0,0>, a=< 0,0,0>                       X (3)      
+    p=< 1,0,0>, v=<-1,0,0>, a=< 0,0,0>
+    
+    ------destroyed by collision------    
+    ------destroyed by collision------    -6 -5 -4 -3 -2 -1  0  1  2  3
+    ------destroyed by collision------                      (3)         
+    p=< 0,0,0>, v=<-1,0,0>, a=< 0,0,0>
+    
+
+In this example, particles `0`, `1`, and `2` are simultaneously destroyed at the time and place marked `X`. On the next tick, particle `3` passes through unharmed.
+
+_How many particles are left_ after all collisions are resolved?

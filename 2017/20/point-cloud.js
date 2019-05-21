@@ -1,4 +1,4 @@
-const { groupBy, pickBy, flatten } = require('groupBy');
+const { groupBy, pickBy, flatten } = require('lodash');
 const distance = require('manhattan');
 
 const ORIGIN = [0, 0, 0];
@@ -44,6 +44,11 @@ class Point {
             this.position[2] === point.position[2]
         );
     }
+
+    toString() {
+        let [x, y, z] = this.position;
+        return `${x},${y},${z}`;
+    }
 }
 
 class PointCloud {
@@ -81,21 +86,12 @@ class PointCloud {
     }
 
     removeCollidedPoints() {
-        let distances = this.points.map(point => ({ point, distance: point.getDistanceFromOrigin() }));
-        // distances.sort((a, b) => {
-        //     if (a.distance < b.distance) return -1;
-        //     else if (a.distance > b.distance) return 1;
-        //     else return 0;
-        // });
+        // Get duplicate positions
+        let points_by_position = groupBy(this.points, point => point.toString());
+        let unique_points_obj = pickBy(points_by_position, group => group.length === 1);
 
-        // Get duplicates distances, they have the possibility for collisions
-        let points_groups_by_distance = groupBy(distances, obj => obj.distance);
-        let points_that_may_have_collided = pickBy(points_groups_by_distance, points => points.length > 1);
-
-        for (let points_arr of points_that_may_have_collided) {
-            
-        }
-
+        this.points = flatten(Object.values(unique_points_obj));
+        return this.points;
     }
 
     /**
@@ -124,6 +120,29 @@ class PointCloud {
         }
 
         return this.closest_point_index;
+    }
+
+    runUntilNoPointsCollide(min_stable_runs = 1000) {
+        let stable_runs = 0;
+        while (stable_runs < min_stable_runs) {
+            let old_amount_of_points = this.points.length;
+
+            // Update all points and remove collisions
+            this.tick();
+            this.removeCollidedPoints();
+
+            // Get new closest point
+            let new_amount_of_points = this.points.length;
+
+            // Compare amounts, and reset our "stable runs" if the value changes
+            if (old_amount_of_points !== new_amount_of_points) {
+                stable_runs = 0;
+            } else {
+                stable_runs++;
+            }
+        }
+
+        return this.points.length;
     }
 }
 
