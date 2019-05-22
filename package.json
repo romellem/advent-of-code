@@ -22,13 +22,13 @@
     "double-ended-queue": "^2.1.0-0",
     "generatorics": "^1.1.0",
     "get-divisors": "^1.0.0",
-    "jimp": "^0.6.0",
+    "jimp": "^0.6.4",
     "jsnetworkx": "^0.3.4",
     "lodash": "^4.17.11",
     "looped-list": "^0.1.1",
     "manhattan": "^1.0.0",
     "pathfinding": "^0.4.18",
-    "table": "^5.1.1",
+    "table": "^5.3.3",
     "traverse": "^0.6.6"
   }
 }
