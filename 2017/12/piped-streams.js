@@ -57,24 +57,30 @@ class PipedStream {
         });
     }
 
-    countConnectedPrograms(root_program_id = 0, analyzing = []) {
+    countConnectedPrograms(root_program_id = 0, connected_to = {}) {
         // Assumes `this.programs` has been initialized and connected
         let program = this.programs[root_program_id];
-        if (analyzing.length === 0) {
-            analyzing.push(program);
-        }
-        let running_children_count = program.children.length;
 
-        for (let i = 0; i < program.children.length; i++) {
-            let child = program.children[i];
-            if (!analyzing.includes(child)) {
-                analyzing.push(child);
-                running_children_count += this.countConnectedPrograms(child.id, analyzing);
-                analyzing.pop();
+        let to_count = [];
+        program.children.forEach(child => {
+            let { id } = child;
+
+            // If we haven't seen this before, then visit its children
+            if (!connected_to[id]) {
+                connected_to[id] = true;
+                to_count.push(child);
             }
+
+            // Otherwise, we've counted this (and subsequently its children) so we can skip it
+        });
+
+        // Recursively add children's children to `connected_to`
+        for (let child of to_count) {
+            this.countConnectedPrograms(child.id, connected_to);
         }
 
-        return running_children_count;
+        // Return number of programs we saw, only really valid on last call
+        return Object.keys(connected_to).length;
     }
 }
 
