@@ -86,6 +86,22 @@ class PipedStream {
     countConnectedPrograms(root_program_id = 0, connected_to = {}) {
         return this.getConnectedPrograms(root_program_id, connected_to).length;
     }
+
+    countConnectedGroups() {
+        let ids = Object.keys(this.programs);
+
+        let groups_count = 0;
+        while (ids.length) {
+            let program_id = ids.pop();
+            let connected_program_ids = this.getConnectedPrograms(program_id).map(p => p.id);
+
+            // Filter the ids we just figured out were in a group
+            ids = ids.filter(id => !connected_program_ids.includes(id));
+            groups_count++;
+        }
+
+        return groups_count;
+    }
 }
 
 module.exports = PipedStream;
