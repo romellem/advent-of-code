@@ -57,7 +57,7 @@ class PipedStream {
         });
     }
 
-    countConnectedPrograms(root_program_id = 0, connected_to = {}) {
+    getConnectedPrograms(root_program_id = 0, connected_to = {}) {
         // Assumes `this.programs` has been initialized and connected
         let program = this.programs[root_program_id];
 
@@ -67,7 +67,7 @@ class PipedStream {
 
             // If we haven't seen this before, then visit its children
             if (!connected_to[id]) {
-                connected_to[id] = true;
+                connected_to[id] = child;
                 to_count.push(child);
             }
 
@@ -80,7 +80,11 @@ class PipedStream {
         }
 
         // Return number of programs we saw, only really valid on last call
-        return Object.keys(connected_to).length;
+        return Object.values(connected_to);
+    }
+
+    countConnectedPrograms(root_program_id = 0, connected_to = {}) {
+        return this.getConnectedPrograms(root_program_id, connected_to).length;
     }
 }
 
