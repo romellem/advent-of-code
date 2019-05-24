@@ -45,21 +45,33 @@ class PipedStream {
 
     connectPrograms() {
         this.streams.forEach(({ from, to }) => {
-            let program = this.programs[from];
+            let from_program = this.programs[from];
             to.forEach(to_id => {
                 let to_program = this.programs[to_id];
-                program.connect(to_program);
+
+                if (from_program !== to_program) {
+                    from_program.connect(to_program);
+                    to_program.connect(from_program);
+                }
             });
         });
     }
 
-    countConnectedPrograms(root_program_id = 0) {
+    countConnectedPrograms(root_program_id = 0, analyzing = []) {
         // Assumes `this.programs` has been initialized and connected
         let program = this.programs[root_program_id];
+        if (analyzing.length === 0) {
+            analyzing.push(program);
+        }
         let running_children_count = program.children.length;
+
         for (let i = 0; i < program.children.length; i++) {
             let child = program.children[i];
-            running_children_count += this.countConnectedPrograms(child.id);
+            if (!analyzing.includes(child)) {
+                analyzing.push(child);
+                running_children_count += this.countConnectedPrograms(child.id, analyzing);
+                analyzing.pop();
+            }
         }
 
         return running_children_count;
