@@ -84,20 +84,20 @@ class Hex {
     }
 }
 Hex.directions = {
-    n: new Hex(0, -1, 1),
-    ne: new Hex(1, -1, 0),
+    s: new Hex(0, -1, 1),
+    se: new Hex(1, -1, 0),
     sw: new Hex(-1, 0, 1),
-    s: new Hex(0, 1, -1),
-    se: new Hex(1, 0, -1),
+    n: new Hex(0, 1, -1),
+    ne: new Hex(1, 0, -1),
     nw: new Hex(-1, 1, 0),
 };
 Hex.diagonals = {
     e: new Hex(2, -1, -1),
-    ne: new Hex(1, -2, 1),
-    nw: new Hex(-1, -1, 2),
+    se: new Hex(1, -2, 1),
+    sw: new Hex(-1, -1, 2),
     w: new Hex(-2, 1, 1),
-    sw: new Hex(-1, 2, -1),
-    se: new Hex(1, 1, -2),
+    nw: new Hex(-1, 2, -1),
+    ne: new Hex(1, 1, -2),
 };
 
 class OffsetCoord {
