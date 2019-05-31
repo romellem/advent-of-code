@@ -78,22 +78,22 @@ class Hex {
         return results;
     }
 }
-Hex.directions = [
-    new Hex(1, 0, -1),
-    new Hex(1, -1, 0),
-    new Hex(0, -1, 1),
-    new Hex(-1, 0, 1),
-    new Hex(-1, 1, 0),
-    new Hex(0, 1, -1),
-];
-Hex.diagonals = [
-    new Hex(2, -1, -1),
-    new Hex(1, -2, 1),
-    new Hex(-1, -1, 2),
-    new Hex(-2, 1, 1),
-    new Hex(-1, 2, -1),
-    new Hex(1, 1, -2),
-];
+Hex.directions = {
+    n: new Hex(0, -1, 1),
+    ne: new Hex(1, -1, 0),
+    sw: new Hex(-1, 0, 1),
+    s: new Hex(0, 1, -1),
+    se: new Hex(1, 0, -1),
+    nw: new Hex(-1, 1, 0),
+};
+Hex.diagonals = {
+    e: new Hex(2, -1, -1),
+    ne: new Hex(1, -2, 1),
+    nw: new Hex(-1, -1, 2),
+    w: new Hex(-2, 1, 1),
+    sw: new Hex(-1, 2, -1),
+    se: new Hex(1, 1, -2),
+};
 
 class OffsetCoord {
     constructor(col, row) {
