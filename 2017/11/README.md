@@ -2,7 +2,7 @@
 
 | Part 1 | Part 2 |
 |--------|--------|
-|  `747` |  ` ` |
+|  `747` | `1544` |
 
 ## --- Day 11: Hex Ed ---
 
@@ -31,3 +31,9 @@ For example:
 *   `ne,ne,sw,sw` is `0` steps away (back where you started).
 *   `ne,ne,s,s` is `2` steps away (`se,se`).
 *   `se,sw,se,sw,sw` is `3` steps away (`s,s,sw`).
+
+-----------------
+
+## --- Part Two ---
+
+_How many steps away_ is the _furthest_ he ever got from his starting position?
