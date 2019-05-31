@@ -77,6 +77,11 @@ class Hex {
         }
         return results;
     }
+
+    toString() {
+        let { q, r, s } = this;
+        return [q, r, s].join(',');
+    }
 }
 Hex.directions = {
     n: new Hex(0, -1, 1),
