@@ -42,8 +42,6 @@ class Firewall {
         this.layers = Array(max_depth + 1)
             .fill()
             .map((layer, depth) => new Layer(layers_lookup[depth]));
-
-        this.times_caught = [];
     }
 
     getMaxDepth(layers) {
@@ -59,6 +57,7 @@ class Firewall {
     }
 
     moveThrough(checkPosition = 0) {
+        let times_caught = [];
         this.layers.forEach((layer, time) => {
             /**
              * First, particle enters (determined by `time`),
@@ -68,14 +67,20 @@ class Firewall {
              * by the layers `range`.
              */
             if (layer.scanner === checkPosition) {
-                this.times_caught.push(time * layer.range);
+                times_caught.push(time * layer.range);
             }
 
             // Next, tick all layers' scanners forward
-            this.layers.forEach(l => l.tick());
+            this.tickAll();
         });
 
-        return this.times_caught.reduce((a, b) => a + b, 0);
+        return times_caught.reduce((a, b) => a + b, 0);
+    }
+
+    tickAll(n = 1) {
+        for (let i = 0; i < n; i++) {
+            this.layers.forEach(l => l.tick());
+        }
     }
 }
 
