@@ -32,9 +32,9 @@ class Layer {
 }
 
 class Firewall {
-    constructor(layers_orig) {
+    constructor(layers) {
         // Poor man's deep clone
-        let layers = JSON.parse(JSON.stringify(layers_orig));
+        // let layers = JSON.parse(JSON.stringify(layers_orig));
 
         let max_depth = this.getMaxDepth(layers);
         let layers_lookup = this.convertLayersArrayToMap(layers);
@@ -57,7 +57,11 @@ class Firewall {
         return mapValues(keyBy(layers, 'depth'), 'range');
     }
 
-    moveThrough(checkPosition = 0) {
+    /**
+     * @param {Boolean} return_severity - When true, returns the "severity" score. When false, returns `true` if you _were_ caught, false if otherwise.
+     * @returns {Number|Boolean}
+     */
+    moveThrough(return_severity = true) {
         let times_caught = [];
         this.layers.forEach((layer, time) => {
             /**
@@ -67,7 +71,7 @@ class Firewall {
              * to our tracker array, with `time` multiplied
              * by the layers `range`.
              */
-            if (layer.scanner === checkPosition) {
+            if (layer.scanner === 0) {
                 times_caught.push(time * layer.range);
             }
 
@@ -75,7 +79,7 @@ class Firewall {
             this.tickAll();
         });
 
-        return times_caught.reduce((a, b) => a + b, 0);
+        return return_severity ? times_caught.reduce((a, b) => a + b, 0) : Boolean(times_caught.length);
     }
 
     tickAll(n = 1) {
