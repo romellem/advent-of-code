@@ -3,7 +3,7 @@ const { input, sampleInput } = require('./input');
 const Firewall = require('./firewall');
 
 // Tests
-let test_delay = -1;
+let test_delay = 22;
 let test_caught;
 do {
     test_delay++;
@@ -13,7 +13,10 @@ do {
     test_caught = test_firewall.moveThrough(false);
 } while (test_caught === true);
 
-assert.strictEqual(test_delay, sampleInput.delay);
+console.log(test_delay)
+process.exit(1)
+
+// assert.strictEqual(test_delay, sampleInput.delay);
 
 let delay = -1;
 let caught;
@@ -24,7 +27,7 @@ do {
     firewall.tickAll(delay);
     caught = firewall.moveThrough(false);
 
-    process.stdout.write(delay + '\r');
+    if (delay % 89 === 0) process.stdout.write(delay + '\r');
 } while (caught === true);
 
 console.log('\n\n=====\n',delay);

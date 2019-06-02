@@ -58,28 +58,39 @@ class Firewall {
     }
 
     /**
-     * @param {Boolean} return_severity - When true, returns the "severity" score. When false, returns `true` if you _were_ caught, false if otherwise.
+     * @param {Boolean} return_severity - When true, returns the "severity" score.
+     *                                    When false, returns `true` if you _were_ caught, false if otherwise.
      * @returns {Number|Boolean}
      */
     moveThrough(return_severity = true) {
         let times_caught = [];
-        this.layers.forEach((layer, time) => {
+        for (let time = 0; time < this.layers.length; time++) {
+            let layer = this.layers[time];
             /**
              * First, particle enters (determined by `time`),
              * so we see if the layer at `time` has the scanner
-             * in position `0`. If so, push a "time_caught"
-             * to our tracker array, with `time` multiplied
-             * by the layers `range`.
+             * in position `0`.
+             *
+             * If we are "returning the severity score,"
+             * then, push a "time_caught" into our array,
+             * with `time` multiplied by the layers `range`.
+             *
+             * If we want to see if we are caught only, then
+             * exit immediately.
              */
             if (layer.scanner === 0) {
-                times_caught.push(time * layer.range);
+                if (return_severity) {
+                    times_caught.push(time * layer.range);
+                } else {
+                    return true;
+                }
             }
 
             // Next, tick all layers' scanners forward
             this.tickAll();
-        });
+        }
 
-        return return_severity ? times_caught.reduce((a, b) => a + b, 0) : Boolean(times_caught.length);
+        return return_severity ? times_caught.reduce((a, b) => a + b, 0) : false;
     }
 
     tickAll(n = 1) {
