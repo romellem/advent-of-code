@@ -45,6 +45,31 @@ class Firewall {
             .map((layer, depth) => new Layer(layers_lookup[depth]));
     }
 
+    /**
+     * @param {Array} layers - Array of `{ depth, range }` Objects
+     * @param {Number} initial_delay
+     * @returns {Number}
+     */
+    static calculateMinDelayToMoveUncaught(layers, initial_delay = -1) {
+        let delay = initial_delay;
+        let found_failure;
+        do {
+            delay++;
+            found_failure = false;
+
+            for (let layer of layers) {
+                let { depth, range } = layer;
+                let modulus = (range - 1) * 2;
+                if ((delay + depth) % modulus === 0) {
+                    found_failure = true;
+                    break;
+                }
+            }
+        } while (found_failure);
+
+        return delay;
+    }
+
     getMaxDepth(layers) {
         return Math.max.apply(null, layers.map(l => l.depth));
     }
@@ -57,40 +82,25 @@ class Firewall {
         return mapValues(keyBy(layers, 'depth'), 'range');
     }
 
-    /**
-     * @param {Boolean} return_severity - When true, returns the "severity" score.
-     *                                    When false, returns `true` if you _were_ caught, false if otherwise.
-     * @returns {Number|Boolean}
-     */
-    moveThrough(return_severity = true) {
+    moveThrough() {
         let times_caught = [];
         for (let time = 0; time < this.layers.length; time++) {
             let layer = this.layers[time];
             /**
              * First, particle enters (determined by `time`),
              * so we see if the layer at `time` has the scanner
-             * in position `0`.
-             *
-             * If we are "returning the severity score,"
-             * then, push a "time_caught" into our array,
-             * with `time` multiplied by the layers `range`.
-             *
-             * If we want to see if we are caught only, then
-             * exit immediately.
+             * in position `0`. If so, push a "time_caught" into our
+             * array, with `time` multiplied by the layers `range`.
              */
             if (layer.scanner === 0) {
-                if (return_severity) {
-                    times_caught.push(time * layer.range);
-                } else {
-                    return true;
-                }
+                times_caught.push(time * layer.range);
             }
 
             // Next, tick all layers' scanners forward
             this.tickAll();
         }
 
-        return return_severity ? times_caught.reduce((a, b) => a + b, 0) : false;
+        return times_caught.reduce((a, b) => a + b, 0);
     }
 
     tickAll(n = 1) {
