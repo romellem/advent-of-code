@@ -5,16 +5,26 @@ class Layer {
         this.range = range;
 
         this.scanner = null;
+        this.direction = null;
+
         if (this.range > 0) {
-            // Initialize the scanner at position 0
+            // Initialize the scanner at position 0, going down (+1)
             this.scanner = 0;
+            this.direction = 1;
         }
     }
 
     tick() {
         if (this.range > 0) {
-            this.scanner++;
-            this.scanner %= this.range;
+            this.scanner += this.direction;
+
+            // If we are at the end, or are at the beginning, the flip the direction
+            if (
+                (this.direction === 1 && this.scanner === this.range - 1) ||
+                (this.direction === -1 && this.scanner === 0)
+            ) {
+                this.direction *= -1;
+            }
         }
 
         return this.scanner;
