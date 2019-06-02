@@ -6,3 +6,6 @@ const Firewall = require('./firewall');
 let test_firewall = new Firewall(sampleInput.config);
 let test_severity = test_firewall.moveThrough();
 assert.strictEqual(test_severity, sampleInput.severity);
+
+let firewall = new Firewall(input);
+console.log(firewall.moveThrough());
