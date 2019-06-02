@@ -32,9 +32,10 @@ class Layer {
 }
 
 class Firewall {
-    constructor(layers) {
+    constructor(layers_orig) {
         // Poor man's deep clone
-        // this.layers = JSON.parse(JSON.stringify(layers));
+        let layers = JSON.parse(JSON.stringify(layers_orig));
+
         let max_depth = this.getMaxDepth(layers);
         let layers_lookup = this.convertLayersArrayToMap(layers);
 

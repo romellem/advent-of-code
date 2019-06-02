@@ -54,5 +54,6 @@ module.exports = {
             { depth: 6, range: 4 },
         ],
         severity: 24, // 0 * 3 + 6 * 4
+        delay: 10,
     },
 };
