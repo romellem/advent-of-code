@@ -1,18 +1,30 @@
 // Helper, I use this a bit
 const isStr = val => typeof val === 'string';
 
-class Duet {
-    constructor(program) {
+class Program {
+    constructor(id, program) {
+        this.id = id;
+        this.queue = [];
+        this.sibling;
+
         this.program = JSON.parse(JSON.stringify(program));
-        this.registers = Duet.getUniqueRegisters(this.program);
+        this.registers = Program.getUniqueRegisters(this.program);
         this.index = 0;
         this.finished = false;
+        this.sent_count = 0;
+    }
 
-        this.last_sound_played = null;
+    setSibling(sibling) {
+        this.sibling = sibling;
+    }
+
+    addToQueue(value) {
+        this.queue.push(value);
     }
 
     snd(value) {
-        this.last_sound_played = this.getValueAtRegister(value);
+        this.sent_count++;
+        this.sibling.addToQueue(this.getValueAtRegister(value));
     }
 
     set(register, value) {
@@ -31,20 +43,19 @@ class Duet {
         this.registers[register] %= this.getValueAtRegister(value);
     }
 
-    /**
-     * `rcv X` recovers the frequency of the last sound played,
-     * but only when the value of `X` is not zero. (If it is zero,
-     * the command does nothing.)
-     *
-     * In practice, this is what "halts" the program, where returning
-     * `true` halts, and `false` continues.
-     */
-    rcv(value) {
-        if (this.getValueAtRegister(value) !== 0) {
+    canReceive() {
+        return Boolean(this.queue.length);
+    }
+
+    rcv(register) {
+        if (this.queue.length > 0) {
+            // Set register to the value at top of the queue
+            this.registers[register] = this.queue.pop();
+            return false;
+        } else {
+            // Halt the program, nothing to receive
             this.finished = true;
             return true;
-        } else {
-            return false;
         }
     }
 
@@ -69,6 +80,9 @@ class Duet {
             }
         }
 
+        // Adds program ID to register 'p'
+        registers['p'] = this.id;
+
         return return_object ? registers : Object.keys(registers);
     }
 
@@ -76,19 +90,60 @@ class Duet {
         return isStr(value) ? this.registers[value] : value;
     }
 
-    run() {
-        while (!this.finished) {
-            let { type, x, y } = this.program[this.index];
-            let value = this[type](x, y);
-            if (type === 'jgz' && value === true) {
-                // Do nothing, we jumped. Otherwise, skip the `jgz` instruction
-            } else {
-                this.index++;
-            }
+    tick() {
+        let { type, x, y } = this.program[this.index];
+        let value = this[type](x, y);
+        if (type === 'jgz' && value === true) {
+            // Do nothing, we jumped. Otherwise, skip the `jgz` instruction
+        } else {
+            this.index++;
         }
 
         return this.last_sound_played;
     }
+
+    peekCurrentInstructionType() {
+        return this.program[this.index].type;
+    }
 }
 
-module.exports = Duet;
+class ParallelPrograms {
+    constructor(program) {
+        this.programs = [
+            new Program(0, program),
+            new Program(1, program),
+        ];
+
+        this.programs[0].setSibling(this.programs[1]);
+        this.programs[1].setSibling(this.programs[0]);
+    }
+
+    orchestrateRun() {
+        let current_program = 0;
+        let flip_count = 0;
+        let p = this.programs[current_program];
+
+        do {
+            if (p.peekCurrentInstructionType() === 'rcv' && !p.canReceive()) {
+                flip_count++;
+
+                if (flip_count >= 2) {
+                    // Flipped twice, neither program can receive, so we should be deadlocked
+                    p.tick();
+                } else {
+                    // Hackky way to toggle between 0 and 1
+                    current_program = +!current_program;
+                    p = this.programs[current_program];
+                }
+            } else {
+                p.tick();
+            }
+            
+        } while (!this.programs[0].finished && !this.programs[1].finished);
+
+        return this.programs[1].sent_count;
+    }
+
+}
+
+module.exports = ParallelPrograms;
