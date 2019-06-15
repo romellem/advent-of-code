@@ -1,8 +1,8 @@
 # Answers
 
-|       Part 1       |       Part 2       |
-|--------------------|--------------------|
-| ` ` | ` ` |
+| Part 1 | Part 2 |
+|--------|--------|
+| `4225` | ` ` |
 
 ## --- Day 23: Coprocessor Conflagration ---
 
@@ -21,15 +21,16 @@ The coprocessor is currently set to some kind of _debug mode_, which allows for 
 
 If you run the program (your puzzle input), _how many times is the `mul` instruction invoked?_
 
+-----------------
 
-## Part two
+## --- Part Two ---
 
-Now, it’s time to fix the problem.
+Now, it's time to fix the problem.
 
-The debug mode switch is wired directly to register a. You flip the switch, which makes register a now start at 1 when the program is executed.
+The _debug mode switch_ is wired directly to register `a`. You flip the switch, which makes _register `a` now start at `1`_ when the program is executed.
 
-Immediately, the coprocessor begins to overheat. Whoever wrote this program obviously didn’t choose a very efficient implementation. You’ll need to optimize the program if it has any hope of completing before Santa needs that printer working.
+Immediately, the coprocessor begins to overheat. Whoever wrote this program obviously didn't choose a very efficient implementation. You'll need to _optimize the program_ if it has any hope of completing before Santa needs that printer working.
 
-The coprocessor’s ultimate goal is to determine the final value left in register h once the program completes. Technically, if it had that… it wouldn’t even need to run the program.
+The coprocessor's ultimate goal is to determine the final value left in register `h` once the program completes. Technically, if it had that... it wouldn't even need to run the program.
 
-After setting register a to 1, if the program were to run to completion, what value would be left in register h?
+After setting register `a` to `1`, if the program were to run to completion, _what value would be left in register `h`?_
