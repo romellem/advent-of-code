@@ -148,8 +148,6 @@ class GameGraph {
 
         this.win_nodes = [];
         this.loss_nodes = [];
-
-        this.buildTree();
     }
 
     buildTree(base = this.baseNode) {
@@ -164,39 +162,51 @@ class GameGraph {
                 let next_turn, local_state;
 
                 // Missle
-                local_state = new Game(reduce(state, { type: 'CAST_SPELL', payload: 'MISSLE' }));
-                this.graph.addEdge(base, local_state, { weight: SPELLS.MISSLE.mana });
-                next_turn = new Game(postTick(local_state));
-                this.graph.addEdge(local_state, next_turn);
-                this.buildTree(next_turn);
+                if (state.playerMana >= SPELLS.MISSLE.mana) {
+                    local_state = new Game(reduce(state, { type: 'CAST_SPELL', payload: 'MISSLE' }));
+                    this.graph.addEdge(base, local_state, { weight: SPELLS.MISSLE.mana });
+                    next_turn = new Game(postTick(local_state.state));
+                    this.graph.addEdge(local_state, next_turn);
+                    this.buildTree(next_turn);
+                }
 
                 // Drain
-                local_state = new Game(reduce(state, { type: 'CAST_SPELL', payload: 'DRAIN' }));
-                this.graph.addEdge(base, local_state, { weight: SPELLS.DRAIN.mana });
-                next_turn = new Game(postTick(local_state));
-                this.graph.addEdge(local_state, next_turn);
-                this.buildTree(next_turn);
-
-                // Shield
-                local_state = new Game(reduce(state, { type: 'CAST_SPELL', payload: 'SHIELD' }));
-                this.graph.addEdge(base, local_state, { weight: SPELLS.SHIELD.mana });
-                next_turn = new Game(postTick(local_state));
-                this.graph.addEdge(local_state, next_turn);
-                this.buildTree(next_turn);
+                if (state.playerMana >= SPELLS.DRAIN.mana) {
+                    local_state = new Game(reduce(state, { type: 'CAST_SPELL', payload: 'DRAIN' }));
+                    this.graph.addEdge(base, local_state, { weight: SPELLS.DRAIN.mana });
+                    next_turn = new Game(postTick(local_state.state));
+                    this.graph.addEdge(local_state, next_turn);
+                    this.buildTree(next_turn);
+                }
 
                 // Poison
-                local_state = new Game(reduce(state, { type: 'CAST_SPELL', payload: 'POISON' }));
-                this.graph.addEdge(base, local_state, { weight: SPELLS.POISON.mana });
-                next_turn = new Game(postTick(local_state));
-                this.graph.addEdge(local_state, next_turn);
-                this.buildTree(next_turn);
+                if (!state.poison && state.playerMana >= SPELLS.POISON.mana) {
+                    local_state = new Game(reduce(state, { type: 'CAST_SPELL', payload: 'POISON' }));
+                    this.graph.addEdge(base, local_state, { weight: SPELLS.POISON.mana });
+                    next_turn = new Game(postTick(local_state.state));
+                    this.graph.addEdge(local_state, next_turn);
+                    this.buildTree(next_turn);
+                }
+
+                // Shield
+                if (!state.shield && state.playerMana >= SPELLS.SHIELD.mana) {
+                    local_state = new Game(reduce(state, { type: 'CAST_SPELL', payload: 'SHIELD' }));
+                    this.graph.addEdge(base, local_state, { weight: SPELLS.SHIELD.mana });
+                    next_turn = new Game(postTick(local_state.state));
+                    this.graph.addEdge(local_state, next_turn);
+                    this.buildTree(next_turn);
+                }
+
+                
 
                 // Recharge
-                local_state = new Game(reduce(state, { type: 'CAST_SPELL', payload: 'RECHARGE' }));
-                this.graph.addEdge(base, local_state, { weight: SPELLS.RECHARGE.mana });
-                next_turn = new Game(postTick(local_state));
-                this.graph.addEdge(local_state, next_turn);
-                this.buildTree(next_turn);
+                if (!state.recharge && state.playerMana >= SPELLS.RECHARGE.mana) {
+                    local_state = new Game(reduce(state, { type: 'CAST_SPELL', payload: 'RECHARGE' }));
+                    this.graph.addEdge(base, local_state, { weight: SPELLS.RECHARGE.mana });
+                    next_turn = new Game(postTick(local_state.state));
+                    this.graph.addEdge(local_state, next_turn);
+                    this.buildTree(next_turn);
+                }
             } else {
                 // Boss
                 let next_turn, local_state;
@@ -204,19 +214,23 @@ class GameGraph {
                 // Boss's only action
                 local_state = new Game(reduce(state, { type: 'BOSS_DAMAGE' }));
                 this.graph.addEdge(base, local_state);
-                next_turn = new Game(postTick(local_state));
+                next_turn = new Game(postTick(local_state.state));
                 this.graph.addEdge(local_state, next_turn);
                 this.buildTree(next_turn);
             }
         } else {
             // Game over! This `base` node is an "end" state
+            let end_node = new Game(state);
+            this.graph.addEdge(base, end_node, { gameOver: true });
             if (state.status === 'win') {
-                this.win_nodes.push(base);
+                this.win_nodes.push(end_node);
             } else {
-                this.loss_nodes.push(base);
+                this.loss_nodes.push(end_node);
             }
         }
     }
 
     
 }
+
+module.exports = GameGraph;
