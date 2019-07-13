@@ -28,6 +28,7 @@
     "looped-list": "^0.1.1",
     "manhattan": "^1.0.0",
     "pathfinding": "^0.4.18",
+    "redux": "^4.0.4",
     "table": "^5.3.3",
     "traverse": "^0.6.6"
   }

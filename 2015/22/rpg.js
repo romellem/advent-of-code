@@ -48,7 +48,6 @@ class Game {
     run() {
         let moves = this.getNextMoves();
         if (moves === true) {
-            
         }
     }
 
