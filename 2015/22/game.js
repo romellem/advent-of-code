@@ -1,5 +1,5 @@
 // Keep it flat to help with spread operators
-const initial_state = {
+const real_state = {
     round: 0, // Only used internally in case we run into a duplicate state later (don't know if that's possible...)
     turn: 'player', // player, boss
     status: 'playing', // playing, won, lost
@@ -17,30 +17,67 @@ const initial_state = {
     recharge: 0,
 };
 
-// const initial_state = {
-//     round: 0,
-//     turn: 'player', // player, boss
-//     status: 'playing', // playing, won, lost
+const test_state = {
+    round: 0,
+    turn: 'player', // player, boss
+    status: 'playing', // playing, won, lost
 
-//     playerHp: 10,
-//     playerMana: 250,
-//     playerArmor: 0,
+    playerHp: 10,
+    playerMana: 250,
+    playerArmor: 0,
 
-//     // From puzzle input
-//     bossHp: 14,
-//     bossDamage: 8,
+    // From puzzle input
+    bossHp: 14,
+    bossDamage: 8,
 
-//     shield: 0,
-//     poison: 0,
-//     recharge: 0,
-// };
+    shield: 0,
+    poison: 0,
+    recharge: 0,
+};
+
+const ADVANCE_EFFECT_TIMERS = { type: 'ADVANCE_EFFECT_TIMERS' };
+const APPLY_EFFECTS = { type: 'APPLY_EFFECTS' };
+const CHECK_STATUS = { type: 'CHECK_STATUS' };
+const NEXT_TURN = { type: 'NEXT_TURN' };
+
+const MISSLE_SPELL = { type: 'CAST_SPELL', payload: 'MISSLE' };
+const DRAIN_SPELL = { type: 'CAST_SPELL', payload: 'DRAIN' };
+const SHIELD_SPELL = { type: 'CAST_SPELL', payload: 'SHIELD' };
+const POISON_SPELL = { type: 'CAST_SPELL', payload: 'POISON' };
+const RECHARGE_SPELL = { type: 'CAST_SPELL', payload: 'RECHARGE' };
+
+const BOSS_DAMAGE = { type: 'BOSS_DAMAGE' };
+
+// ****************************************
+// Toggle between real and test if you want
+// ****************************************
+
+const initial_state = real_state;
+// const initial_state = test_state;
 
 function Game(state, spell) {
     this.state = Object.assign({}, state);
     this.spell = spell;
 }
 Game.prototype.toString = function() {
-    return JSON.stringify(this.state);
+    // For how many nodes I have in my graph, this ends up being too slow.
+    // Faster (and more memory efficient) to hard code a unique key for this obj
+    // return JSON.stringify(this.state);
+
+    let {
+        round,
+        turn,
+        status,
+        playerHp,
+        playerMana,
+        playerArmor,
+        bossHp,
+        bossDamage,
+        shield,
+        poison,
+        recharge,
+    } = this.state;
+    return `${round},${turn},${status},${playerHp},${playerMana},${playerArmor},${bossHp},${bossDamage},${shield},${poison},${recharge}`;
 };
 
 const SPELLS = {
@@ -146,15 +183,15 @@ const reduce = (state, action) => {
 };
 
 const preTick = state => {
-    state = reduce(state, { type: 'ADVANCE_EFFECT_TIMERS' });
-    state = reduce(state, { type: 'APPLY_EFFECTS' });
-    state = reduce(state, { type: 'CHECK_STATUS' });
+    state = reduce(state, ADVANCE_EFFECT_TIMERS);
+    state = reduce(state, APPLY_EFFECTS);
+    state = reduce(state, CHECK_STATUS);
 
     return state;
 };
 const postTick = state => {
-    state = reduce(state, { type: 'NEXT_TURN' });
-    state = reduce(state, { type: 'CHECK_STATUS' });
+    state = reduce(state, NEXT_TURN);
+    state = reduce(state, CHECK_STATUS);
 
     return state;
 };
@@ -166,139 +203,177 @@ class GameGraph {
         this.graph.addNode(this.baseNode);
 
         this.win_nodes = [];
+        this.pruneLeaves = this.pruneLeaves.bind(this);
         // this.loss_nodes = [];
     }
 
-    buildTree(base = this.baseNode) {
-        let { state } = base;
+    buildTree(orig_base = this.baseNode) {
+        let depth = 0;
+        let bases = [orig_base];
+        do {
+            let next_base = [];
+            console.log(`${depth++} - ${bases.length} nodes`);
+            for (let base of bases) {
+                let { state } = base;
 
-        if (state.status !== 'playing') {
-            // Game over! This `base` node is an "end" state
+                if (state.status !== 'playing') {
+                    // Game over! This `base` node is an "end" state
 
-            if (state.status === 'win') {
-                let end_node = new Game(state);
-                this.graph.addEdge(base, end_node, { gameOver: true });
-                this.win_nodes.push(end_node);
-            } else {
-                // this.loss_nodes.push(end_node);
+                    if (state.status === 'win') {
+                        let end_node = new Game(state);
+                        this.graph.addEdge(base, end_node, { weight: 0, gameOver: true });
+                        this.win_nodes.push(end_node);
+                    } else {
+                        this.pruneLeaves(base);
+                        // try { this.graph.removeNode(base) } catch (e) {}
+                        // this.loss_nodes.push(end_node);
+                    }
+                } else {
+                    // Advance effect timers, apply effects, and check status of game
+                    state = preTick(state);
+
+                    if (state.status === 'playing') {
+                        // If we are playing, return new edges
+                        if (state.turn === 'player') {
+                            let next_turn, local_state;
+
+                            // Missle
+                            if (state.playerMana >= SPELLS.MISSLE.mana) {
+                                // console.log(`${state.round}\tPlayer (HP: ${state.playerHp}, MANA: ${state.playerMana}) - MISSLE`);
+                                local_state = new Game(reduce(state, MISSLE_SPELL), 'MISSLE');
+                                this.graph.addEdge(base, local_state, {
+                                    weight: SPELLS.MISSLE.mana,
+                                });
+                                next_turn = new Game(postTick(local_state.state));
+                                this.graph.addEdge(local_state, next_turn, { weight: 0 });
+                                // this.buildTree(next_turn);
+                                next_base.push(next_turn);
+                            }
+
+                            // Drain
+                            if (state.playerMana >= SPELLS.DRAIN.mana) {
+                                // console.log(`${state.round}\tPlayer (HP: ${state.playerHp}, MANA: ${state.playerMana})- DRAIN`);
+                                local_state = new Game(reduce(state, DRAIN_SPELL), 'DRAIN');
+                                this.graph.addEdge(base, local_state, {
+                                    weight: SPELLS.DRAIN.mana,
+                                });
+                                next_turn = new Game(postTick(local_state.state));
+                                this.graph.addEdge(local_state, next_turn, { weight: 0 });
+                                // this.buildTree(next_turn);
+                                next_base.push(next_turn);
+                            }
+
+                            // Poison
+                            if (!state.poison && state.playerMana >= SPELLS.POISON.mana) {
+                                // console.log(`${state.round}\tPlayer (HP: ${state.playerHp}, MANA: ${state.playerMana})- POISON`);
+                                local_state = new Game(reduce(state, POISON_SPELL), 'POISON');
+                                this.graph.addEdge(base, local_state, {
+                                    weight: SPELLS.POISON.mana,
+                                });
+                                next_turn = new Game(postTick(local_state.state));
+                                this.graph.addEdge(local_state, next_turn, { weight: 0 });
+                                next_base.push(next_turn);
+                            }
+
+                            // Shield
+                            if (!state.shield && state.playerMana >= SPELLS.SHIELD.mana) {
+                                // console.log(`${state.round}\tPlayer (HP: ${state.playerHp}, MANA: ${state.playerMana})- SHIELD`);
+                                local_state = new Game(reduce(state, SHIELD_SPELL), 'SHIELD');
+                                this.graph.addEdge(base, local_state, {
+                                    weight: SPELLS.SHIELD.mana,
+                                });
+                                next_turn = new Game(postTick(local_state.state));
+                                this.graph.addEdge(local_state, next_turn, { weight: 0 });
+                                next_base.push(next_turn);
+                            }
+
+                            // Recharge
+                            if (!state.recharge && state.playerMana >= SPELLS.RECHARGE.mana) {
+                                // console.log(`${state.round}\tPlayer (HP: ${state.playerHp}, MANA: ${state.playerMana}) - RECHARGE`);
+                                local_state = new Game(reduce(state, RECHARGE_SPELL), 'RECHARGE');
+                                this.graph.addEdge(base, local_state, {
+                                    weight: SPELLS.RECHARGE.mana,
+                                });
+                                next_turn = new Game(postTick(local_state.state));
+                                this.graph.addEdge(local_state, next_turn, { weight: 0 });
+                                next_base.push(next_turn);
+                            }
+                        } else {
+                            // Boss
+                            let next_turn, local_state;
+
+                            // Boss's only action
+                            // console.log(`${state.round}\tBoss (HP: ${state.bossHp}) - DAMAGE`);
+                            local_state = new Game(reduce(state, BOSS_DAMAGE));
+                            this.graph.addEdge(base, local_state, { weight: 0 });
+                            next_turn = new Game(postTick(local_state.state));
+                            this.graph.addEdge(local_state, next_turn, { weight: 0 });
+                            next_base.push(next_turn);
+                        }
+                    } else {
+                        // Game over! This `base` node is an "end" state
+
+                        // console.log(`${state.round}\tGAME OVER - ${state.status.toUpperCase()}`);
+                        // console.log(`==================\n`);
+
+                        if (state.status === 'win') {
+                            let end_node = new Game(state);
+                            this.graph.addEdge(base, end_node, { weight: 0, gameOver: true });
+                            this.win_nodes.push(end_node);
+                        } else {
+                            this.pruneLeaves(base);
+                            // try { this.graph.removeNode(base) } catch (e) {}
+                            // this.loss_nodes.push(end_node);
+                        }
+                    }
+                }
             }
 
-            return;
-        }
+            bases = next_base;
+        } while (bases.length > 0);
+    }
 
-        // Advance effect timers, apply effects, and check status of game
-        state = preTick(state);
-
-        if (state.status === 'playing') {
-            // If we are playing, return new edges
-            if (state.turn === 'player') {
-                let next_turn, local_state;
-
-                // Missle
-                if (state.playerMana >= SPELLS.MISSLE.mana) {
-                    // console.log(`${state.round}\tPlayer (HP: ${state.playerHp}, MANA: ${state.playerMana}) - MISSLE`);
-                    local_state = new Game(
-                        reduce(state, { type: 'CAST_SPELL', payload: 'MISSLE' }),
-                        'MISSLE'
-                    );
-                    this.graph.addEdge(base, local_state, { weight: SPELLS.MISSLE.mana });
-                    next_turn = new Game(postTick(local_state.state));
-                    this.graph.addEdge(local_state, next_turn);
-                    this.buildTree(next_turn);
+    pruneLeaves(node) {
+        let siblings;
+        try {
+            siblings = this.graph.neighbors(node);
+        } catch (e) {}
+        if (siblings && siblings.length === 0) {
+            let parents = [];
+            try {
+                parents = this.graph.predecessors(node);
+            } catch (e) {}
+            try {
+                this.graph.removeNode(node);
+                for (let parent of parents) {
+                    this.pruneLeaves(parent);
                 }
-
-                // Drain
-                if (state.playerMana >= SPELLS.DRAIN.mana) {
-                    // console.log(`${state.round}\tPlayer (HP: ${state.playerHp}, MANA: ${state.playerMana})- DRAIN`);
-                    local_state = new Game(
-                        reduce(state, { type: 'CAST_SPELL', payload: 'DRAIN' }),
-                        'DRAIN'
-                    );
-                    this.graph.addEdge(base, local_state, { weight: SPELLS.DRAIN.mana });
-                    next_turn = new Game(postTick(local_state.state));
-                    this.graph.addEdge(local_state, next_turn);
-                    this.buildTree(next_turn);
-                }
-
-                // Poison
-                if (!state.poison && state.playerMana >= SPELLS.POISON.mana) {
-                    // console.log(`${state.round}\tPlayer (HP: ${state.playerHp}, MANA: ${state.playerMana})- POISON`);
-                    local_state = new Game(
-                        reduce(state, { type: 'CAST_SPELL', payload: 'POISON' }),
-                        'POISON'
-                    );
-                    this.graph.addEdge(base, local_state, { weight: SPELLS.POISON.mana });
-                    next_turn = new Game(postTick(local_state.state));
-                    this.graph.addEdge(local_state, next_turn);
-                    this.buildTree(next_turn);
-                }
-
-                // Shield
-                if (!state.shield && state.playerMana >= SPELLS.SHIELD.mana) {
-                    // console.log(`${state.round}\tPlayer (HP: ${state.playerHp}, MANA: ${state.playerMana})- SHIELD`);
-                    local_state = new Game(
-                        reduce(state, { type: 'CAST_SPELL', payload: 'SHIELD' }),
-                        'SHIELD'
-                    );
-                    this.graph.addEdge(base, local_state, { weight: SPELLS.SHIELD.mana });
-                    next_turn = new Game(postTick(local_state.state));
-                    this.graph.addEdge(local_state, next_turn);
-                    this.buildTree(next_turn);
-                }
-
-                // Recharge
-                if (!state.recharge && state.playerMana >= SPELLS.RECHARGE.mana) {
-                    // console.log(`${state.round}\tPlayer (HP: ${state.playerHp}, MANA: ${state.playerMana}) - RECHARGE`);
-                    local_state = new Game(
-                        reduce(state, { type: 'CAST_SPELL', payload: 'RECHARGE' }),
-                        'RECHARGE'
-                    );
-                    this.graph.addEdge(base, local_state, { weight: SPELLS.RECHARGE.mana });
-                    next_turn = new Game(postTick(local_state.state));
-                    this.graph.addEdge(local_state, next_turn);
-                    this.buildTree(next_turn);
-                }
-            } else {
-                // Boss
-                let next_turn, local_state;
-
-                // Boss's only action
-                // console.log(`${state.round}\tBoss (HP: ${state.bossHp}) - DAMAGE`);
-                local_state = new Game(reduce(state, { type: 'BOSS_DAMAGE' }));
-                this.graph.addEdge(base, local_state);
-                next_turn = new Game(postTick(local_state.state));
-                this.graph.addEdge(local_state, next_turn);
-                this.buildTree(next_turn);
-            }
-        } else {
-            // Game over! This `base` node is an "end" state
-
-            // console.log(`${state.round}\tGAME OVER - ${state.status.toUpperCase()}`);
-            // console.log(`==================\n`);
-
-            if (state.status === 'win') {
-                let end_node = new Game(state);
-                this.graph.addEdge(base, end_node, { gameOver: true });
-                this.win_nodes.push(end_node);
-            } else {
-                // this.loss_nodes.push(end_node);
-            }
+            } catch (e) {}
         }
     }
 
     getWinningPaths() {
+        console.log(this.win_nodes.length + ' total winning paths');
+        let shortest_path = Number.MAX_SAFE_INTEGER;
         let paths_and_weights = this.win_nodes.map(target => {
-            return {
-                path: jsnx
-                    .dijkstraPath(this.graph, { source: this.baseNode, target })
-                    .map(({ state, spell }) => {
-                        let { round, turn, playerHp, bossHp } = state;
-                        return `${round}\t${turn.toUpperCase()[0]} - P:${playerHp} B:${bossHp}${
-                            spell ? ' - ' + spell : ''
-                        }`;
-                    }),
-                weight: jsnx.dijkstraPathLength(this.graph, { source: this.baseNode, target }),
-            };
+            // let weight = jsnx.dijkstraPathLength(this.graph, { source: this.baseNode, target });
+            let weight = jsnx.shortestPathLength(this.graph, { source: this.baseNode, target, weight: 'weight' });
+            if (weight < shortest_path) {
+                console.log('Shortest ', weight);
+                shortest_path = weight;
+            }
+            return { weight };
+            // return {
+            //     path: jsnx
+            //         .dijkstraPath(this.graph, { source: this.baseNode, target })
+            //         .map(({ state, spell }) => {
+            //             let { round, turn, playerHp, bossHp } = state;
+            //             return `${round}\t${turn.toUpperCase()[0]} - P:${playerHp} B:${bossHp}${
+            //                 spell ? ' - ' + spell : ''
+            //             }`;
+            //         }),
+            //     weight: jsnx.dijkstraPathLength(this.graph, { source: this.baseNode, target })
+            // };
         });
 
         return paths_and_weights;
