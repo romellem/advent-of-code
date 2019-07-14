@@ -1,8 +1,12 @@
-const GameGraph = require('./game.js');
+const GameGraph = require('./game-bfs-opt.js');
 
 let game = new GameGraph();
 console.log('Running');
-game.buildTree();
+try { game.buildTree() } catch (e) {
+    debugger;
+    console.log(e);
+}
+console.log('Number of nodes: ', game.graph.nodes().length);
 console.log('Getting shortest paths');
 let paths = game.getWinningPaths();
 let weights = paths.map(p => p.weight);

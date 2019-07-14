@@ -1,4 +1,4 @@
-const GameGraph = require('./game.js');
+const GameGraph = require('./game-bfs.js');
 
 let game = new GameGraph();
 console.log('Running');

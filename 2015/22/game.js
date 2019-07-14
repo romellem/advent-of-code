@@ -174,9 +174,10 @@ class GameGraph {
 
         if (state.status !== 'playing') {
             // Game over! This `base` node is an "end" state
-            let end_node = new Game(state);
-            this.graph.addEdge(base, end_node, { gameOver: true });
+
             if (state.status === 'win') {
+                let end_node = new Game(state);
+                this.graph.addEdge(base, end_node, { gameOver: true });
                 this.win_nodes.push(end_node);
             } else {
                 // this.loss_nodes.push(end_node);
@@ -196,7 +197,10 @@ class GameGraph {
                 // Missle
                 if (state.playerMana >= SPELLS.MISSLE.mana) {
                     // console.log(`${state.round}\tPlayer (HP: ${state.playerHp}, MANA: ${state.playerMana}) - MISSLE`);
-                    local_state = new Game(reduce(state, { type: 'CAST_SPELL', payload: 'MISSLE' }), 'MISSLE');
+                    local_state = new Game(
+                        reduce(state, { type: 'CAST_SPELL', payload: 'MISSLE' }),
+                        'MISSLE'
+                    );
                     this.graph.addEdge(base, local_state, { weight: SPELLS.MISSLE.mana });
                     next_turn = new Game(postTick(local_state.state));
                     this.graph.addEdge(local_state, next_turn);
@@ -206,7 +210,10 @@ class GameGraph {
                 // Drain
                 if (state.playerMana >= SPELLS.DRAIN.mana) {
                     // console.log(`${state.round}\tPlayer (HP: ${state.playerHp}, MANA: ${state.playerMana})- DRAIN`);
-                    local_state = new Game(reduce(state, { type: 'CAST_SPELL', payload: 'DRAIN' }), 'DRAIN');
+                    local_state = new Game(
+                        reduce(state, { type: 'CAST_SPELL', payload: 'DRAIN' }),
+                        'DRAIN'
+                    );
                     this.graph.addEdge(base, local_state, { weight: SPELLS.DRAIN.mana });
                     next_turn = new Game(postTick(local_state.state));
                     this.graph.addEdge(local_state, next_turn);
@@ -216,7 +223,10 @@ class GameGraph {
                 // Poison
                 if (!state.poison && state.playerMana >= SPELLS.POISON.mana) {
                     // console.log(`${state.round}\tPlayer (HP: ${state.playerHp}, MANA: ${state.playerMana})- POISON`);
-                    local_state = new Game(reduce(state, { type: 'CAST_SPELL', payload: 'POISON' }), 'POISON');
+                    local_state = new Game(
+                        reduce(state, { type: 'CAST_SPELL', payload: 'POISON' }),
+                        'POISON'
+                    );
                     this.graph.addEdge(base, local_state, { weight: SPELLS.POISON.mana });
                     next_turn = new Game(postTick(local_state.state));
                     this.graph.addEdge(local_state, next_turn);
@@ -226,7 +236,10 @@ class GameGraph {
                 // Shield
                 if (!state.shield && state.playerMana >= SPELLS.SHIELD.mana) {
                     // console.log(`${state.round}\tPlayer (HP: ${state.playerHp}, MANA: ${state.playerMana})- SHIELD`);
-                    local_state = new Game(reduce(state, { type: 'CAST_SPELL', payload: 'SHIELD' }), 'SHIELD');
+                    local_state = new Game(
+                        reduce(state, { type: 'CAST_SPELL', payload: 'SHIELD' }),
+                        'SHIELD'
+                    );
                     this.graph.addEdge(base, local_state, { weight: SPELLS.SHIELD.mana });
                     next_turn = new Game(postTick(local_state.state));
                     this.graph.addEdge(local_state, next_turn);
@@ -236,7 +249,10 @@ class GameGraph {
                 // Recharge
                 if (!state.recharge && state.playerMana >= SPELLS.RECHARGE.mana) {
                     // console.log(`${state.round}\tPlayer (HP: ${state.playerHp}, MANA: ${state.playerMana}) - RECHARGE`);
-                    local_state = new Game(reduce(state, { type: 'CAST_SPELL', payload: 'RECHARGE' }), 'RECHARGE');
+                    local_state = new Game(
+                        reduce(state, { type: 'CAST_SPELL', payload: 'RECHARGE' }),
+                        'RECHARGE'
+                    );
                     this.graph.addEdge(base, local_state, { weight: SPELLS.RECHARGE.mana });
                     next_turn = new Game(postTick(local_state.state));
                     this.graph.addEdge(local_state, next_turn);
@@ -247,7 +263,7 @@ class GameGraph {
                 let next_turn, local_state;
 
                 // Boss's only action
-                console.log(`${state.round}\tBoss (HP: ${state.bossHp}) - DAMAGE`);
+                // console.log(`${state.round}\tBoss (HP: ${state.bossHp}) - DAMAGE`);
                 local_state = new Game(reduce(state, { type: 'BOSS_DAMAGE' }));
                 this.graph.addEdge(base, local_state);
                 next_turn = new Game(postTick(local_state.state));
@@ -256,34 +272,37 @@ class GameGraph {
             }
         } else {
             // Game over! This `base` node is an "end" state
-            let end_node = new Game(state);
+
             // console.log(`${state.round}\tGAME OVER - ${state.status.toUpperCase()}`);
             // console.log(`==================\n`);
-            this.graph.addEdge(base, end_node, { gameOver: true });
+
             if (state.status === 'win') {
+                let end_node = new Game(state);
+                this.graph.addEdge(base, end_node, { gameOver: true });
                 this.win_nodes.push(end_node);
             } else {
                 // this.loss_nodes.push(end_node);
             }
-
         }
     }
 
     getWinningPaths() {
         let paths_and_weights = this.win_nodes.map(target => {
             return {
-                path: jsnx.dijkstraPath(this.graph, { source: this.baseNode, target }).map(({state, spell}) => {
-                    let { round, turn, playerHp, bossHp } = state;
-                    return `${round}\t${turn.toUpperCase()[0]} - P:${playerHp} B:${bossHp}${spell ? ' - ' + spell : ''}`;
-                }),
+                path: jsnx
+                    .dijkstraPath(this.graph, { source: this.baseNode, target })
+                    .map(({ state, spell }) => {
+                        let { round, turn, playerHp, bossHp } = state;
+                        return `${round}\t${turn.toUpperCase()[0]} - P:${playerHp} B:${bossHp}${
+                            spell ? ' - ' + spell : ''
+                        }`;
+                    }),
                 weight: jsnx.dijkstraPathLength(this.graph, { source: this.baseNode, target }),
-            }
+            };
         });
 
         return paths_and_weights;
     }
-
-    
 }
 
 module.exports = GameGraph;
