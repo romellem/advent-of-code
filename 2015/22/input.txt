@@ -1,0 +1,2 @@
+Hit Points: 51
+Damage: 9
