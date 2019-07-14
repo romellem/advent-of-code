@@ -79,6 +79,8 @@ while ((state = moves.pop())) {
             let { cost, damage, heal, duration } = spells[spell];
 
             // If this costs more than the mana we have, skip it
+            // Note that if we spend all out mana, this effectively kills the branch because
+            // all spells will be skipped and we'll never `push` a new state onto our moves array
             if (cost >= state.mana) {
                 continue;
             }
