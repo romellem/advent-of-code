@@ -4,6 +4,19 @@
 > programming puzzles for a variety of skill sets and skill levels that can be solved
 > in any programming language you like.
 
+This is a repo containing my solutions to [Eric Wastl's](http://was.tl/) **Advent of Code**.
+All of the solutions are in JavaScript, meant to be run via [NodeJS](https://nodejs.org/).
+When I started I had thought I'd have an [accompanying page](https://romellem.github.io/advent-of-code/)
+(that had some level of interaction) for each solution, but I quickly found that I didn't
+have much time for that. Maybe some day I'll complete (brief) write-ups for each of the
+problems, but for now, this mostly is just a collection of scripts.
+
+Also when I started, I would programmatically parse my _input_ for each problem, so I could
+drop in any other input and the script would work. As I went through the problems, I often
+found it easier to hand-parse my input and create a static JS export for each problem, so
+trying to use most of these solutions for some other puzzle input will require some level
+of manual tinkering.
+
 ## 2018 Puzzles List
 
 Completed: **19 / 25** (76%)
