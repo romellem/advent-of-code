@@ -17,7 +17,7 @@ const INSTRUCTIONS = [
 	{ op: 'jnz', args: ['d', -2] },
 	{ op: 'tgl', args: ['c'] },
 	{ op: 'cpy', args: [-16, 'c'] },
-	{ op: 'jnz', args: ['1', 'c'] },
+	{ op: 'jnz', args: [1, 'c'] },
 	{ op: 'cpy', args: [99, 'c'] },
 	{ op: 'jnz', args: [77, 'd'] },
 	{ op: 'inc', args: ['a'] },
