@@ -136,6 +136,8 @@ class ParallelPrograms {
                     p = this.programs[current_program];
                 }
             } else {
+                // I need to reset `flip_count`, but should I do it here?
+                // flip_count = 0;
                 p.tick();
             }
             
