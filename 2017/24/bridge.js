@@ -21,53 +21,84 @@ class Component {
 	toString() {
 		return `${this.a}/${this.b}`;
 	}
+
+	sum() {
+		return this.a + this.b;
+	}
 }
 
 class Bridges {
 	constructor(components) {
 		this.components = components.map(c => new Component(c));
 		const zeros = this.components.filter(c => c.has(0));
-		const pool = this.components.filter(c => !c.has(0));
 		const bridges = zeros.map(c => [c]);
 
 		this.solutions = bridges.slice(0);
-		this.buildBridges(pool, bridges, 0);
+		this.buildBridges(bridges, 0);
 	}
 
-	buildBridges(pool, bridges, current_port) {
+	generateWeakMapFromBridge(bridge) {
+		let map = new WeakMap(bridge);
+	}
+
+	buildBridges(bridges, current_port) {
 		for (let bridge of bridges) {
+			let using = new WeakMap(bridge.map(c => [c, 1]));
 			let last_component = bridge[bridge.length - 1];
 			let new_port = last_component.otherPort(current_port);
 
 			let new_bridges = [];
-			let new_pool = [];
-			for (let i = 0; i < pool.length; i++) {
-				let component = pool[i];
+			for (let i = 0; i < this.components.length; i++) {
+				let component = this.components[i];
+				if (using.has(component)) {
+					continue;
+				}
+				
 				if (component.has(new_port)) {
 					let new_bridge = bridge.concat(component);
 					new_bridges.push(new_bridge);
 
 					// Save in overall array to view solutions later
 					this.solutions.push(new_bridge);
-				} else {
-					new_pool.push(component);
 				}
 			}
 
 			if (new_bridges.length) {
-				this.buildBridges(new_pool, new_bridges, new_port);
+				this.buildBridges(new_bridges, new_port);
 			}
 		}
 
 		return this.solutions;
 	}
 
+	static getSolutionString(solution) {
+		// Uses `toString` of Connection class
+		return solution.join('-');
+	}
+
+	static getSolutionScore(solution) {
+		return solution.map(c => c.sum()).reduce((a, b) => a + b, 0);
+	}
+
 	printSolutions() {
 		for (let solution of this.solutions) {
-			// Uses `toString` of Connection class
-			let solution_str = solution.join('-');
-			console.log(solution_str);
+			console.log(Bridges.getSolutionString(solution));
 		}
+	}
+
+	getBestSolution() {
+		let best_solution = -1;
+		let best_solution_index = null;
+		for (let i = 0; i < this.solutions.length; i++) {
+			let solution = this.solutions[i];
+			let solution_score = Bridges.getSolutionScore(solution);
+			if (solution_score > best_solution) {
+				best_solution = solution_score;
+				best_solution_index = i;
+			}
+		}
+
+		return this.solutions[best_solution_index];
 	}
 }
 
