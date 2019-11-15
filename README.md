@@ -49,7 +49,7 @@ Completed: **19 / 25** (76%)
 
 ## 2017 Puzzles List
 
-Completed: **20 / 25** (80%)
+Completed: **21 / 25** (84%)
 
 *  [✅ Day 1](2017/1/)
 *  [✅ Day 2](2017/2/)
@@ -74,7 +74,7 @@ Completed: **20 / 25** (80%)
 *  Day 21
 *  Day 22
 *  Day 23
-*  Day 24
+*  [✅ Day 24](2017/24/)
 *  [✅ Day 25](2017/25/)
 
 ## 2016 Puzzles List
