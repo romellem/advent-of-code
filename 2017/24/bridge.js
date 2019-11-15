@@ -2,50 +2,73 @@ class Component {
 	constructor([port_a, port_b]) {
 		this.a = port_a;
 		this.b = port_b;
+	}
 
-		this.from = null;
-		this.to = null;
+	otherPort(n) {
+		if (this.a === n) {
+			return this.b;
+		} else if (this.b === n) {
+			return this.a;
+		} else {
+			return null;
+		}
 	}
 
 	has(n) {
 		return this.a === n || this.b === n;
 	}
 
-	connect(component) {
-		component.to = this;
-		this.from = component;
-	}
-
-	canConnect(component) {
-		return (
-			this.a === component.a ||
-			this.a === component.b ||
-			this.b === component.a ||
-			this.b === component.a
-		);
+	toString() {
+		return `${this.a}/${this.b}`;
 	}
 }
 
 class Bridges {
 	constructor(components) {
 		this.components = components.map(c => new Component(c));
-		this.zeros = this.components.filter(c => c.has(0));
+		const zeros = this.components.filter(c => c.has(0));
+		const pool = this.components.filter(c => !c.has(0));
+		const bridges = zeros.map(c => [c]);
+
+		this.solutions = bridges.slice(0);
+		this.buildBridges(pool, bridges, 0);
 	}
 
-	buildBridges(starting_points) {
-		let others = this.components(c => !starting_points.includes(c));
-		let possibilites = [];
-		for (let i = 0; i < others.length; i++) {
-			let component = this.components[i];
-			if (starting_points.includes(component)) {
-				continue;
+	buildBridges(pool, bridges, current_port) {
+		for (let bridge of bridges) {
+			let last_component = bridge[bridge.length - 1];
+			let new_port = last_component.otherPort(current_port);
+
+			let new_bridges = [];
+			let new_pool = [];
+			for (let i = 0; i < pool.length; i++) {
+				let component = pool[i];
+				if (component.has(new_port)) {
+					let new_bridge = bridge.concat(component);
+					new_bridges.push(new_bridge);
+
+					// Save in overall array to view solutions later
+					this.solutions.push(new_bridge);
+				} else {
+					new_pool.push(component);
+				}
 			}
 
-			// if (starting_points.component.)
+			if (new_bridges.length) {
+				this.buildBridges(new_pool, new_bridges, new_port);
+			}
 		}
 
-		return starting_points;
+		return this.solutions;
+	}
+
+	printSolutions() {
+		for (let solution of this.solutions) {
+			// Uses `toString` of Connection class
+			let solution_str = solution.join('-');
+			console.log(solution_str);
+		}
 	}
 }
 
-module.exports = Bridge;
+module.exports = Bridges;
