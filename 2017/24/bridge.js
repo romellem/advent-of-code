@@ -37,12 +37,9 @@ class Bridges {
 		this.buildBridges(bridges, 0);
 	}
 
-	generateWeakMapFromBridge(bridge) {
-		let map = new WeakMap(bridge);
-	}
-
 	buildBridges(bridges, current_port) {
 		for (let bridge of bridges) {
+			// The value `1` in the WeakMap is arbitrary, I only want to use it for the `.has` method later
 			let using = new WeakMap(bridge.map(c => [c, 1]));
 			let last_component = bridge[bridge.length - 1];
 			let new_port = last_component.otherPort(current_port);
@@ -53,7 +50,7 @@ class Bridges {
 				if (using.has(component)) {
 					continue;
 				}
-				
+
 				if (component.has(new_port)) {
 					let new_bridge = bridge.concat(component);
 					new_bridges.push(new_bridge);
@@ -86,11 +83,11 @@ class Bridges {
 		}
 	}
 
-	getBestSolution() {
+	getBestSolution(solutions = this.solutions) {
 		let best_solution = -1;
 		let best_solution_index = null;
-		for (let i = 0; i < this.solutions.length; i++) {
-			let solution = this.solutions[i];
+		for (let i = 0; i < solutions.length; i++) {
+			let solution = solutions[i];
 			let solution_score = Bridges.getSolutionScore(solution);
 			if (solution_score > best_solution) {
 				best_solution = solution_score;
@@ -98,7 +95,19 @@ class Bridges {
 			}
 		}
 
-		return this.solutions[best_solution_index];
+		return solutions[best_solution_index];
+	}
+
+	getLongestAndHighestScoringBridge() {
+		// The `Math.max` gives a 'call stack exceeded' error. ¯\_(ツ)_/¯
+		// let max_length = Math.max.apply(null, this.solutions.map(b => b.length));
+		let max_length = this.solutions
+			.map(b => b.length)
+			.sort((a, b) => a - b)
+			.pop();
+		let longest_bridges = this.solutions.filter(b => b.length === max_length);
+
+		return this.getBestSolution(longest_bridges);
 	}
 }
 

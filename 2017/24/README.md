@@ -2,7 +2,7 @@
 
 | Part 1 | Part 2 |
 |--------|--------|
-|  ` ` |  ` ` |
+| `2006` | `1994` |
 
 ## --- Day 24: Electromagnetic Moat ---
 
@@ -47,3 +47,18 @@ With them, you could make the following valid bridges:
 Of these bridges, the _strongest_ one is `0/1`\--`10/1`\--`9/10`; it has a strength of `0+1 + 1+10 + 10+9 = _31_`.
 
 _What is the strength of the strongest bridge you can make_ with the components you have available?
+
+-----------------
+
+## --- Part Two ---
+
+The bridge you've built isn't long enough; you can't jump the rest of the way.
+
+In the example above, there are two longest bridges:
+
+*   `0/2`\--`2/2`\--`2/3`\--`3/4`
+*   `0/2`\--`2/2`\--`2/3`\--`3/5`
+
+Of them, the one which uses the `3/5` component is stronger; its strength is `0+2 + 2+2 + 2+3 + 3+5 = _19_`.
+
+_What is the strength of the longest bridge you can make?_ If you can make multiple bridges of the longest length, pick the _strongest_ one.
