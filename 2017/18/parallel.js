@@ -127,19 +127,18 @@ class ParallelPrograms {
 
                 if (flip_count >= 2) {
                     // Flipped twice, neither program can receive, so we should be deadlocked
-                    p.tick();
+                    return this.programs[1].sent_count;
                 } else {
-                    // Hackky way to toggle between 0 and 1
+                    // Hacky way to toggle between 0 and 1
                     current_program = +!current_program;
                     p = this.programs[current_program];
                 }
             } else {
-                // I need to reset `flip_count`, but should I do it here?
-                // flip_count = 0;
+                flip_count = 0;
                 p.tick();
             }
             
-        } while (!this.programs[0].finished && !this.programs[1].finished);
+        } while (!this.programs[0].finished || !this.programs[1].finished);
 
         return this.programs[1].sent_count;
     }
