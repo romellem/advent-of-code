@@ -55,7 +55,18 @@ const SAMPLE_PROGRAM = [
     { type: 'jgz', x: 'a', y: -2 },
 ];
 
+const SAMPLE_PARALLEL_PROGRAM = [
+    { type: 'snd', x: 1 },
+    { type: 'snd', x: 2 },
+    { type: 'snd', x: 'p' },
+    { type: 'rcv', x: 'a' },
+    { type: 'rcv', x: 'b' },
+    { type: 'rcv', x: 'c' },
+    { type: 'rcv', x: 'd' },
+];
+
 module.exports = {
     input: PROGRAM,
     sampleInput: SAMPLE_PROGRAM,
+    sampleParallelInput: SAMPLE_PARALLEL_PROGRAM,
 };
