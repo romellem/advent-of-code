@@ -51,7 +51,7 @@ class Program {
     rcv(register) {
         if (this.queue.length > 0) {
             // Set register to the value at top of the queue
-            this.registers[register] = this.queue.pop();
+            this.registers[register] = this.queue.shift();
             return false;
         } else {
             // Halt the program, nothing to receive
