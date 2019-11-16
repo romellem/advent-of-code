@@ -9,6 +9,7 @@ class Program {
 
         this.program = JSON.parse(JSON.stringify(program));
         this.registers = Program.getUniqueRegisters(this.program);
+        this.registers.p = this.id;
         this.index = 0;
         this.finished = false;
         this.sent_count = 0;
@@ -79,9 +80,6 @@ class Program {
                 registers[y] = 0;
             }
         }
-
-        // Adds program ID to register 'p'
-        registers['p'] = this.id;
 
         return return_object ? registers : Object.keys(registers);
     }
