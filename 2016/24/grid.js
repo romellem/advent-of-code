@@ -21,7 +21,7 @@ class Grid {
 		}
 	}
 
-	calculateShortestPathBetweenAllLocations() {
+	calculateShortestPathBetweenAllLocations(return_to_start = false) {
 		// Get all locations minus the starting one
 		const visits_arr = Object.keys(this.visits).map(v => parseInt(v)).filter(v => v !== 0);
 
@@ -30,6 +30,11 @@ class Grid {
 
 		// Add 0 to start of all paths
 		possible_paths = possible_paths.map(path => [0].concat(path));
+
+		if (return_to_start) {
+			// End back at 0
+			possible_paths = possible_paths.map(path => path.concat(0));
+		}
 		
 		// Loop through all paths, compute distance between each point, and record those lengths
 		const possible_distances = possible_paths.map(path => {
