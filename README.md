@@ -79,7 +79,7 @@ Completed: **22/ 25** (88%)
 
 ## 2016 Puzzles List
 
-Completed: **18 / 25** (72%)
+Completed: **19 / 25** (76%)
 
 *  [✅ Day 1](2016/1/)
 *  [✅ Day 2](2016/2/)
@@ -104,7 +104,7 @@ Completed: **18 / 25** (72%)
 *  Day 21
 *  [✅ Day 22](2016/22/)
 *  Day 23
-*  Day 24
+*  [✅ Day 24](2016/24/)
 *  Day 25
 
 ## 2015 Puzzles List
