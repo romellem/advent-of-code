@@ -1,4 +1,4 @@
-module.exports = {
+const GRID = {
 	'0,0': { size: 91, used: 66, available: 25, usedPercent: 72 },
 	'0,1': { size: 88, used: 68, available: 20, usedPercent: 77 },
 	'0,2': { size: 88, used: 66, available: 22, usedPercent: 75 },
@@ -924,4 +924,19 @@ module.exports = {
 	'36,22': { size: 93, used: 65, available: 28, usedPercent: 69 },
 	'36,23': { size: 88, used: 66, available: 22, usedPercent: 75 },
 	'36,24': { size: 88, used: 66, available: 22, usedPercent: 75 },
+};
+
+module.exports = {
+	input: GRID,
+	sampleInput: {
+		'0,0': { size: 10, used: 8, available: 2, usedPercent: 80 },
+		'0,1': { size: 11, used: 6, available: 5, usedPercent: 54 },
+		'0,2': { size: 32, used: 28, available: 4, usedPercent: 87 },
+		'1,0': { size: 9, used: 7, available: 2, usedPercent: 77 },
+		'1,1': { size: 8, used: 0, available: 8, usedPercent: 0 },
+		'1,2': { size: 11, used: 7, available: 4, usedPercent: 63 },
+		'2,0': { size: 10, used: 6, available: 4, usedPercent: 60 },
+		'2,1': { size: 9, used: 8, available: 1, usedPercent: 88 },
+		'2,2': { size: 9, used: 6, available: 3, usedPercent: 66 },
+	},
 };

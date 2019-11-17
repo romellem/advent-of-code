@@ -1,4 +1,4 @@
-const input = require('./input');
+const { input } = require('./input');
 const G = require('generatorics');
 
 const nodes = Object.values(input);
