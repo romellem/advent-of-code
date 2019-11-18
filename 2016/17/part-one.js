@@ -1,6 +1,6 @@
 const assert = require('assert');
 const { input, sampleInputs } = require('./input');
-const Room = require('./room');
+const { Room } = require('./room');
 
 for (let [solution_path, starting_passcode] of sampleInputs) {
 	const test_room = new Room(starting_passcode);

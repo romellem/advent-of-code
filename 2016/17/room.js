@@ -26,7 +26,10 @@ const directionsFromHash = hash => {
 const directionsFromPasscode = passcode => directionsFromHash(md5(passcode));
 
 class Node {
-	constructor(depth, x, y, direction = '') {
+	constructor(seed, depth, x, y, direction = '') {
+		// Used to create unique nodes
+		this.seed = seed;
+
 		this.depth = depth;
 		this.x = x;
 		this.y = y;
@@ -41,37 +44,43 @@ class Node {
 
 		// Up
 		if (this.y > 1 && U) {
-			new_nodes.push(new Node(this.depth + 1, this.x, this.y - 1, 'U'));
+			new_nodes.push(nodeFactory(this.depth + 1, this.x, this.y - 1, 'U'));
 		}
 
 		// Down
 		if (this.y < 4 && D) {
-			new_nodes.push(new Node(this.depth + 1, this.x, this.y + 1, 'D'));
+			new_nodes.push(nodeFactory(this.depth + 1, this.x, this.y + 1, 'D'));
 		}
 
 		// Left
 		if (this.x > 1 && L) {
-			new_nodes.push(new Node(this.depth + 1, this.x - 1, this.y, 'L'));
+			new_nodes.push(nodeFactory(this.depth + 1, this.x - 1, this.y, 'L'));
 		}
 
 		// Right
 		if (this.x < 4 && R) {
-			new_nodes.push(new Node(this.depth + 1, this.x + 1, this.y, 'R'));
+			new_nodes.push(nodeFactory(this.depth + 1, this.x + 1, this.y, 'R'));
 		}
 
 		return new_nodes;
 	}
 
 	toString() {
-		return `${this.depth}-${this.direction}-${this.x}-${this.y}`;
+		return `${this.seed}-${this.depth}-${this.direction}-${this.x}-${this.y}`;
 	}
 }
+
+const nodeFactory = (() => {
+	let seed = 0;
+
+	return (...args) => new Node(seed++, ...args);
+})();
 
 class Room {
 	constructor(passcode) {
 		this.passcode = passcode;
 		this.graph = new jsnx.DiGraph();
-		this.origin = new Node(0, 1, 1);
+		this.origin = nodeFactory(0, 1, 1);
 		this.targets = [];
 
 		this.graph.addNode(this.origin);
@@ -98,6 +107,9 @@ class Room {
 		const new_nodes = node.generateDeeperNodes(directions);
 
 		for (let new_node of new_nodes) {
+			if (this.nodeAlreadyExists(new_node)) {
+				console.log(new_node, 'already exists');
+			}
 			this.graph.addEdge(node, new_node);
 			this.generateGraph(path + new_node.direction, new_node);
 		}
@@ -113,6 +125,11 @@ class Room {
 
 		return paths[0];
 	}
+
+	nodeAlreadyExists(node) {
+		let nodes = this.graph.nodes().map(n => n.toString());
+		return nodes.includes(node.toString());
+	}
 }
 
-module.exports = Room;
+module.exports = { Room, nodeFactory, Node };
