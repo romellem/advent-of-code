@@ -1,8 +1,8 @@
 # Answers
 
-| Part 1 | Part 2 |
-|--------|--------|
-| `` | `` |
+|   Part 1   |   Part 2   |
+|------------|------------|
+| `cbeghdaf` | `bacdefgh` |
 
 ## --- Day 21: Scrambled Letters and Hash ---
 
