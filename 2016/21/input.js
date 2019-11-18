@@ -119,10 +119,65 @@ const input = {
     ],
 };
 
+const stringInstructionToObject = str => {
+    let str_arr = str.split(' ');
+    const type = str_arr.shift();
+    const instruction = { type };
+
+    const action = str_arr.shift();
+
+    let x, y;
+    switch (type) {
+        case 'swap':
+            [x, , , y] = str_arr;
+            if (action === 'position') {
+                // swap position a with position y
+                instruction.positions = [+x, +y];
+            } else {
+                // swap letter x with letter y
+                instruction.letters = [x, y];
+            }
+            break;
+
+        case 'move':
+            // move position X to position Y
+            [x, , , y] = str_arr;
+            instruction.positions = [+x, +y];
+            break;
+
+        case 'reverse':
+            // reverse positions X through Y
+            [x, , y] = str_arr;
+            instruction.positions = [+x, +y];
+            break;
+
+        case 'rotate':
+            if (action === 'left') {
+                // rotate left X steps
+                [x] = str_arr;
+                instruction.left = +x;
+            } else if (action === 'right') {
+                // rotate right X steps
+                [x] = str_arr;
+                instruction.right = +x;
+            } else {
+                // rotate based on position of letter X
+                [, , , , x] = str_arr;
+                instruction.letter = x;
+            }
+            break;
+
+        default:
+    }
+
+    return instruction;
+};
+
 const partTwoPassword = 'fbgdceah';
 
 module.exports = {
     sampleInput,
     input,
+    stringInstructionToObject,
     partTwoPassword,
 };

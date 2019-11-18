@@ -1,5 +1,5 @@
 const assert = require('assert');
-const scramble = require('./scramble');
+const { scramble } = require('./scramble');
 const { sampleInput, input } = require('./input');
 
 // Tests
