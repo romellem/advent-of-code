@@ -133,6 +133,18 @@ class Room {
 
 		return paths[0];
 	}
+
+	getLongestPathLength() {
+		let paths_arr = this.targets.map(end => {
+			return jsnx.bidirectionalShortestPath(this.graph, this.origin, end);
+		});
+
+		paths_arr.sort((a, b) => a.length - b.length);
+		let paths = paths_arr.map(path_arr => path_arr.length);
+
+		// Path includes first node, I don't need that
+		return paths[paths.length - 1] - 1;
+	}
 }
 
 module.exports = { Room, nodeFactory, Node };
