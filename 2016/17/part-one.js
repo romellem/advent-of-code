@@ -5,11 +5,9 @@ const { Room } = require('./room');
 for (let [solution_path, starting_passcode] of sampleInputs) {
 	const test_room = new Room(starting_passcode);
 	const test_path = test_room.getShortestPath();
-	console.log(`${starting_passcode} ->\n\t${test_path}`);
+	console.log(`${starting_passcode} -> ${test_path}`);
 
-	if (test_path !== solution_path) {
-		console.log('oops, should be ', solution_path);
-	}
+	assert.strictEqual(test_path, solution_path);
 }
 
 const room = new Room(input);

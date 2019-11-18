@@ -7,8 +7,6 @@ const md5 = str =>
 		.update(str)
 		.digest('hex');
 
-const first4MD5 = str => md5(str).substr(0, 4);
-
 const directionsFromHash = hash => {
 	const u = hash[0];
 	const d = hash[1];
@@ -44,29 +42,37 @@ class Node {
 
 		// Up
 		if (this.y > 1 && U) {
-			new_nodes.push(nodeFactory(this.depth + 1, this.x, this.y - 1, 'U'));
+			new_nodes.push(
+				nodeFactory(this.depth + 1, this.x, this.y - 1, 'U')
+			);
 		}
 
 		// Down
 		if (this.y < 4 && D) {
-			new_nodes.push(nodeFactory(this.depth + 1, this.x, this.y + 1, 'D'));
+			new_nodes.push(
+				nodeFactory(this.depth + 1, this.x, this.y + 1, 'D')
+			);
 		}
 
 		// Left
 		if (this.x > 1 && L) {
-			new_nodes.push(nodeFactory(this.depth + 1, this.x - 1, this.y, 'L'));
+			new_nodes.push(
+				nodeFactory(this.depth + 1, this.x - 1, this.y, 'L')
+			);
 		}
 
 		// Right
 		if (this.x < 4 && R) {
-			new_nodes.push(nodeFactory(this.depth + 1, this.x + 1, this.y, 'R'));
+			new_nodes.push(
+				nodeFactory(this.depth + 1, this.x + 1, this.y, 'R')
+			);
 		}
 
 		return new_nodes;
 	}
 
 	toString() {
-		return `${this.seed}-${this.depth}-${this.direction}-${this.x}-${this.y}`;
+		return `${this.seed}-${this.x}-${this.y}`;
 	}
 }
 
@@ -77,11 +83,13 @@ const nodeFactory = (() => {
 })();
 
 class Room {
-	constructor(passcode) {
+	constructor(passcode, look_for_shortest = true) {
 		this.passcode = passcode;
 		this.graph = new jsnx.DiGraph();
 		this.origin = nodeFactory(0, 1, 1);
 		this.targets = [];
+
+		this.look_for_shortest = look_for_shortest;
 
 		this.graph.addNode(this.origin);
 
@@ -94,22 +102,20 @@ class Room {
 			return;
 		}
 
-		if (this.targets.length > 0) {
+		if (this.look_for_shortest && this.targets.length > 0) {
 			/// If current node is deeper than all solutions, then bail
-			const might_find_better_path = this.targets.some(n => node.depth < n.depth);
+			const might_find_better_path = this.targets.some(
+				n => node.depth < n.depth
+			);
 			if (!might_find_better_path) {
 				return;
 			}
 		}
 
-		const hash = first4MD5(this.passcode + path);
 		const directions = directionsFromPasscode(this.passcode + path);
 		const new_nodes = node.generateDeeperNodes(directions);
 
 		for (let new_node of new_nodes) {
-			if (this.nodeAlreadyExists(new_node)) {
-				console.log(new_node, 'already exists');
-			}
 			this.graph.addEdge(node, new_node);
 			this.generateGraph(path + new_node.direction, new_node);
 		}
@@ -121,14 +127,11 @@ class Room {
 		});
 
 		paths_arr.sort((a, b) => a.length - b.length);
-		let paths = paths_arr.map(path_arr => path_arr.reduce((path, node) => path + node.direction, ''));
+		let paths = paths_arr.map(path_arr =>
+			path_arr.reduce((path, node) => path + node.direction, '')
+		);
 
 		return paths[0];
-	}
-
-	nodeAlreadyExists(node) {
-		let nodes = this.graph.nodes().map(n => n.toString());
-		return nodes.includes(node.toString());
 	}
 }
 
