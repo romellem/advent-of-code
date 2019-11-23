@@ -9,6 +9,7 @@ class BotComparisons {
 		this.instructions = JSON.parse(JSON.stringify(instructions_orig));
 
 		this.bots = {};
+		this.botsCompared = {};
 		this.outputs = {};
 
 		// Stupid way of figuring out part one
@@ -30,6 +31,8 @@ class BotComparisons {
 					this.bots[bot] = [];
 				}
 
+				this.botsCompared[bot] = [];
+
 				this.bots[bot].push(value);
 			} else {
 				// Save GIVE actions to loop through later
@@ -46,6 +49,8 @@ class BotComparisons {
 						if (!this.bots[instruction[key].bot]) {
 							this.bots[instruction[key].bot] = [];
 						}
+
+						this.botsCompared[instruction[key].bot] = [];
 					}
 
 					if (instruction[key].output != null) {
@@ -66,17 +71,11 @@ class BotComparisons {
 			const bots_low = this.bots[from.bot].shift();
 			const bots_high = this.bots[from.bot].pop();
 
-			if (bots_low === 61 || bots_high === 61) {
-				this.compared61[from.bot] = true;
+			if (bots_low == null || bots_high == null) {
+				throw new Error(from.bot + ' compared ' + bots_low + ' and ' + bots_high);cc
 			}
 
-			if (bots_low === 17 || bots_high === 17) {
-				this.compared17[from.bot] = true;
-			}
-
-			if ((bots_low === 17 && bots_high === 61)) {
-				this.comparedBoth61And17[from.bot] = true;
-			}
+			this.botsCompared[from.bot].push(bots_low + ',' + bots_high);
 
 			// This is too complicated / clever
 			let collection_key = lowTo.bot == null ? 'outputs' : 'bots';
