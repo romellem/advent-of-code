@@ -14,6 +14,7 @@ class BotComparisons {
 		// Stupid way of figuring out part one
 		this.compared61 = {};
 		this.compared17 = {};
+		this.comparedBoth61And17 = {};
 
 		this.parseInstructions();
 	}
@@ -63,7 +64,7 @@ class BotComparisons {
 		instructions.forEach(instruction => {
 			const { from, lowTo, highTo } = instruction;
 			const bots_low = this.bots[from.bot].shift();
-			const bots_high= this.bots[from.bot].pop();
+			const bots_high = this.bots[from.bot].pop();
 
 			if (bots_low === 61 || bots_high === 61) {
 				this.compared61[from.bot] = true;
@@ -71,6 +72,10 @@ class BotComparisons {
 
 			if (bots_low === 17 || bots_high === 17) {
 				this.compared17[from.bot] = true;
+			}
+
+			if ((bots_low === 17 && bots_high === 61)) {
+				this.comparedBoth61And17[from.bot] = true;
 			}
 
 			// This is too complicated / clever
@@ -87,7 +92,7 @@ class BotComparisons {
 	}
 
 	whichBotCompared61And17() {
-		const bots_who_compared_both = union(Object.keys(this.compared61), Object.keys(this.compared17));
+		const bots_who_compared_both = Object.keys(this.comparedBoth61And17);
 		if (bots_who_compared_both.length === 1) {
 			return bots_who_compared_both[0];
 		} else {
