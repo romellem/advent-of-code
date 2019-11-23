@@ -5,12 +5,27 @@ module.exports = {
 	INIT,
 	GIVE,
 	sampleInput: [
-		{ action: INIT, value: 5, goesTo: 2 },
-		{ action: GIVE, fromBot: 2, lowTo: 1, highTo: 0 },
-		{ action: INIT, value: 3, goesTo: 1 },
-		{ action: GIVE, fromBot: 1, lowTo: 1, highTo: 0 },
-		{ action: GIVE, fromBot: 0, lowTo: 2, highTo: 0 },
-		{ action: INIT, value: 2, goesTo: 2 },
+		{ action: INIT, value: 5, goesTo: { bot: 2 } },
+		{
+			action: GIVE,
+			from: { bot: 2 },
+			lowTo: { bot: 1 },
+			highTo: { bot: 0 },
+		},
+		{ action: INIT, value: 3, goesTo: { bot: 1 } },
+		{
+			action: GIVE,
+			from: { bot: 1 },
+			lowTo: { output: 1 },
+			highTo: { bot: 0 },
+		},
+		{
+			action: GIVE,
+			from: { bot: 0 },
+			lowTo: { output: 2 },
+			highTo: { output: 0 },
+		},
+		{ action: INIT, value: 2, goesTo: { bot: 2 } },
 	],
 	input: [
 		{ action: INIT, value: 23, goesTo: 208 },
