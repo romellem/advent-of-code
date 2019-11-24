@@ -1,0 +1,28 @@
+html {
+  font-family: monospace;
+}
+
+body {
+  margin: 1em;
+}
+
+table {
+  border-spacing: 0;
+}
+
+.device {
+  display: flex;
+}
+
+.device > * {
+  padding: 0.5em;
+  border: 1px solid gainsboro;
+}
+
+.device > * + * {
+  border-left: none;
+}
+
+.active {
+  background: #f5f5f5;
+}
