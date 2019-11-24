@@ -106,6 +106,7 @@ class Device {
 	// Jump - jumps to an instruction `y` away (positive means forward; negative means backward), but only if `x` is not zero.
 	jnz(x, y) {
 		x = this.getValueOf(x);
+		y = this.getValueOf(y);
 
 		if (x === 0) {
 			// Then just move forward as normal
