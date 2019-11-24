@@ -30,18 +30,7 @@ class Device {
 		this.instruction = starting_instruction;
 
 		this.run = this.run.bind(this);
-	}
-
-	// Used in debugging registers
-	get r() {
-		let { a, b, c, d } = this.registers;
-		return `a:${a} b:${b} c:${c} d:${d}`;
-	}
-
-	// Used in debugging current op
-	get o() {
-		let { op, args } = this.program[this.instruction];
-		return `${op} ${args.map(v => '' + v).join(' ')}`;
+		this.step = this.step.bind(this);
 	}
 
 	printRegisters() {
@@ -61,6 +50,15 @@ class Device {
 		}
 
 		return this.registers[register_to_print];
+	}
+
+	step(n = 1) {
+		for (let i = 0; i < n; i++) {
+			const { op, args } = line;
+
+			// Run the opcode
+			this[op].apply(this, args);
+		}
 	}
 
 	getValueOf(x) {
