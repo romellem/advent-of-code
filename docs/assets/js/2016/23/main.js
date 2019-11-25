@@ -112,37 +112,6 @@ const Controls = props => {
 };
 // END - Controls.js
 
-// START - data.js
-const data = [
-	{ op: 'cpy', args: ['a', 'b'] },
-	{ op: 'dec', args: ['b'] },
-	{ op: 'cpy', args: ['a', 'd'] },
-	{ op: 'cpy', args: [0, 'a'] },
-	{ op: 'cpy', args: ['b', 'c'] },
-	{ op: 'inc', args: ['a'] },
-	{ op: 'dec', args: ['c'] },
-	{ op: 'jnz', args: ['c', -2] },
-	{ op: 'dec', args: ['d'] },
-	{ op: 'jnz', args: ['d', -5] },
-	{ op: 'dec', args: ['b'] },
-	{ op: 'cpy', args: ['b', 'c'] },
-	{ op: 'cpy', args: ['c', 'd'] },
-	{ op: 'dec', args: ['d'] },
-	{ op: 'inc', args: ['c'] },
-	{ op: 'jnz', args: ['d', -2] },
-	{ op: 'tgl', args: ['c'] },
-	{ op: 'cpy', args: [-16, 'c'] },
-	{ op: 'jnz', args: [1, 'c'] },
-	{ op: 'cpy', args: [99, 'c'] },
-	{ op: 'jnz', args: [77, 'd'] },
-	{ op: 'inc', args: ['a'] },
-	{ op: 'inc', args: ['d'] },
-	{ op: 'jnz', args: ['d', -2] },
-	{ op: 'inc', args: ['c'] },
-	{ op: 'jnz', args: ['c', -5] },
-];
-// END - data.js
-
 // START - Device.js
 
 /**
@@ -168,25 +137,44 @@ const TOGGLE_TRANSFORMS = {
 	cpy: 'jnz',
 };
 
+const VALID_OPS = Object.keys(TOGGLE_TRANSFORMS);
+
 const parseLine = line => {
-	let parts = line.split(' ');
-	const registers = ['a', 'b', 'c', 'd'];
-	const args = [];
-	if (!registers.includes(parts[1])) {
-		parts[1] = parseInt(parts[1], 10);
-	}
+  let parts = line.split(" ");
+  if (!VALID_OPS.includes(parts[0])) {
+    throw new Error(`Invalid op passed: "${parts[0]}" in line "${line}"`);
+  }
 
-	args.push(parts[1]);
+  const registers = ["a", "b", "c", "d"];
+  const args = [];
+  if (!registers.includes(parts[1])) {
+    const raw_arg = parts[1];
+    parts[1] = parseInt(parts[1], 10);
+    if (Number.isNaN(parts[1])) {
+      throw new Error(
+        `Invalid number / register as arugment passed: "${raw_arg}" in line "${line}"`
+      );
+    }
+  }
 
-	if (parts[2] != null && !registers.includes(parts[2])) {
-		parts[2] = parseInt(parts[2], 10);
-	}
+  args.push(parts[1]);
 
-	if (parts[2] != null) {
-		args.push(parts[2]);
-	}
+  if (parts[2] != null && !registers.includes(parts[2])) {
+    const raw_arg = parts[2];
+    parts[2] = parseInt(parts[2], 10);
 
-	return { op: parts[0], args };
+    if (Number.isNaN(parts[2])) {
+      throw new Error(
+        `Invalid number / register as arugment passed: "${raw_arg}" in line "${line}"`
+      );
+    }
+  }
+
+  if (parts[2] != null) {
+    args.push(parts[2]);
+  }
+
+  return { op: parts[0], args };
 };
 
 /**
@@ -449,8 +437,100 @@ class Device extends React.Component {
 
 // END - Device.js
 
-function App() {
-	return <Device program={data} />;
+const initial_data = `cpy a b
+dec b
+cpy a d
+cpy 0 a
+cpy b c
+inc a
+dec c
+jnz c -2
+dec d
+jnz d -5
+dec b
+cpy b c
+cpy c d
+dec d
+inc c
+jnz d -2
+tgl c
+cpy -16 c
+jnz 1 c
+cpy 99 c
+jnz 77 d
+inc a
+inc d
+jnz d -2
+inc c
+jnz c -5`;
+
+class App extends React.Component {
+  constructor(props) {
+	super(props);
+	this.data_ref = React.createRef();
+	this.state = {
+	  data: null,
+	  run: false,
+	  dataError: ""
+	};
+  }
+
+  parseProgramAndRun = () => {
+	let data_str = String(this.data_ref.current.value).trim();
+	if (!data_str) {
+	  this.setState({ dataError: "Empty program passed in." });
+	  return;
+	}
+
+	let data_arr = data_str.split("\n");
+	const data = [];
+
+	// Run using for loop instead of `map` so I can catch errors
+	try {
+	  for (let i = 0; i < data_arr.length; i++) {
+		data.push(parseLine(data_arr[i]));
+	  }
+	} catch (e) {
+	  this.setState({ dataError: e.toString() });
+	  return;
+	}
+
+	// If we are here, we have a valid data
+	this.setState({
+	  data,
+	  run: true
+	});
+  };
+
+  componentDidMount() {
+	this.data_ref.current.value = initial_data;
+  }
+
+  render() {
+	if (!this.state.run) {
+	  return (
+		<div>
+		  <p>Enter the program input, separated by newlines:</p>
+		  <textarea
+			rows="16"
+			cols="46"
+			ref={this.data_ref}
+			onClick={() => this.setState({ dataError: null })}
+		  />
+		  <div>
+			<button onClick={() => this.parseProgramAndRun()}>
+			  Run Program
+			</button>
+			{this.state.dataError ? (
+			  <p style={{ color: "red" }}>{this.state.dataError}</p>
+			) : null}
+		  </div>
+		</div>
+	  );
+	}
+
+	return <Device program={this.state.data} />;
+  }
 }
 
 const rootElement = document.getElementById('root');

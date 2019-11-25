@@ -27,18 +27,37 @@ export const TOGGLE_TRANSFORMS = {
   cpy: "jnz"
 };
 
-const parseLine = line => {
+const VALID_OPS = Object.keys(TOGGLE_TRANSFORMS);
+
+export const parseLine = line => {
   let parts = line.split(" ");
+  if (!VALID_OPS.includes(parts[0])) {
+    throw new Error(`Invalid op passed: "${parts[0]}" in line "${line}"`);
+  }
+
   const registers = ["a", "b", "c", "d"];
   const args = [];
   if (!registers.includes(parts[1])) {
+    const raw_arg = parts[1];
     parts[1] = parseInt(parts[1], 10);
+    if (Number.isNaN(parts[1])) {
+      throw new Error(
+        `Invalid number / register as arugment passed: "${raw_arg}" in line "${line}"`
+      );
+    }
   }
 
   args.push(parts[1]);
 
   if (parts[2] != null && !registers.includes(parts[2])) {
+    const raw_arg = parts[2];
     parts[2] = parseInt(parts[2], 10);
+
+    if (Number.isNaN(parts[2])) {
+      throw new Error(
+        `Invalid number / register as arugment passed: "${raw_arg}" in line "${line}"`
+      );
+    }
   }
 
   if (parts[2] != null) {
