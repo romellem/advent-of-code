@@ -54,7 +54,7 @@ const Registers = ({
     c,
     d
   } = registers;
-  return React.createElement("div", null, React.createElement("ul", {
+  return React.createElement("div", null, "Registers:", React.createElement("ul", {
     style: {
       margin: 0,
       paddingLeft: '10px'

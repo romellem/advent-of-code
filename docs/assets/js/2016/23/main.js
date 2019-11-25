@@ -48,7 +48,7 @@ const Program = ({ program, instruction } = {}) => {
 const Registers = ({ registers } = {}) => {
 	const { a, b, c, d } = registers;
 	return (
-		<div>
+		<div>Registers:
 			<ul style={{ margin: 0, paddingLeft: '10px' }}>
 				<li>a: {a}</li>
 				<li>b: {b}</li>
