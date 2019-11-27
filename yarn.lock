@@ -1271,6 +1271,11 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
 
+von-neumann@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/von-neumann/-/von-neumann-1.0.1.tgz#3fc5e4ffd50e21ad8b93bd167f0f8a4e79927616"
+  integrity sha1-P8Xk/9UOIa2Lk70Wfw+KTnmSdhY=
+
 which-module@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/which-module/-/which-module-2.0.0.tgz#d9ef07dce77b9902b8a3a8fa4b31c3e3f7e6e87a"
