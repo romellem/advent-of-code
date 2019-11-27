@@ -1,5 +1,4 @@
 const vonNeumann = require('von-neumann');
-const G = require('generatorics');
 
 // @see https://en.wikipedia.org/wiki/Delannoy_number
 const D34 = vonNeumann(3, 4);
@@ -23,18 +22,6 @@ class FixedPoint {
 
 	canBeConnectedTo(fixed_point) {
 		return Boolean(this.cloudMap[fixed_point.toString()]);
-	}
-
-	/**
-	 * @param {Array} point_a Flat 4D array
-	 * @param {Array} point_b flat 4D array
-	 * @returns {Boolean}
-	 */
-	static pointsAreEqual(point_a, point_b) {
-		const [a1, b1, c1, d1] = point_a;
-		const [a2, b2, c2, d2] = point_b;
-
-		return a1 === a2 && b1 === b2 && c1 === c2 && d1 === d2;
 	}
 
 	toString() {
@@ -77,21 +64,19 @@ class Constellation {
 	}
 
 	addPoint(point) {
-		// if (!this.contains(point)) {
 		this.points.push(point);
 		this.reduceCloudMap(point);
-		// }
 	}
-
-	// contains(point) {
-	// 	return this.points.some(p => FixedPoint.pointsAreEqual(p.coords, point.coords));
-	// }
 }
 
 class NightSky {
 	constructor(fixed_points_orig) {
 		this.fixed_points = fixed_points_orig.map(p => new FixedPoint(p));
+
+		// Initialize all constellations as 1-point constellations
 		this.constellations = this.fixed_points.map(p => new Constellation(p));
+
+		// Then reduce them together until we've reduce them all the way
 		this.constellations = this.reduceConstellations();
 	}
 
