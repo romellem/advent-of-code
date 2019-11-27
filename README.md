@@ -19,7 +19,7 @@ of manual tinkering.
 
 ## 2018 Puzzles List
 
-Completed: **19 / 25** (76%)
+Completed: **20 / 25** (80%)
 
 *  [✅ Day 1](2018/1/)
 *  [✅ Day 2](2018/2/)
@@ -45,7 +45,7 @@ Completed: **19 / 25** (76%)
 *  [✅ Day 22](2018/22/)
 *  Day 23
 *  Day 24
-*  Day 25
+*  [✅ Day 25](2018/25/)
 
 ## 2017 Puzzles List
 
