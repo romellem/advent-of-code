@@ -1,8 +1,11 @@
 const { MICROCHIP, GENERATOR } = require('./input');
 
-class Node {
-	constructor(id) {
-		this.id = id;
+class ArrangementNode {
+	constructor(state_str) {
+		this.id = state_str;
+		const { elevator, floors } = ArrangementNode.parseStrToNode(state_str);
+		this.elevator = elevator;
+		this.floors = floors;
 
 		// [node, distance]
 		this.connections = new Map();
@@ -11,70 +14,62 @@ class Node {
 	addConnection(node, distance = 1) {
 		if (!this.connections.has(node)) {
 			this.connections.set(node, distance);
-			// node.connections.set(this, distance);
 		}
 	}
+
+	static parseStrToNode(str) {
+		let [elevator, floors_str] = str.split(';');
+		elevator = +elevator;
+		let floors_arr = floors_str.split(',');
+		let floors = [];
+		for (let i = 0; i < floors_arr.length; i += 2) {
+			let chips = +floors_arr[i];
+			let gens = +floors_arr[i + 1];
+			floors.push([chips, gens]);
+		}
+
+		return {
+			elevator,
+			floors
+		};
+	}
+
+	_floorsToString() {
+		let floors_str = '';
+		for (let [chips, gens] of this.floors) {
+			floors_str += chips + ',' + gens;
+		}
+
+		return floors_str;
+	}
+
+	toString() {
+		return `${this.elevator};${this._floorsToString()}`;
+	}
+
+	calculateEndingFloorStateString() {
+		let chips_gens_total = this.floors.reduce((sum, floor) => [sum[0] + floor[0], sum[1] + floor[1]], [0, 0]);
+		let floors_str = '';
+		for (let i = 0; i < this.floors.length - 1; i++) {
+			floors_str += '0,0';
+		}
+
+		floors_str += chips_gens_total[0] + ',' + chips_gens_total[1];
+		return floors_str;
+	}
+
+	
 }
 
-class Graph {
-	constructor(root_node = null) {
-		this.nodes = {};
-		this.root_node = null;
-	}
-	
-	addNode(node) {
-		if (!this.nodes[node]) {
-			this.nodes[node] = node;
-		}
-	}
+class ArrangementGraph {
+	constructor(initial_state, floors = 4) {
+		this.root_node = new ArrangementNode(initial_state);
+		this.arrangements = {
+			[this.root_node.toString()]: this.root_node
+		};
 
-	setRoot(node) {
-		this.root_node = node;
-	}
-
-	calculateDistancesFromRoot() {
-		// [[ node_state, distance_from_root ]]
-		const distance_from_root = new Map(
-			Object.entries(this.nodes).map([node_str, node] => [node, node === this.root_node ? 0 : Number.POSITIVE_INFINITY])
-		);
-
-		const shortest_path_tree_set = new Map();
-		const all_nodes_keys = Object.keys(this.nodes);
-		while (shortest_path_tree_set.size < all_nodes_keys.length) {
-			// Get shortest distance from distance_from_root that we haven't already seen
-			let shortest_distance = Number.POSITIVE_INFINITY;
-			let shortest_distance_node;
-
-			for (let [node, distance] of distance_from_root) {
-				if (distance < shortest_distance && !shortest_path_tree_set.has(node)) {
-					shortest_distance = distance;
-					shortest_distance_node = node;
-				}
-			}
-
-			// Add to the set of nodes we've calculated distances from
-			shortest_path_tree_set.set(shortest_distance_node, true);
-
-			// Calculate the distances to its neighbors
-			for (let [node, distance] of shortest_distance_node.connections) {
-				if (!shortest_path_tree_set.has(node)) {
-					let current_distance_saved = this.distancedFromRoot.get(node);
-					// Only update distance if it is shortest than what we've already saved
-					if (current_distance_saved > distance + shortest_distance) {
-						// Note I only save ths shortest, I don't save longer edges. Do I care about this?
-						this.distancedFromRoot.set(node, distance + shortest_distance);
-					}
-				}
-			}
-		}
-
-		return [...this.distancedFromRoot]
-			.map(([node, distance]) => `${node.id}: ${distance}`)
-			.join('\n');
-	}
-
-	getDistanceFromRootTo(node) {
-		return this.distancedFromRoot.get(node);
+		// Calculate ending state and store key for later
+		this.ending_state_key = (floors - 1) + ';' + this.root_node.calculateEndingFloorStateString();
 	}
 }
 
