@@ -3,8 +3,8 @@ const { strictEqual } = require('assert');
 // 0-indexed
 const MAX_FLOOR = 3;
 
-class Arrangement {
-	constructor({ elevator, floors }) {
+class ArrangementNode {
+	constructor(elevator, floors) {
 		this.elevator = elevator;
 		this.floors = this.cloneFloors(floors);
 	}
@@ -43,7 +43,7 @@ class Arrangement {
 				new_floors[this.elevator][0] -= 1;
 				new_floors[this.elevator][1] -= 1;
 
-				if (Arrangement.validateFloors(new_floors)) {
+				if (ArrangementNode.validateFloors(new_floors)) {
 					valid_nodes.push(new ArrangementNode(up, new_floors));
 				}
 			}
@@ -54,7 +54,7 @@ class Arrangement {
 				new_floors[up][0] += 1;
 				new_floors[this.elevator][0] -= 1;
 
-				if (Arrangement.validateFloors(new_floors)) {
+				if (ArrangementNode.validateFloors(new_floors)) {
 					valid_nodes.push(new ArrangementNode(up, new_floors));
 				}
 			} else if (chips > 1) {
@@ -63,7 +63,7 @@ class Arrangement {
 				new_floors[up][0] += 2;
 				new_floors[this.elevator][0] -= 2;
 
-				if (Arrangement.validateFloors(new_floors)) {
+				if (ArrangementNode.validateFloors(new_floors)) {
 					valid_nodes.push(new ArrangementNode(up, new_floors));
 				}
 			}
@@ -74,7 +74,7 @@ class Arrangement {
 				new_floors[up][1] += 1;
 				new_floors[this.elevator][1] -= 1;
 
-				if (Arrangement.validateFloors(new_floors)) {
+				if (ArrangementNode.validateFloors(new_floors)) {
 					valid_nodes.push(new ArrangementNode(up, new_floors));
 				}
 			} else if (gens > 1) {
@@ -83,7 +83,7 @@ class Arrangement {
 				new_floors[up][1] += 2;
 				new_floors[this.elevator][1] -= 2;
 
-				if (Arrangement.validateFloors(new_floors)) {
+				if (ArrangementNode.validateFloors(new_floors)) {
 					valid_nodes.push(new ArrangementNode(up, new_floors));
 				}
 			}
@@ -101,8 +101,8 @@ class Arrangement {
 				new_floors[this.elevator][0] -= 1;
 				new_floors[this.elevator][1] -= 1;
 
-				if (Arrangement.validateFloors(new_floors)) {
-					valid_nodes.push(new ArrangementNode(up, new_floors));
+				if (ArrangementNode.validateFloors(new_floors)) {
+					valid_nodes.push(new ArrangementNode(down, new_floors));
 				}
 			}
 
@@ -112,8 +112,8 @@ class Arrangement {
 				new_floors[down][0] += 1;
 				new_floors[this.elevator][0] -= 1;
 
-				if (Arrangement.validateFloors(new_floors)) {
-					valid_nodes.push(new ArrangementNode(up, new_floors));
+				if (ArrangementNode.validateFloors(new_floors)) {
+					valid_nodes.push(new ArrangementNode(down, new_floors));
 				}
 			} else if (chips > 1) {
 				// 2 chips
@@ -121,8 +121,8 @@ class Arrangement {
 				new_floors[down][0] += 2;
 				new_floors[this.elevator][0] -= 2;
 
-				if (Arrangement.validateFloors(new_floors)) {
-					valid_nodes.push(new ArrangementNode(up, new_floors));
+				if (ArrangementNode.validateFloors(new_floors)) {
+					valid_nodes.push(new ArrangementNode(down, new_floors));
 				}
 			}
 
@@ -132,8 +132,8 @@ class Arrangement {
 				new_floors[down][1] += 1;
 				new_floors[this.elevator][1] -= 1;
 
-				if (Arrangement.validateFloors(new_floors)) {
-					valid_nodes.push(new ArrangementNode(up, new_floors));
+				if (ArrangementNode.validateFloors(new_floors)) {
+					valid_nodes.push(new ArrangementNode(down, new_floors));
 				}
 			} else if (gens > 1) {
 				// 2 gens
@@ -141,8 +141,8 @@ class Arrangement {
 				new_floors[down][1] += 2;
 				new_floors[this.elevator][1] -= 2;
 
-				if (Arrangement.validateFloors(new_floors)) {
-					valid_nodes.push(new ArrangementNode(up, new_floors));
+				if (ArrangementNode.validateFloors(new_floors)) {
+					valid_nodes.push(new ArrangementNode(down, new_floors));
 				}
 			}
 		}
@@ -193,12 +193,12 @@ class Arrangement {
 // prettier-ignore
 {
 	// validateFoors tests
-	strictEqual(Arrangement.validateFloors([[0, 0], [2, 1], [0, 1]]), false);
-	strictEqual(Arrangement.validateFloors([[0, 5], [1, 1], [6, 1]]), false);
-	strictEqual(Arrangement.validateFloors([[0, 0], [2, 0], [0, 2]]), true);
-	strictEqual(Arrangement.validateFloors([[0, 2], [2, 0], [0, 0]]), true);
-	strictEqual(Arrangement.validateFloors([[0, 2], [0, 0], [1, 0], [1, 0]]), true);
-	strictEqual(Arrangement.validateFloors([[1, 2], [2, 0], [0, 1]]), true);
-	strictEqual(Arrangement.validateFloors([[1, 1], [1, 1]]), true);
-	strictEqual(Arrangement.validateFloors([[1, 2], [3, 3], [1, 0]]), true);
+	strictEqual(ArrangementNode.validateFloors([[0, 0], [2, 1], [0, 1]]), false);
+	strictEqual(ArrangementNode.validateFloors([[0, 5], [1, 1], [6, 1]]), false);
+	strictEqual(ArrangementNode.validateFloors([[0, 0], [2, 0], [0, 2]]), true);
+	strictEqual(ArrangementNode.validateFloors([[0, 2], [2, 0], [0, 0]]), true);
+	strictEqual(ArrangementNode.validateFloors([[0, 2], [0, 0], [1, 0], [1, 0]]), true);
+	strictEqual(ArrangementNode.validateFloors([[1, 2], [2, 0], [0, 1]]), true);
+	strictEqual(ArrangementNode.validateFloors([[1, 1], [1, 1]]), true);
+	strictEqual(ArrangementNode.validateFloors([[1, 2], [3, 3], [1, 0]]), true);
 }
