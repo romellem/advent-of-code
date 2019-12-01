@@ -212,6 +212,16 @@ class ArrangementNode {
 		return this.str;
 	}
 
+	toLongString() {
+		let floors_str = '';
+		for (let [chips, gens] of this.floors) {
+			floors_str += '|' + chips + ',' + gens + '| ';
+		}
+
+		let floors = floors_str.substring(0, floors_str.length - 1);
+		return this.elevator + '; ' + floors;
+	}
+
 	calculateEndingFloorStateString() {
 		let chips_gens_total = this.floors.reduce(
 			(sum, floor) => [sum[0] + floor[0], sum[1] + floor[1]],
@@ -240,22 +250,6 @@ class ArrangementNode {
 	strictEqual(ArrangementNode.validateFloors([[1, 2], [3, 3], [1, 0]]), true);
 }
 
-
-const sampleWinningPath = [
-	'0;2,0,0,1,0,1,0,0',
-	'1;1,0,1,1,0,1,0,0',
-	'2;1,0,0,0,1,2,0,0',
-	'1;1,0,1,0,0,2,0,0',
-	'0;2,0,0,0,0,2,0,0',
-	'1;0,0,2,0,0,2,0,0',
-	'2;0,0,0,0,2,2,0,0',
-	'3;0,0,0,0,0,2,2,0',
-	'2;0,0,0,0,1,2,1,0',
-	'3;0,0,0,0,1,0,1,2',
-	'2;0,0,0,0,2,0,0,2',
-	'3;0,0,0,0,0,0,2,2',
-];
-
 class RTGPath {
 	constructor(starting_arrangement) {
 		this.frontier = [];
@@ -269,10 +263,9 @@ class RTGPath {
 		// Keys are `ArrangementNode.toString()`, and value is `{ from, length }`, where
 		// `from` is the ArrangementNode we came from, and `length` is what step we are at
 		this.visted = {};
-		this.visted[start.str] = { from: null, length: 0 };
+		this.visted[start.str] = { node: start, from: null, length: 0 };
 
 		this.goal = this.searchToEnd();
-		this.hey = false;
 	}
 
 	searchToEnd() {
@@ -292,15 +285,11 @@ class RTGPath {
 					if (!this.visted[next_node_str]) {
 						this.frontier.push(next_node);
 						this.visted[next_node_str] = {
+							node: next_node,
 							from: current_node,
 							length: current_node_length + 1,
 						};
 					}
-
-					// if (this.visted['2;0,0,0,0,1,2,1,0']) {
-					// 	console.log('aready seen at');
-					// 	console.log(this.getPathFromVistedNode('2;0,0,0,0,1,2,1,0'));
-					// }
 				}
 			}
 		}
@@ -311,15 +300,14 @@ class RTGPath {
 	}
 
 	getPathFromVistedNode(node) {
-		let path = [node];
-		node = this.visted[node];
-		while (node.from) {
-			path.push(node.from.str);
-			node = this.visted[node.from.str];
+		let path = [];
+		while (node) {
+			path.push(node.node.toLongString());
+			node = this.visted[node.from && node.from.str];
 		}
 
 		path.reverse();
-		path = path.map((c, i) => '  ' + i + ' - ' + c);
+		path = path.map((c, i) => (i < 10 ? ' ' : '') + i + ' - ' + c);
 
 		return path.join('\n');
 	}
