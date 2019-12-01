@@ -7,6 +7,8 @@ class ArrangementNode {
 	constructor(elevator, floors) {
 		this.elevator = elevator;
 		this.floors = this.cloneFloors(floors);
+
+		this.str = `${this.elevator};${this._floorsToString()}`;
 	}
 
 	cloneFloors(floors_orig = this.floors) {
@@ -49,7 +51,7 @@ class ArrangementNode {
 			}
 
 			// 1 Chip
-			if (chips === 1) {
+			if (chips > 0) {
 				let new_floors = this.cloneFloors();
 				new_floors[up][0] += 1;
 				new_floors[this.elevator][0] -= 1;
@@ -57,8 +59,10 @@ class ArrangementNode {
 				if (ArrangementNode.validateFloors(new_floors)) {
 					valid_nodes.push(new ArrangementNode(up, new_floors));
 				}
-			} else if (chips > 1) {
-				// 2 chips
+			}
+
+			// 2 chips
+			if (chips > 1) {
 				let new_floors = this.cloneFloors();
 				new_floors[up][0] += 2;
 				new_floors[this.elevator][0] -= 2;
@@ -69,7 +73,7 @@ class ArrangementNode {
 			}
 
 			// 1 gen
-			if (gens === 1) {
+			if (gens > 0) {
 				let new_floors = this.cloneFloors();
 				new_floors[up][1] += 1;
 				new_floors[this.elevator][1] -= 1;
@@ -77,8 +81,10 @@ class ArrangementNode {
 				if (ArrangementNode.validateFloors(new_floors)) {
 					valid_nodes.push(new ArrangementNode(up, new_floors));
 				}
-			} else if (gens > 1) {
-				// 2 gens
+			}
+
+			// 2 gens
+			if (gens > 1) {
 				let new_floors = this.cloneFloors();
 				new_floors[up][1] += 2;
 				new_floors[this.elevator][1] -= 2;
@@ -107,7 +113,7 @@ class ArrangementNode {
 			}
 
 			// 1 Chip
-			if (chips === 1) {
+			if (chips > 0) {
 				let new_floors = this.cloneFloors();
 				new_floors[down][0] += 1;
 				new_floors[this.elevator][0] -= 1;
@@ -115,8 +121,10 @@ class ArrangementNode {
 				if (ArrangementNode.validateFloors(new_floors)) {
 					valid_nodes.push(new ArrangementNode(down, new_floors));
 				}
-			} else if (chips > 1) {
-				// 2 chips
+			}
+
+			// 2 chips
+			if (chips > 1) {
 				let new_floors = this.cloneFloors();
 				new_floors[down][0] += 2;
 				new_floors[this.elevator][0] -= 2;
@@ -127,7 +135,7 @@ class ArrangementNode {
 			}
 
 			// 1 gen
-			if (gens === 1) {
+			if (gens > 0) {
 				let new_floors = this.cloneFloors();
 				new_floors[down][1] += 1;
 				new_floors[this.elevator][1] -= 1;
@@ -135,8 +143,10 @@ class ArrangementNode {
 				if (ArrangementNode.validateFloors(new_floors)) {
 					valid_nodes.push(new ArrangementNode(down, new_floors));
 				}
-			} else if (gens > 1) {
-				// 2 gens
+			}
+
+			// 2 gens
+			if (gens > 1) {
 				let new_floors = this.cloneFloors();
 				new_floors[down][1] += 2;
 				new_floors[this.elevator][1] -= 2;
@@ -188,6 +198,33 @@ class ArrangementNode {
 			floors,
 		};
 	}
+
+	_floorsToString() {
+		let floors_str = '';
+		for (let [chips, gens] of this.floors) {
+			floors_str += chips + ',' + gens + ',';
+		}
+
+		return floors_str.substring(0, floors_str.length - 1);
+	}
+
+	toString() {
+		return this.str;
+	}
+
+	calculateEndingFloorStateString() {
+		let chips_gens_total = this.floors.reduce(
+			(sum, floor) => [sum[0] + floor[0], sum[1] + floor[1]],
+			[0, 0]
+		);
+		let floors_str = '';
+		for (let i = 0; i < this.floors.length - 1; i++) {
+			floors_str += '0,0,';
+		}
+
+		floors_str += chips_gens_total[0] + ',' + chips_gens_total[1];
+		return floors_str;
+	}
 }
 
 // prettier-ignore
@@ -202,3 +239,94 @@ class ArrangementNode {
 	strictEqual(ArrangementNode.validateFloors([[1, 1], [1, 1]]), true);
 	strictEqual(ArrangementNode.validateFloors([[1, 2], [3, 3], [1, 0]]), true);
 }
+
+
+const sampleWinningPath = [
+	'0;2,0,0,1,0,1,0,0',
+	'1;1,0,1,1,0,1,0,0',
+	'2;1,0,0,0,1,2,0,0',
+	'1;1,0,1,0,0,2,0,0',
+	'0;2,0,0,0,0,2,0,0',
+	'1;0,0,2,0,0,2,0,0',
+	'2;0,0,0,0,2,2,0,0',
+	'3;0,0,0,0,0,2,2,0',
+	'2;0,0,0,0,1,2,1,0',
+	'3;0,0,0,0,1,0,1,2',
+	'2;0,0,0,0,2,0,0,2',
+	'3;0,0,0,0,0,0,2,2',
+];
+
+class RTGPath {
+	constructor(starting_arrangement) {
+		this.frontier = [];
+		const { elevator, floors } = starting_arrangement;
+		const start = new ArrangementNode(elevator, floors);
+		this.frontier.push(start);
+
+		// Calculate this so we know when we are at the end
+		this.endingStateString = MAX_FLOOR + ';' + start.calculateEndingFloorStateString();
+
+		// Keys are `ArrangementNode.toString()`, and value is `{ from, length }`, where
+		// `from` is the ArrangementNode we came from, and `length` is what step we are at
+		this.visted = {};
+		this.visted[start.str] = { from: null, length: 0 };
+
+		this.goal = this.searchToEnd();
+		this.hey = false;
+	}
+
+	searchToEnd() {
+		while (this.frontier.length > 0) {
+			const current_node = this.frontier.shift();
+			const current_node_str = current_node.str;
+			const current_node_length = this.visted[current_node_str].length;
+
+			if (current_node_str === this.endingStateString) {
+				// Not sure if I should immediately exit, or trim down to nodes that are still on the frontier...
+				// Going to try and return immediately, see what happens
+				return this.visted[current_node_str];
+			} else {
+				const neighbors = current_node.getNeighbors();
+				for (let next_node of neighbors) {
+					const next_node_str = next_node.str;
+					if (!this.visted[next_node_str]) {
+						this.frontier.push(next_node);
+						this.visted[next_node_str] = {
+							from: current_node,
+							length: current_node_length + 1,
+						};
+					}
+
+					// if (this.visted['2;0,0,0,0,1,2,1,0']) {
+					// 	console.log('aready seen at');
+					// 	console.log(this.getPathFromVistedNode('2;0,0,0,0,1,2,1,0'));
+					// }
+				}
+			}
+		}
+	}
+
+	getShortestLengthToFourthFloor() {
+		return this.goal && this.goal.length;
+	}
+
+	getPathFromVistedNode(node) {
+		let path = [node];
+		node = this.visted[node];
+		while (node.from) {
+			path.push(node.from.str);
+			node = this.visted[node.from.str];
+		}
+
+		path.reverse();
+		path = path.map((c, i) => '  ' + i + ' - ' + c);
+
+		return path.join('\n');
+	}
+
+	get f() {
+		return this.frontier.map(n => this.visted[n.str] && this.visted[n.str].length).join(',');
+	}
+}
+
+module.exports = RTGPath;

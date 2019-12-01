@@ -6,13 +6,27 @@
  * 
  *     0;2,0,0,1,0,1,0,0
  */
-// const sampleInput = {
-// 	elevator: 0,
-// 	floors: [
-// 		[2, 0],
-// 		[0, 1],
-// 		[0, 1],
-// 		[0, 0],
-// 	]
-// };
-const sampleInput = '0;2,0,0,1,0,1,0,0';
+const sampleInput = {
+	elevator: 0,
+	floors: [
+		[2, 0],
+		[0, 1],
+		[0, 1],
+		[0, 0],
+	]
+};
+
+const input = {
+	elevator: 0,
+	floors: [
+		[1, 1],
+		[0, 4],
+		[4, 0],
+		[0, 0],
+	]
+};
+
+module.exports = {
+	sampleInput,
+	input,
+};
