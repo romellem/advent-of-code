@@ -1,9 +1,11 @@
 const { MICROCHIP, GENERATOR } = require('./input');
 
+
+// 0-indexed
+const MAX_FLOOR = 3;
+
 class ArrangementNode {
-	constructor(state_str) {
-		this.id = state_str;
-		const { elevator, floors } = ArrangementNode.parseStrToNode(state_str);
+	constructor(elevator, floors) {
 		this.elevator = elevator;
 		this.floors = floors;
 
@@ -11,10 +13,68 @@ class ArrangementNode {
 		this.connections = new Map();
 	}
 
+	getValidNodesFromHere() {
+		const [chips, gens] = this.floors[this.elevator];
+		let valid_nodes = [];
+		// Up
+		if (this.elevator < MAX_FLOOR) {
+			let up = this.elevator + 1;
+			const [chips_up, gens_up] = this.floors[up];
+
+			// Chip + Gen
+			if (chips > 0 && gens > 0) {
+				let new_floors = this.cloneFloors();
+				new_floors[up][0] += 1;
+				new_floors[up][1] += 1;
+				new_floors[this.elevator][0] -= 1;
+				new_floors[this.elevator][1] -= 1;
+
+				valid_nodes.push(new ArrangementNode(up, new_floors));
+			}
+
+			// Chips
+			if (chips > 0) {
+				const new_gens_up = gens_up;
+				const new_gens_current = gens;
+				const new_chips_up = chips_up + 1;
+				const new_chips_current = chips - 1;
+				if (gens_up === 0 || (gens_up > 0 && chips_up + 1 < gens_up)) {
+					let new_floors = this.cloneFloors();
+					new_floors[up][0] += 1;
+					new_floors[this.elevator][0] -= 1;
+
+					valid_nodes.push(new ArrangementNode(up, new_floors));
+				}
+
+				// 2 chips
+				if (gens_up === 0 || (gens_up > 0 && chips_up + 2 < gens_up)) {
+					let new_floors = this.cloneFloors();
+					new_floors[up][0] += 2;
+					new_floors[this.elevator][0] -= 2;
+
+					valid_nodes.push(new ArrangementNode(up, new_floors));
+				}
+			}
+
+			// Gens
+	
+			
+		}
+	}
+
 	addConnection(node, distance = 1) {
 		if (!this.connections.has(node)) {
 			this.connections.set(node, distance);
 		}
+	}
+
+	cloneFloors() {
+		const floors = [];
+		for (let floor of this.floors) {
+			floors.push(floor.slice(0));
+		}
+
+		return floors;
 	}
 
 	static parseStrToNode(str) {
@@ -58,7 +118,7 @@ class ArrangementNode {
 		return floors_str;
 	}
 
-	
+
 }
 
 class ArrangementGraph {
