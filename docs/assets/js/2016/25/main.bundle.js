@@ -44,7 +44,8 @@ const Program = ({
 
 
 const Registers = ({
-  registers
+  registers,
+  signal
 } = {}) => {
   const {
     a,
@@ -52,12 +53,27 @@ const Registers = ({
     c,
     d
   } = registers;
-  return React.createElement("div", null, "Registers:", React.createElement("ul", {
-    style: {
-      margin: 0,
-      paddingLeft: '10px'
-    }
-  }, React.createElement("li", null, "a: ", a), React.createElement("li", null, "b: ", b), React.createElement("li", null, "c: ", c), React.createElement("li", null, "d: ", d)));
+  return React.createElement(
+		'div',
+		null,
+		'Registers:',
+		React.createElement(
+			'ul',
+			{
+				style: {
+					margin: 0,
+					paddingLeft: '10px',
+				},
+			},
+			React.createElement('li', null, 'a: ', a),
+			React.createElement('li', null, 'b: ', b),
+			React.createElement('li', null, 'c: ', c),
+			React.createElement('li', null, 'd: ', d)
+		),
+	    'Signal:',
+	    signal
+	);
+
 }; // END - Registers.js
 // START - BreakOn.js
 
@@ -431,7 +447,8 @@ class Device extends React.Component {
         flexGrow: 2
       }
     }, React.createElement(Registers, {
-      registers: this.registers
+      registers: this.registers,
+      signal: this.signal
     }), React.createElement("br", null), React.createElement(BreakOn, {
       setDeviceBreakOn: this.setDeviceBreakOn
     })), React.createElement(Program, {
