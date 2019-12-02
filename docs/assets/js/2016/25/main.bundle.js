@@ -137,7 +137,8 @@ const TOGGLE_TRANSFORMS = {
   dec: 'inc',
   tgl: 'inc',
   jnz: 'cpy',
-  cpy: 'jnz'
+  cpy: 'jnz',
+  out: 'inc'
 };
 const VALID_OPS = Object.keys(TOGGLE_TRANSFORMS);
 
