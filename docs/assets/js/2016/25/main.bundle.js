@@ -336,7 +336,9 @@ class Device extends React.Component {
     // Day 25 - Manually added `out` opcode
     _defineProperty(this, "out", x => {
       x = this.getValueOf(x);
-		  return this.signal += x;
+		this.signal += x;
+
+		this.instruction++;
     });
 
     _defineProperty(this, "setDeviceBreakOn", breakOn => {
