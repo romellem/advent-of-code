@@ -101,20 +101,7 @@ class ArrangementNode {
 			this.floors = floors;
 		}
 
-		this.str = `${this.elevator};${this.floors.map(f => f.str).join(',')}`;
-	}
-
-	constructor(elevator, floors, clone = true) {
-		this.elevator = elevator;
-		this.floors;
-
-		if (clone) {
-			this.floors = floors.map(f => f.clone());
-		} else {
-			this.floors = floors;
-		}
-
-		this.str = `${this.elevator};${this.floors.map(f => f.str).join(',')}`;
+		this.str = `${this.elevator};${this.floors.map(f => f.toString()).join(',')}`;
 	}
 
 	/**
@@ -141,7 +128,7 @@ class ArrangementNode {
 			},
 		];
 
-		for (let { direction, canMove} of directions) {
+		for (let { direction, canMove } of directions) {
 			if (canMove) {
 				// Chip + Gen
 				// @todo rewrite to the `continue` paradigm like the other move types
@@ -155,7 +142,7 @@ class ArrangementNode {
 							// We have a matching generator, we can move it!
 
 							// Microoptimization, reuse `chip` in place of `generators` array since we are moving the same element
-							new_floor = this.floors[up].cloneAndAdd(chip, chip);
+							new_floor = this.floors[direction].cloneAndAdd(chip, chip);
 							current_floor_removal = current_floor.cloneAndRemove(chip, chip);
 						} else {
 							new_floor = undefined;
@@ -173,11 +160,11 @@ class ArrangementNode {
 									new_floors.push(this.floors[i].clone());
 								}
 							}
-						}
 
-						if (this.validateFloors(new_floors)) {
-							valid_nodes.push(new ArrangementNode(direction, new_floors, false));
-							break;
+							if (this.validateFloors(new_floors)) {
+								valid_nodes.push(new ArrangementNode(direction, new_floors, false));
+								break;
+							}
 						}
 					}
 				}
@@ -327,23 +314,31 @@ class ArrangementNode {
 		return true;
 	}
 
+	// @example "2;0,0,1,1,1,2,2,1"
 	toString() {
 		return this.str;
 	}
 
+	/**
+	 * For debugging purposes.
+	 *
+	 * @example "2; |0,0| |1,1| |1,2| |2,1|"
+	 */
 	toLongString() {
 		let floors_str = '';
-		for (let [chips, gens] of this.floors) {
-			floors_str += '|' + chips + ',' + gens + '| ';
+		for (let floor of this.floors) {
+			floors_str += '|' + floor.toString() + '| ';
 		}
 
+		// Trim trailing space
 		let floors = floors_str.substring(0, floors_str.length - 1);
 		return this.elevator + '; ' + floors;
 	}
 
+	// @example "3;0,0,0,0,0,0,3,3"
 	calculateEndingFloorStateString() {
 		let chips_gens_total = this.floors.reduce(
-			(sum, floor) => [sum[0] + floor[0], sum[1] + floor[1]],
+			(sum, floor) => [sum[0] + floor.microchips.length, sum[1] + floor.generators.length],
 			[0, 0]
 		);
 		let floors_str = '';
@@ -356,19 +351,6 @@ class ArrangementNode {
 	}
 }
 
-// prettier-ignore
-{
-	// validateFoors tests
-	strictEqual(ArrangementNode.validateFloors([[0, 0], [2, 1], [0, 1]]), false);
-	strictEqual(ArrangementNode.validateFloors([[0, 5], [1, 1], [6, 1]]), false);
-	strictEqual(ArrangementNode.validateFloors([[0, 0], [2, 0], [0, 2]]), true);
-	strictEqual(ArrangementNode.validateFloors([[0, 2], [2, 0], [0, 0]]), true);
-	strictEqual(ArrangementNode.validateFloors([[0, 2], [0, 0], [1, 0], [1, 0]]), true);
-	strictEqual(ArrangementNode.validateFloors([[1, 2], [2, 0], [0, 1]]), true);
-	strictEqual(ArrangementNode.validateFloors([[1, 1], [1, 1]]), true);
-	strictEqual(ArrangementNode.validateFloors([[1, 2], [3, 3], [1, 0]]), true);
-}
-
 class RTGPath {
 	constructor(starting_arrangement) {
 		this.frontier = [];
@@ -379,8 +361,10 @@ class RTGPath {
 		// Calculate this so we know when we are at the end
 		this.endingStateString = MAX_FLOOR + ';' + start.calculateEndingFloorStateString();
 
-		// Keys are `ArrangementNode.toString()`, and value is `{ from, length }`, where
-		// `from` is the ArrangementNode we came from, and `length` is what step we are at
+		// Keys are `ArrangementNode.toString()`, and value is `{ node, from, length }`, where
+		// `node` is a reference to the ArrangementNode as indicated by the key,
+		// `from` is the ArrangementNode we came from,
+		// `length` is what step we are at.
 		this.visted = {};
 		this.visted[start.str] = { node: start, from: null, length: 0 };
 
@@ -428,10 +412,6 @@ class RTGPath {
 		path = path.map((c, i) => (i < 10 ? ' ' : '') + i + ' - ' + c);
 
 		return path.join('\n');
-	}
-
-	get f() {
-		return this.frontier.map(n => this.visted[n.str] && this.visted[n.str].length).join(',');
 	}
 }
 
