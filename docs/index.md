@@ -1,4 +1,4 @@
-### Advent of Code
+## Table of Contents
 
 {% assign posts_2018 = site.pages | where: "year", 2018 | sort:"day" %}
 {% assign posts_2016 = site.pages | where: "year", 2016 | sort:"day" %}
@@ -18,6 +18,3 @@
         </ul>
     </li>
 </ul>
-
-<!-- - [2018]({{ "/2018/day/1" | relative_url }}) -->
-
