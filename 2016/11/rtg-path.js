@@ -91,20 +91,30 @@ class Floor {
 }
 
 class ArrangementNode {
-	constructor(elevator, floors) {
+	constructor(elevator, floors, clone = true) {
 		this.elevator = elevator;
-		this.floors = this.cloneFloors(floors);
+		this.floors;
 
-		this.str = `${this.elevator};${this._floorsToString()}`;
-	}
-
-	cloneFloors(floors_orig = this.floors) {
-		const floors = [];
-		for (let floor of floors_orig) {
-			floors.push(floor.slice(0));
+		if (clone) {
+			this.floors = floors.map(f => f.clone());
+		} else {
+			this.floors = floors;
 		}
 
-		return floors;
+		this.str = `${this.elevator};${this.floors.map(f => f.str).join(',')}`;
+	}
+
+	constructor(elevator, floors, clone = true) {
+		this.elevator = elevator;
+		this.floors;
+
+		if (clone) {
+			this.floors = floors.map(f => f.clone());
+		} else {
+			this.floors = floors;
+		}
+
+		this.str = `${this.elevator};${this.floors.map(f => f.str).join(',')}`;
 	}
 
 	/**
@@ -117,129 +127,179 @@ class ArrangementNode {
 	 * Does _not_ take into account previously visted states.
 	 */
 	getNeighbors() {
-		const [chips, gens] = this.floors[this.elevator];
 		const valid_nodes = [];
+		const current_floor = this.floors[this.elevator];
 
-		// Up
-		if (this.elevator < MAX_FLOOR) {
-			const up = this.elevator + 1;
+		let directions = [
+			{
+				direction: this.elevator + 1,
+				canMove: this.elevator < MAX_FLOOR,
+			},
+			{
+				direction: this.elevator - 1,
+				canMove: this.elevator > 0 && this.hasItemsBeneathCurrentPosition(),
+			},
+		];
 
-			// Chip + Gen
-			if (chips > 0 && gens > 0) {
-				let new_floors = this.cloneFloors();
-				new_floors[up][0] += 1;
-				new_floors[up][1] += 1;
-				new_floors[this.elevator][0] -= 1;
-				new_floors[this.elevator][1] -= 1;
+		for (let { direction, canMove} of directions) {
+			if (canMove) {
+				// Chip + Gen
+				// @todo rewrite to the `continue` paradigm like the other move types
+				if (current_floor.canMove(1, 1)) {
+					// If moving both, we _have_ to move same element of the chip and generator
+					// So, just loop through chips, find a matching generator (if it exists), and move
+					let new_floor;
+					let current_floor_removal;
+					for (let chip of G.combination(current_floor.microchips, 1)) {
+						if (chip.every(c => current_floor.generators.includes(c))) {
+							// We have a matching generator, we can move it!
 
-				if (ArrangementNode.validateFloors(new_floors)) {
-					valid_nodes.push(new ArrangementNode(up, new_floors));
+							// Microoptimization, reuse `chip` in place of `generators` array since we are moving the same element
+							new_floor = this.floors[up].cloneAndAdd(chip, chip);
+							current_floor_removal = current_floor.cloneAndRemove(chip, chip);
+						} else {
+							new_floor = undefined;
+							current_floor_removal = undefined;
+						}
+
+						if (new_floor && current_floor_removal) {
+							let new_floors = [];
+							for (let i = 0; i < this.floors.length; i++) {
+								if (i === this.elevator) {
+									new_floors.push(current_floor_removal);
+								} else if (i === direction) {
+									new_floors.push(new_floor);
+								} else {
+									new_floors.push(this.floors[i].clone());
+								}
+							}
+						}
+
+						if (this.validateFloors(new_floors)) {
+							valid_nodes.push(new ArrangementNode(direction, new_floors, false));
+							break;
+						}
+					}
 				}
-			}
 
-			// 1 Chip
-			if (chips > 0) {
-				let new_floors = this.cloneFloors();
-				new_floors[up][0] += 1;
-				new_floors[this.elevator][0] -= 1;
+				// 1 Chip
+				if (current_floor.canMove(1)) {
+					for (let chip of G.combination(current_floor.microchips, 1)) {
+						let new_floor = this.floors[direction].cloneAndAdd(chip);
+						if (!new_floor.isValid()) {
+							continue;
+						}
 
-				if (ArrangementNode.validateFloors(new_floors)) {
-					valid_nodes.push(new ArrangementNode(up, new_floors));
+						let current_floor_removal = current_floor.cloneAndRemove(chip);
+						if (!current_floor_removal.isValid()) {
+							continue;
+						}
+
+						// We we are here, both floors are valid
+						let new_floors = [];
+						for (let i = 0; i < this.floors.length; i++) {
+							if (i === this.elevator) {
+								new_floors.push(current_floor_removal);
+							} else if (i === direction) {
+								new_floors.push(new_floor);
+							} else {
+								new_floors.push(this.floors[i].clone());
+							}
+						}
+
+						valid_nodes.push(new ArrangementNode(direction, new_floors, false));
+						break;
+					}
 				}
-			}
 
-			// 2 chips
-			if (chips > 1) {
-				let new_floors = this.cloneFloors();
-				new_floors[up][0] += 2;
-				new_floors[this.elevator][0] -= 2;
+				// 2 Chips
+				if (current_floor.canMove(2)) {
+					for (let chips of G.combination(current_floor.microchips, 2)) {
+						let new_floor = this.floors[direction].cloneAndAdd(chips);
+						if (!new_floor.isValid()) {
+							continue;
+						}
 
-				if (ArrangementNode.validateFloors(new_floors)) {
-					valid_nodes.push(new ArrangementNode(up, new_floors));
+						let current_floor_removal = current_floor.cloneAndRemove(chips);
+						if (!current_floor_removal.isValid()) {
+							continue;
+						}
+
+						// We we are here, both floors are valid
+						let new_floors = [];
+						for (let i = 0; i < this.floors.length; i++) {
+							if (i === this.elevator) {
+								new_floors.push(current_floor_removal);
+							} else if (i === direction) {
+								new_floors.push(new_floor);
+							} else {
+								new_floors.push(this.floors[i].clone());
+							}
+						}
+
+						valid_nodes.push(new ArrangementNode(direction, new_floors, false));
+						break;
+					}
 				}
-			}
 
-			// 1 gen
-			if (gens > 0) {
-				let new_floors = this.cloneFloors();
-				new_floors[up][1] += 1;
-				new_floors[this.elevator][1] -= 1;
+				// 1 Generator
+				if (current_floor.canMove(0, 1)) {
+					for (let gen of G.combination(current_floor.generators, 1)) {
+						let new_floor = this.floors[direction].cloneAndAdd(undefined, gen);
+						if (!new_floor.isValid()) {
+							continue;
+						}
 
-				if (ArrangementNode.validateFloors(new_floors)) {
-					valid_nodes.push(new ArrangementNode(up, new_floors));
+						let current_floor_removal = current_floor.cloneAndRemove(undefined, gen);
+						if (!current_floor_removal.isValid()) {
+							continue;
+						}
+
+						// We we are here, both floors are valid
+						let new_floors = [];
+						for (let i = 0; i < this.floors.length; i++) {
+							if (i === this.elevator) {
+								new_floors.push(current_floor_removal);
+							} else if (i === direction) {
+								new_floors.push(new_floor);
+							} else {
+								new_floors.push(this.floors[i].clone());
+							}
+						}
+
+						valid_nodes.push(new ArrangementNode(direction, new_floors, false));
+						break;
+					}
 				}
-			}
 
-			// 2 gens
-			if (gens > 1) {
-				let new_floors = this.cloneFloors();
-				new_floors[up][1] += 2;
-				new_floors[this.elevator][1] -= 2;
+				// 2 Generators
+				if (current_floor.canMove(0, 2)) {
+					for (let gens of G.combination(current_floor.generators, 2)) {
+						let new_floor = this.floors[direction].cloneAndAdd(undefined, gens);
+						if (!new_floor.isValid()) {
+							continue;
+						}
 
-				if (ArrangementNode.validateFloors(new_floors)) {
-					valid_nodes.push(new ArrangementNode(up, new_floors));
-				}
-			}
-		}
+						let current_floor_removal = current_floor.cloneAndRemove(undefined, gens);
+						if (!current_floor_removal.isValid()) {
+							continue;
+						}
 
-		// Down
-		if (this.elevator > 0 && this.hasItemsBeneathCurrentPosition()) {
-			const down = this.elevator - 1;
+						// We we are here, both floors are valid
+						let new_floors = [];
+						for (let i = 0; i < this.floors.length; i++) {
+							if (i === this.elevator) {
+								new_floors.push(current_floor_removal);
+							} else if (i === direction) {
+								new_floors.push(new_floor);
+							} else {
+								new_floors.push(this.floors[i].clone());
+							}
+						}
 
-			// Chip + Gen
-			if (chips > 0 && gens > 0) {
-				let new_floors = this.cloneFloors();
-				new_floors[down][0] += 1;
-				new_floors[down][1] += 1;
-				new_floors[this.elevator][0] -= 1;
-				new_floors[this.elevator][1] -= 1;
-
-				if (ArrangementNode.validateFloors(new_floors)) {
-					valid_nodes.push(new ArrangementNode(down, new_floors));
-				}
-			}
-
-			// 1 Chip
-			if (chips > 0) {
-				let new_floors = this.cloneFloors();
-				new_floors[down][0] += 1;
-				new_floors[this.elevator][0] -= 1;
-
-				if (ArrangementNode.validateFloors(new_floors)) {
-					valid_nodes.push(new ArrangementNode(down, new_floors));
-				}
-			}
-
-			// 2 chips
-			if (chips > 1) {
-				let new_floors = this.cloneFloors();
-				new_floors[down][0] += 2;
-				new_floors[this.elevator][0] -= 2;
-
-				if (ArrangementNode.validateFloors(new_floors)) {
-					valid_nodes.push(new ArrangementNode(down, new_floors));
-				}
-			}
-
-			// 1 gen
-			if (gens > 0) {
-				let new_floors = this.cloneFloors();
-				new_floors[down][1] += 1;
-				new_floors[this.elevator][1] -= 1;
-
-				if (ArrangementNode.validateFloors(new_floors)) {
-					valid_nodes.push(new ArrangementNode(down, new_floors));
-				}
-			}
-
-			// 2 gens
-			if (gens > 1) {
-				let new_floors = this.cloneFloors();
-				new_floors[down][1] += 2;
-				new_floors[this.elevator][1] -= 2;
-
-				if (ArrangementNode.validateFloors(new_floors)) {
-					valid_nodes.push(new ArrangementNode(down, new_floors));
+						valid_nodes.push(new ArrangementNode(direction, new_floors, false));
+						break;
+					}
 				}
 			}
 		}
@@ -250,49 +310,21 @@ class ArrangementNode {
 	hasItemsBeneathCurrentPosition(current_position = this.elevator) {
 		let total_items_beneath_current_position = 0;
 		for (let i = 0; i < current_position; i++) {
-			total_items_beneath_current_position += this.floors[i][0] + this.floors[i][1];
+			total_items_beneath_current_position +=
+				this.floors[i].microchips.length + this.floors[i].generators.length;
 		}
 
 		return total_items_beneath_current_position > 0;
 	}
 
-	static validateFloors(floors) {
+	validateFloors(floors = this.floors) {
 		for (let floor of floors) {
-			const [chips, gens] = floor;
-
-			// When generators is greater than zero, we can't have more chips than gens
-			if (gens > 0 && chips > gens) {
+			if (!floor.isValid()) {
 				return false;
 			}
 		}
 
 		return true;
-	}
-
-	static parseStrToNode(str) {
-		let [elevator, floors_str] = str.split(';');
-		elevator = +elevator;
-		let floors_arr = floors_str.split(',');
-		let floors = [];
-		for (let i = 0; i < floors_arr.length; i += 2) {
-			let chips = +floors_arr[i];
-			let gens = +floors_arr[i + 1];
-			floors.push([chips, gens]);
-		}
-
-		return {
-			elevator,
-			floors,
-		};
-	}
-
-	_floorsToString() {
-		let floors_str = '';
-		for (let [chips, gens] of this.floors) {
-			floors_str += chips + ',' + gens + ',';
-		}
-
-		return floors_str.substring(0, floors_str.length - 1);
 	}
 
 	toString() {
@@ -361,21 +393,20 @@ class RTGPath {
 			const current_node_str = current_node.str;
 			const current_node_length = this.visted[current_node_str].length;
 
-			if (current_node_str === this.endingStateString) {
-				// Not sure if I should immediately exit, or trim down to nodes that are still on the frontier...
-				// Going to try and return immediately, see what happens
-				return this.visted[current_node_str];
-			} else {
-				const neighbors = current_node.getNeighbors();
-				for (let next_node of neighbors) {
-					const next_node_str = next_node.str;
-					if (!this.visted[next_node_str]) {
-						this.frontier.push(next_node);
-						this.visted[next_node_str] = {
-							node: next_node,
-							from: current_node,
-							length: current_node_length + 1,
-						};
+			const neighbors = current_node.getNeighbors();
+			for (let next_node of neighbors) {
+				const next_node_str = next_node.str;
+				if (!this.visted[next_node_str]) {
+					this.frontier.push(next_node);
+					this.visted[next_node_str] = {
+						node: next_node,
+						from: current_node,
+						length: current_node_length + 1,
+					};
+
+					// If we have reached the end, exit our loop immediately. BFS guarantees we won't find a shorter route.
+					if (next_node_str === this.endingStateString) {
+						return this.visted[next_node_str];
 					}
 				}
 			}
@@ -404,4 +435,9 @@ class RTGPath {
 	}
 }
 
-module.exports = RTGPath;
+module.exports = {
+	RTGPath,
+	Floor,
+	GENERATOR,
+	MICROCHIP,
+};

@@ -1,18 +1,18 @@
-/**
- * State is the elevator position and the sum of chips / generators on each floor.
- * I store this info as an array, first element is chip count, second is generator count.
- * 
- * toString (might) look like:
- * 
- *     0;2,0,0,1,0,1,0,0
- */
+const { GENERATOR, MICROCHIP, Floor } = require('./rtg-path');
+
+/*
+The first floor contains a hydrogen-compatible microchip and a lithium-compatible microchip.
+The second floor contains a hydrogen generator.
+The third floor contains a lithium generator.
+The fourth floor contains nothing relevant.
+*/
 const sampleInput = {
 	elevator: 0,
 	floors: [
-		[2, 0],
-		[0, 1],
-		[0, 1],
-		[0, 0],
+		new Floor([{ type: MICROCHIP, element: 'H'}, { type: MICROCHIP, element: 'L'}]),
+		new Floor([{ type: GENERATOR, element: 'H'}]),
+		new Floor([{ type: GENERATOR, element: 'L'}]),
+		new Floor(),
 	]
 };
 
