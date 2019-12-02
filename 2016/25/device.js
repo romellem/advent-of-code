@@ -21,12 +21,16 @@ const TOGGLE_TRANSFORMS = {
 	tgl: 'inc',
 	jnz: 'cpy',
 	cpy: 'jnz',
+	out: 'inc',
 };
 
 class Device {
 	constructor(
 		program,
 		starting_registers = {},
+
+		// Arbitrary 6 chars, of course this doesn't mean this will go on forever necessarily...
+		exit_on = '010101',
 		starting_instruction = 0
 	) {
 		// Defaults all registers to 0. Allows you to pass in just one register than you want to change
@@ -38,6 +42,9 @@ class Device {
 		this.registers = JSON.parse(JSON.stringify(starting_registers));
 
 		this.instruction = starting_instruction;
+
+		this.exit_on = exit_on;
+		this.signal = '';
 
 		this.run = this.run.bind(this);
 		this.step = this.step.bind(this);
@@ -64,10 +71,36 @@ class Device {
 
 	step(n = 1) {
 		for (let i = 0; i < n; i++) {
-			const { op, args } = line;
+			const { op, args } = this.program[this.instruction];;
 
 			// Run the opcode
 			this[op].apply(this, args);
+		}
+	}
+
+	/**
+	 * @returns {Boolean} - Returns true if we reached our exit condition, returns false if we can't reach exit condition
+	 */
+	runUntilExitCondition() {
+		while (true) {
+			const { op } = this.program[this.instruction];
+
+			this.step();
+
+			// If we just ran `out`, check our signal and see if it matches the exit condition
+			if (op === 'out') {
+				if (this.signal === this.exit_on) {
+					return true;
+				} else if (this.signal.length > this.exit_on.length) {
+					return false;
+				} else {
+					// The signal is less than our exit string, so check that exit starts with the signla so far
+					// If it doesn't we can exit early.
+					if (this.exit_on.indexOf(this.signal) !== 0) {
+						return false;
+					}
+				}
+			}
 		}
 	}
 
@@ -138,6 +171,12 @@ class Device {
 		}
 
 		this.instruction++;
+	}
+
+	// Transmit out to our device's "signal"
+	out(x) {
+		x = this.getValueOf(x);
+		return this.signal += x;
 	}
 }
 
