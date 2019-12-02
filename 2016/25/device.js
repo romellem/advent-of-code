@@ -176,7 +176,9 @@ class Device {
 	// Transmit out to our device's "signal"
 	out(x) {
 		x = this.getValueOf(x);
-		return this.signal += x;
+		this.signal += x;
+
+		this.instruction++;
 	}
 }
 

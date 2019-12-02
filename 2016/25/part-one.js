@@ -1,7 +1,7 @@
 const { input } = require('./input');
 const Device = require('./device');
 
-let a = -1;
+let a = 0;
 let repeated_signal = false;
 while (!repeated_signal) {
     let device = new Device(input, { a: ++a });
