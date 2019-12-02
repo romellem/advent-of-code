@@ -412,6 +412,59 @@ class RTGPath {
 
 		return path.join('\n');
 	}
+
+	static parseInputStringToStartingArrangementObject(str = '') {
+		str = String(str).trim();
+		const lines = str.split('\n');
+		const floors = [];
+		for (let line of lines) {
+			let [, items] = line.split(' contains ');
+			if (!items) {
+				throw new Error(`Invalid line: ${line}`);
+			}
+
+			// @see https://github.com/tc39/proposal-string-matchall
+
+			const gen_regex = / ([^\s]+) generator/g;
+			const gens = [];
+			const gen_last_indexes = {};
+			let gen;
+			gen_last_indexes[gen_regex.lastIndex] = true;
+			while ((gen = gen_regex.exec(items))) {
+				gen_last_indexes[gen_regex.lastIndex] = true;
+
+				// Only capture group is the element type, so pop that off
+				// @example `gen = [ "cobalt generator", "cobalt" ]`
+				gens.push({ type: GENERATOR, element: gen.pop() });
+			}
+
+			const chip_regex = / ([^\s]+)-compatible microchip/g;
+			const chips = [];
+			const chip_last_indexes = {};
+			let chip;
+			chip_last_indexes[chip_regex.lastIndex] = true;
+			while ((chip = chip_regex.exec(items))) {
+				chip_last_indexes[chip_regex.lastIndex] = true;
+
+				// Only capture group is the element type, so pop that off
+				// @example `gen = [ "cobalt-compatible microchip", "cobalt" ]`
+				chips.push({ type: MICROCHIP, element: chip.pop() });
+			}
+
+			if (chips.length || gens.length) {
+				floors.push(new Floor(chips.concat(gens)));
+			} else if (items === 'nothing relevant.') {
+				floors.push(new Floor());
+			} else {
+				throw new Error(`Invalid line: ${line}`);
+			}
+		}
+
+		return {
+			elevator: 0,
+			floors,
+		};
+	}
 }
 
 module.exports = {
