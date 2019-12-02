@@ -1,6 +1,5 @@
 const GENERATOR = 'G';
 const MICROCHIP = 'C';
-const { strictEqual } = require('assert');
 const G = require('generatorics');
 
 // 0-indexed
