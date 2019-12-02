@@ -2,7 +2,7 @@
 
 | Part 1 | Part 2 |
 |--------|--------|
-|  ` ` |  ` ` |
+|   `33` |   `57` |
 
 ## --- Day 11: Radioisotope Thermoelectric Generators ---
 
@@ -133,7 +133,7 @@ In this arrangement, it takes `11` steps to collect all of the objects at the fo
 
 In your situation, what is the _minimum number of steps_ required to bring all of the objects to the fourth floor?
 
------
+-----------------
 
 ## --- Part Two ---
 
@@ -141,10 +141,11 @@ You step into the cleanroom separating the lobby from the isolated area and put 
 
 Upon entering the isolated containment area, however, you notice some extra parts on the first floor that weren't listed on the record outside:
 
-An elerium generator.
-An elerium-compatible microchip.
-A dilithium generator.
-A dilithium-compatible microchip.
+*   An elerium generator.
+*   An elerium-compatible microchip.
+*   A dilithium generator.
+*   A dilithium-compatible microchip.
+
 These work just like the other generators and microchips. You'll have to get them up to assembly as well.
 
-What is the minimum number of steps required to bring all of the objects, including these four new ones, to the fourth floor?
+What is the _minimum number of steps_ required to bring all of the objects, including these four new ones, to the fourth floor?
