@@ -1,3 +1,7 @@
+---
+title:
+---
+
 ## Table of Contents
 
 {% assign posts_2018 = site.pages | where: "year", 2018 | sort:"day" %}
