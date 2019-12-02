@@ -29,8 +29,8 @@ class Device {
 		program,
 		starting_registers = {},
 
-		// Arbitrary 6 chars, of course this doesn't mean this will go on forever necessarily...
-		exit_on = '010101',
+		// Arbitrary 10 chars, of course this doesn't mean this will go on forever necessarily...
+		exit_on = '0101010101',
 		starting_instruction = 0
 	) {
 		// Defaults all registers to 0. Allows you to pass in just one register than you want to change
