@@ -1,7 +1,94 @@
+const GENERATOR = 'G';
+const MICROCHIP = 'C';
 const { strictEqual } = require('assert');
+const G = require('generatorics');
 
 // 0-indexed
 const MAX_FLOOR = 3;
+
+class Floor {
+	constructor(elements = []) {
+		this.generators = [];
+		this.microchips = [];
+		elements.forEach(({ type, element }) => {
+			if (type === GENERATOR) {
+				this.generators.push(element);
+			} else {
+				// Chip
+				this.microchips.push(element);
+			}
+		});
+	}
+
+	isValid() {
+		const is_empty = !this.generators.length && !this.microchips.length;
+		const only_gens = this.generators.length && !this.microchips.length;
+		const only_chips = !this.generators.length && this.microchips.length;
+		if (is_empty || only_gens || only_chips) {
+			return true;
+		}
+
+		// Otherwise, check that the mix of chips and gens cancel each other out
+		if (this.microchips.length > this.generators.length) {
+			// If we have more chips than gens, it has to be invalid
+			return false;
+		}
+
+		// We have an equal amount of chips, or maybe less, loop through chips and see if we have a matching gen
+		for (let element of this.microchips) {
+			if (!this.generators.includes(element)) {
+				return false;
+			}
+		}
+
+		// We looped through all chips, if we are here, they had a matching generator, return true
+		return true;
+	}
+
+	toString() {
+		return this.microchips.length + ',' + this.generators.length;
+	}
+
+	clone() {
+		let new_floor = new Floor();
+		new_floor.microchips = this.microchips.slice(0);
+		new_floor.generators = this.generators.slice(0);
+
+		return new_floor;
+	}
+
+	canMove(chips = 0, generators = 0) {
+		return this.microchips.length >= chips && this.generators.length >= generators;
+	}
+
+	cloneAndRemove(chips = [], generators = []) {
+		let new_floor = this.clone();
+
+		if (chips.length) {
+			new_floor.microchips = new_floor.microchips.filter(c => !chips.includes(c));
+		}
+
+		if (generators.length) {
+			new_floor.generators = new_floor.generators.filter(g => !generators.includes(g));
+		}
+
+		return new_floor;
+	}
+
+	cloneAndAdd(chips = [], generators = []) {
+		let new_floor = this.clone();
+
+		if (chips.length) {
+			new_floor.microchips.push(...chips);
+		}
+
+		if (generators.length) {
+			new_floor.generators.push(...generators);
+		}
+
+		return new_floor;
+	}
+}
 
 class ArrangementNode {
 	constructor(elevator, floors) {
