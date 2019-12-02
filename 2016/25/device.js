@@ -11,22 +11,28 @@
  *   - If an attempt is made to toggle an instruction outside the program, _nothing happens_.
  *   - If toggling produces an _invalid instruction_ (like `cpy 1 2`) and an attempt is later made to execute that instruction, `skip it instead`.
  *   - If `tgl` toggles _itself_ (for example, if `a` is `0`, `tgl a` would target itself and become `inc a`), the resulting instruction is not executed until the next time it is reached.
+ *
+ * `out x` _transmits_ `x` (either an integer or the _value_ of a register) as the next value for the clock signal.
  */
 
 const TOGGLE_TRANSFORMS = {
-	inc: "dec",
-	dec: "inc",
-	tgl: "inc",
-	jnz: "cpy",
-	cpy: "jnz"
+	inc: 'dec',
+	dec: 'inc',
+	tgl: 'inc',
+	jnz: 'cpy',
+	cpy: 'jnz',
 };
 
 class Device {
 	constructor(
 		program,
-		starting_registers = { a: 7, b: 0, c: 0, d: 0 },
+		starting_registers = {},
 		starting_instruction = 0
 	) {
+		// Defaults all registers to 0. Allows you to pass in just one register than you want to change
+		const default_registers = { a: 0, b: 0, c: 0, d: 0 };
+		starting_registers = Object.assign({}, default_registers, starting_registers);
+
 		// Clone the arrays we pass in
 		this.program = JSON.parse(JSON.stringify(program));
 		this.registers = JSON.parse(JSON.stringify(starting_registers));
@@ -41,7 +47,7 @@ class Device {
 		console.log(this.registers);
 	}
 
-	run(register_to_print = "a") {
+	run(register_to_print = 'a') {
 		let line = this.program[this.instruction];
 
 		while (line) {
@@ -66,7 +72,7 @@ class Device {
 	}
 
 	getValueOf(x) {
-		return typeof x === "string" ? this.registers[x] : x;
+		return typeof x === 'string' ? this.registers[x] : x;
 	}
 
 	/**
@@ -78,7 +84,7 @@ class Device {
 		this.instruction++;
 
 		// Invalid instruction, skip
-		if (typeof y !== "string") {
+		if (typeof y !== 'string') {
 			return;
 		}
 
@@ -128,8 +134,7 @@ class Device {
 		let instruction_to_modify = this.instruction + x;
 		if (this.program[instruction_to_modify]) {
 			let current_op = this.program[instruction_to_modify].op;
-			this.program[instruction_to_modify].op =
-				TOGGLE_TRANSFORMS[current_op];
+			this.program[instruction_to_modify].op = TOGGLE_TRANSFORMS[current_op];
 		}
 
 		this.instruction++;
