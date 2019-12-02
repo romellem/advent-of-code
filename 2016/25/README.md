@@ -1,8 +1,8 @@
 # Answers
 
-| Part 1 | Part 2 |
-|--------|--------|
-| ` ` | ` ` |
+| Part 1 |
+|--------|
+|  `192` |
 
 ## --- Day 25: Clock Signal ---
 
@@ -31,3 +31,19 @@ This antenna code, being a signal generator, uses one extra instruction:
 The code takes a value (via register `a`) that describes the signal to generate, but you're not sure how it's used. You'll have to find the input to produce the right signal through experimentation.
 
 _What is the lowest positive integer_ that can be used to initialize register `a` and cause the code to output a clock signal of `0`, `1`, `0`, `1`... repeating forever?
+
+-----------------
+
+## --- Part Two ---
+
+The antenna is ready. Now, all you need is the _fifty stars_ required to generate the signal for the sleigh, but you don't have enough.
+
+You look toward the sky in desperation... suddenly noticing that a lone star has been installed at the top of the antenna! Only _49 more_ to go.
+
+### Transmit the signal
+
+You activate all fifty stars and transmit the signal. The star atop the antenna begins to glow.
+
+_Suddenly, you see the sleigh fly past you!_
+
+Looks like Santa was already waiting for your signal.
