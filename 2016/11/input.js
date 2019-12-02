@@ -50,7 +50,36 @@ const input = {
 	],
 };
 
+// Plus: elerium and dilithium chip/gen pair on first floor
+const partTwoInput = {
+	elevator: 0,
+	floors: [
+		new Floor([
+			{ type: GENERATOR, element: 'S' },
+			{ type: MICROCHIP, element: 'S' },
+			{ type: GENERATOR, element: 'E' },
+			{ type: MICROCHIP, element: 'E' },
+			{ type: GENERATOR, element: 'D' },
+			{ type: MICROCHIP, element: 'D' },
+		]),
+		new Floor([
+			{ type: GENERATOR, element: 'H' },
+			{ type: GENERATOR, element: 'C' },
+			{ type: GENERATOR, element: 'R' },
+			{ type: GENERATOR, element: 'P' },
+		]),
+		new Floor([
+			{ type: MICROCHIP, element: 'H' },
+			{ type: MICROCHIP, element: 'C' },
+			{ type: MICROCHIP, element: 'R' },
+			{ type: MICROCHIP, element: 'P' },
+		]),
+		new Floor(),
+	],
+};
+
 module.exports = {
 	sampleInput,
 	input,
+	partTwoInput,
 };
