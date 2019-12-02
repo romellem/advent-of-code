@@ -1,5 +1,5 @@
 ---
-title:
+title: ""
 ---
 
 ## Table of Contents
