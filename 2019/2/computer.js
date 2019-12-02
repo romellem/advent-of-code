@@ -7,7 +7,6 @@ class Computer {
 		this.input = input.slice(0);
 	}
 
-	// Defaults are for part one
 	run(noun, verb) {
 		let input = this.input.slice(0);
 		input[1] = noun;
