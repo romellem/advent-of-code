@@ -70,6 +70,7 @@ const Registers = ({
 			React.createElement('li', null, 'c: ', c),
 			React.createElement('li', null, 'd: ', d)
 		),
+	  React.createElement("br", null)
 	    'Signal: ',
 	    signal
 	);
