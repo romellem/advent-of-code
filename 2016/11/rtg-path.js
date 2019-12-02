@@ -2,9 +2,6 @@ const GENERATOR = 'G';
 const MICROCHIP = 'C';
 const G = require('generatorics');
 
-// 0-indexed
-const MAX_FLOOR = 3;
-
 class Floor {
 	constructor(elements = []) {
 		this.generators = [];
@@ -100,6 +97,9 @@ class ArrangementNode {
 			this.floors = floors;
 		}
 
+		// 0-indexed
+		this.MAX_FLOOR = this.floors.length - 1;
+
 		this.str = `${this.elevator};${this.floors.map(f => f.toString()).join(',')}`;
 	}
 
@@ -119,7 +119,7 @@ class ArrangementNode {
 		let directions = [
 			{
 				direction: this.elevator + 1,
-				canMove: this.elevator < MAX_FLOOR,
+				canMove: this.elevator < this.MAX_FLOOR,
 			},
 			{
 				direction: this.elevator - 1,
@@ -358,7 +358,7 @@ class RTGPath {
 		this.frontier.push(start);
 
 		// Calculate this so we know when we are at the end
-		this.endingStateString = MAX_FLOOR + ';' + start.calculateEndingFloorStateString();
+		this.endingStateString = start.MAX_FLOOR + ';' + start.calculateEndingFloorStateString();
 
 		// Keys are `ArrangementNode.toString()`, and value is `{ node, from, length }`, where
 		// `node` is a reference to the ArrangementNode as indicated by the key,
