@@ -29,6 +29,7 @@
     "manhattan": "^1.0.0",
     "pathfinding": "^0.4.18",
     "redux": "^4.0.4",
+    "string.prototype.matchall": "^4.0.0",
     "table": "^5.3.3",
     "traverse": "^0.6.6",
     "von-neumann": "^1.0.1"
