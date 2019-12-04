@@ -31,7 +31,7 @@ details {
 
 .logo {
     // Font size 3
-    @include f3();
+    @include f3-responsive();
     font-weight: 100;
     letter-spacing: 0.02em;
 
