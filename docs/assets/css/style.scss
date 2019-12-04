@@ -28,3 +28,21 @@ details {
         margin-top: 16px;
     }
 }
+
+.logo {
+    // Font size 3
+    @include f3();
+    font-weight: 100;
+    letter-spacing: 0.02em;
+
+    text-shadow: 1px 1px 2px rgba($red-500, 0.5);
+    color: white;
+    background-color: $green-500;
+
+    border-radius: $border-radius;
+
+    margin-top: nth($spacers, 2);
+    margin-bottom: nth($spacers, 2);
+    padding-left: nth($spacers, 3);
+    padding-right: nth($spacers, 3);
+}
