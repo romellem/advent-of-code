@@ -41,8 +41,5 @@ details {
 
     border-radius: $border-radius;
 
-    margin-top: nth($spacers, 2);
-    margin-bottom: nth($spacers, 2);
-    padding-left: nth($spacers, 3);
-    padding-right: nth($spacers, 3);
+    padding: nth($spacers, 2) nth($spacers, 3);
 }
