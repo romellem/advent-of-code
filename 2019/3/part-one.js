@@ -32,6 +32,18 @@ class Grid {
 			this.grid[cell] = 1;
 		}
 	}
+
+	getCrosses() {
+		let crosses = [];
+		for (let [cell, count] of Object.entries(this.grid)) {
+			if (count > 1) {
+				let coord = cell.split(',').map(v => parseInt(v, 10));
+				crosses.push(coord);
+			}
+		}
+
+		return crosses;
+	}
 }
 
 const calculateShortestCrossoverFromOrigin = (wire_a, wire_b) => {
@@ -42,35 +54,29 @@ const calculateShortestCrossoverFromOrigin = (wire_a, wire_b) => {
 		let x = 0;
 		let y = 0;
 
+		const grid_method = wire_num === 0 ? 'set' : 'increment';
+
 		// Could DRY this section up a bit... but this seems fairly clear
 		wire.forEach(movement => {
 			let [dir, distance] = movement;
 			if (dir === 'R') {
 				for (let i = x + 1; i <= x + distance; i++) {
-					if (grid.increment(i, y)) {
-						crosses[i + ',' + y] = true;
-					}
+					grid[grid_method](i, y);
 				}
 				x += distance;
 			} else if (dir === 'L') {
 				for (let i = x - 1; i >= x - distance; i--) {
-					if (grid.increment(i, y)) {
-						crosses[i + ',' + y] = true;
-					}
+					grid[grid_method](i, y);
 				}
 				x -= distance;
 			} else if (dir === 'U') {
 				for (let i = y + 1; i <= y + distance; i++) {
-					if (grid.increment(x, i)) {
-						crosses[x + ',' + i] = true;
-					}
+					grid[grid_method](x, i);
 				}
 				y += distance;
 			} else if (dir === 'D') {
 				for (let i = y - 1; i >= y - distance; i--) {
-					if (grid.increment(x, i)) {
-						crosses[x + ',' + i] = true;
-					}
+					grid[grid_method](x, i);
 				}
 				y -= distance;
 			} else {
@@ -80,10 +86,8 @@ const calculateShortestCrossoverFromOrigin = (wire_a, wire_b) => {
 	});
 
 	let closest_distance = Number.MAX_SAFE_INTEGER;
-	for (let cross of Object.keys(crosses)) {
-		let [x, y] = cross.split(',').map(v => parseInt(v, 10));
-		console.log(x, y);
-		let distance = manhattan([x, y], [0, 0]);
+	for (let coord of grid.getCrosses()) {
+		let distance = manhattan([0, 0], coord);
 
 		if (distance < closest_distance) {
 			closest_distance = distance;
@@ -98,4 +102,3 @@ for (let { wire_a, wire_b, closest } of sampleInputs) {
 }
 
 console.log(calculateShortestCrossoverFromOrigin(wire_a, wire_b));
-
