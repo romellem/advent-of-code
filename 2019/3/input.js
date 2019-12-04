@@ -1,3 +1,13 @@
+/**
+ * @returns {Array<Array<String, Number>>} Returns an array of arrays which contain the direction 'L', 'R', 'U', or 'D', followed by the distance to move.
+ * @example parseWire('R8,U5,L5,D3') // -> returns
+ *          [
+ *              ['R', 8],
+ *              ['U', 5],
+ *              ['L', 5],
+ *              ['D', 3],
+ *          ]
+ */
 parseWire = wire => {
 	return wire.split(',').map(movement => {
 		return [movement.substring(0, 1), parseInt(movement.substring(1), 10)];
@@ -5,6 +15,7 @@ parseWire = wire => {
 };
 
 module.exports = {
+	parseWire,
 	sampleInputs: [
 		{
 			wire_a: parseWire('R8,U5,L5,D3'),
