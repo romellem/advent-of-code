@@ -33,10 +33,10 @@ class Grid {
 		}
 	}
 
-	getCrosses() {
+	getCrossesWithOtherGrid(other_grid) {
 		let crosses = [];
-		for (let [cell, count] of Object.entries(this.grid)) {
-			if (count > 1) {
+		for (let cell of Object.keys(this.grid)) {
+			if (other_grid.grid[cell]) {
 				let coord = cell.split(',').map(v => parseInt(v, 10));
 				crosses.push(coord);
 			}
@@ -47,38 +47,34 @@ class Grid {
 }
 
 const calculateShortestCrossoverFromOrigin = (wire_a, wire_b) => {
-	let grid = new Grid();
-	let crosses = {};
+	let grid_a = new Grid();
+	let grid_b = new Grid();
 
 	[wire_a, wire_b].forEach((wire, wire_num) => {
 		let x = 0;
 		let y = 0;
 
-		const grid_method = wire_num === 0 ? 'set' : 'increment';
+		let grid = wire_num === 0 ? grid_a : grid_b;
 
 		// Could DRY this section up a bit... but this seems fairly clear
 		wire.forEach(movement => {
 			let [dir, distance] = movement;
 			if (dir === 'R') {
-				for (let i = x + 1; i <= x + distance; i++) {
-					grid[grid_method](i, y);
+				for (let i = 0; i < distance; i++) {
+					grid.set(++x, y);
 				}
-				x += distance;
 			} else if (dir === 'L') {
-				for (let i = x - 1; i >= x - distance; i--) {
-					grid[grid_method](i, y);
+				for (let i = 0; i < distance; i++) {
+					grid.set(--x, y);
 				}
-				x -= distance;
 			} else if (dir === 'U') {
-				for (let i = y + 1; i <= y + distance; i++) {
-					grid[grid_method](x, i);
+				for (let i = 0; i < distance; i++) {
+					grid.set(x, ++y);
 				}
-				y += distance;
 			} else if (dir === 'D') {
-				for (let i = y - 1; i >= y - distance; i--) {
-					grid[grid_method](x, i);
+				for (let i = 0; i < distance; i++) {
+					grid.set(x, --y);
 				}
-				y -= distance;
 			} else {
 				throw move_str;
 			}
@@ -86,7 +82,7 @@ const calculateShortestCrossoverFromOrigin = (wire_a, wire_b) => {
 	});
 
 	let closest_distance = Number.MAX_SAFE_INTEGER;
-	for (let coord of grid.getCrosses()) {
+	for (let coord of grid_a.getCrossesWithOtherGrid(grid_b)) {
 		let distance = manhattan([0, 0], coord);
 
 		if (distance < closest_distance) {

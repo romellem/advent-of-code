@@ -1,8 +1,8 @@
 parseWire = wire => {
 	return wire.split(',').map(movement => {
-		return [movement.substring(0, 1), parseInt(movement.substring(1))];
+		return [movement.substring(0, 1), parseInt(movement.substring(1), 10)];
 	});
-}
+};
 
 module.exports = {
 	sampleInputs: [
