@@ -13,8 +13,11 @@ class Grid {
 	// While the wires do technically cross right at the central port where they both start, this point does not count, nor does a wire count as crossing with itself.
 	set(x, y) {
 		const cell = `${x},${y}`;
+		this.steps++;
+
+		// If a wire visits a position on the grid multiple times, use the steps value from the first time it visits that position when calculating the total value of a specific intersection.
 		if (this.grid[cell] == null) {
-			this.grid[cell] = ++this.steps;
+			this.grid[cell] = this.steps;
 		}
 	}
 
@@ -91,8 +94,11 @@ const calculateShortestStepsOnCrossover = (wire_a, wire_b) => {
 	return grid_a.getMinStepsOverCrossesWithOtherGrid(grid_b);
 };
 
-// for (let { wire_a, wire_b, closest } of sampleInputs) {
-// 	assert.strictEqual(calculateShortestCrossoverFromOrigin(wire_a, wire_b), closest);
-// }
+for (let { wire_a, wire_b, steps } of sampleInputs) {
+	let calc_steps = calculateShortestStepsOnCrossover(wire_a, wire_b);
+	if (calc_steps !== steps) {
+		assert.strictEqual(calc_steps, steps);
+	}
+}
 
 console.log(calculateShortestStepsOnCrossover(wire_a, wire_b));
