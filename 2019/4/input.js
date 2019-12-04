@@ -1,7 +1,4 @@
-const input = [
-
-];
-
+// Input is a range, inclusive
 module.exports = {
-	input,
+	input: [138241, 674034],
 };
