@@ -21,18 +21,21 @@ class Computer {
 				name: ADD,
 				params: 3,
 				fn: (a, b, c) => (this.input[c] = a + b),
+				write: true,
 			},
 
 			[MUL]: {
 				name: MUL,
 				params: 3,
 				fn: (a, b, c) => (this.input[c] = a * b),
+				write: true,
 			},
 
 			[INP]: {
 				name: INP,
 				params: 1,
 				fn: a => (this.input[a] = this.input_value),
+				write: true,
 			},
 
 			[OUT]: {
@@ -47,6 +50,7 @@ class Computer {
 				fn: (...a) => console.log('STOP', a),
 			},
 		};
+		// this.does_write = [ADD, MUL, INP].reduce((o, v) => ((o[v] = true), o), {});
 	}
 
 	run() {
@@ -76,13 +80,15 @@ class Computer {
 		};
 	}
 
-	runOp({ modes, fn, name }) {
+	runOp({ modes, fn, name, write }) {
 		this.pointer++;
 		let values = [];
 		for (let i = 0; i < modes.length; i++) {
 			let mode = modes[i];
 			let value = this.input[this.pointer + i];
-			if (((i < modes.length - 1 && name !== INP) || name === OUT)&& mode === POSITION_MODE) {
+
+			const can_switch_to_position = !write || i < modes.length - 1;
+			if (can_switch_to_position && mode === POSITION_MODE) {
 				value = this.input[value];
 			}
 
@@ -94,15 +100,9 @@ class Computer {
 	}
 
 	output(v) {
-		console.log(v);
 		if (v !== 0) {
-			// console.error(this.pointer, this.input.join(','));
-			throw v;
+			console.log(v);
 		}
-	}
-
-	get _() {
-		return this.input.slice(Math.max(0, this.pointer - 1), this.pointer + 8);
 	}
 }
 
