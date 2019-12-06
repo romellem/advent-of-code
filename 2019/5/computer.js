@@ -1,8 +1,12 @@
-const ADD = '01';
-const MUL = '02';
-const INP = '03';
-const OUT = '04';
-const STP = '99';
+const ADD = '01'; // Add
+const MUL = '02'; // Multiply
+const INP = '03'; // Input
+const OUT = '04'; // Output
+const JIT = '05'; // Jump-if-true
+const JIF = '06'; // Jump-if-false
+const LTH = '07'; // Less Than
+const EQU = '08'; // Equals
+const STP = '99'; // Stop
 
 const POSITION_MODE = '0';
 const IMMEDIATE_MODE = '1';
@@ -49,8 +53,47 @@ class Computer {
 				params: 0,
 				fn: (...a) => console.log('STOP', a),
 			},
+
+			[JIT]: {
+				name: JIT,
+				params: 2,
+				fn: (a, b) => {
+					if (a) {
+						this.pointer = b;
+						return true;
+					}
+					return false;
+				},
+				jumps: true,
+			},
+
+			[JIF]: {
+				name: JIF,
+				params: 2,
+				fn: (a, b) => {
+					if (!a) {
+						this.pointer = b;
+						return true;
+					}
+					return false;
+				},
+				jumps: true,
+			},
+
+			[LTH]: {
+				name: LTH,
+				params: 3,
+				fn: (a, b, c) => (this.input[c] = a < b ? 1 : 0),
+				write: true,
+			},
+
+			[EQU]: {
+				name: EQU,
+				params: 3,
+				fn: (a, b, c) => (this.input[c] = a === b ? 1 : 0),
+				write: true,
+			},
 		};
-		// this.does_write = [ADD, MUL, INP].reduce((o, v) => ((o[v] = true), o), {});
 	}
 
 	run() {
@@ -80,7 +123,7 @@ class Computer {
 		};
 	}
 
-	runOp({ modes, fn, name, write }) {
+	runOp({ modes, fn, jumps, write }) {
 		this.pointer++;
 		let values = [];
 		for (let i = 0; i < modes.length; i++) {
@@ -95,8 +138,12 @@ class Computer {
 			values.push(value);
 		}
 
-		fn(...values);
-		this.pointer += modes.length;
+		// If result is `true`, we moved the pointer
+		let result = fn(...values);
+
+		if (!jumps || (jumps && !result)) {
+			this.pointer += modes.length;
+		}
 	}
 
 	output(v) {
@@ -104,6 +151,11 @@ class Computer {
 			console.log(v);
 		}
 	}
+
+	// For debugging
+	// get _() {
+	// 	return this.input.slice(Math.max(0, this.pointer - 1), this.pointer + 8);
+	// }
 }
 
 module.exports = Computer;

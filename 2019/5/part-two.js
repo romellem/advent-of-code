@@ -1,5 +1,5 @@
 const { input } = require('./input');
+const Computer = require('./computer');
 
-console.log(
-
-);
+let computer = new Computer(input, 5);
+computer.run();
