@@ -115,3 +115,6 @@ Temporary Items
 
 # Don't save VSCode specific settings (debugging setups, etc.)
 .vscode/
+
+# Jekyll static files
+_site/
