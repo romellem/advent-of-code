@@ -12,33 +12,33 @@ const POSITION_MODE = '0';
 const IMMEDIATE_MODE = '1';
 
 class Computer {
-	constructor(input, input_value = 1) {
-		this.original_input = input.slice(0);
-		this.input = input.slice(0);
+	constructor(memory, inputs, clone_memory = false) {
+		this.original_memory = clone_memory && memory.slice(0);
+		this.memory = memory.slice(0);
 		this.pointer = 0;
 
-		this.input_value = input_value;
-		this.output_value = null;
+		this.inputs = Array.isArray(inputs) ? inputs.slice(0) : [inputs];
+		this.outputs = [];
 
 		this.OPS = {
 			[ADD]: {
 				name: ADD,
 				params: 3,
-				fn: (a, b, c) => (this.input[c] = a + b),
+				fn: (a, b, c) => (this.memory[c] = a + b),
 				write: true,
 			},
 
 			[MUL]: {
 				name: MUL,
 				params: 3,
-				fn: (a, b, c) => (this.input[c] = a * b),
+				fn: (a, b, c) => (this.memory[c] = a * b),
 				write: true,
 			},
 
 			[INP]: {
 				name: INP,
 				params: 1,
-				fn: a => (this.input[a] = this.input_value),
+				fn: a => (this.memory[a] = this.inputs.shift()),
 				write: true,
 			},
 
@@ -83,14 +83,14 @@ class Computer {
 			[LTH]: {
 				name: LTH,
 				params: 3,
-				fn: (a, b, c) => (this.input[c] = a < b ? 1 : 0),
+				fn: (a, b, c) => (this.memory[c] = a < b ? 1 : 0),
 				write: true,
 			},
 
 			[EQU]: {
 				name: EQU,
 				params: 3,
-				fn: (a, b, c) => (this.input[c] = a === b ? 1 : 0),
+				fn: (a, b, c) => (this.memory[c] = a === b ? 1 : 0),
 				write: true,
 			},
 		};
@@ -103,10 +103,12 @@ class Computer {
 			this.runOp(op);
 			op = this.parseOp();
 		}
+
+		return this.outputs;
 	}
 
 	parseOp() {
-		let temp_op = String(this.input[this.pointer]).padStart(2, '0');
+		let temp_op = String(this.memory[this.pointer]).padStart(2, '0');
 		let op = this.OPS[temp_op.substr(-2, 2)];
 
 		let full_op = temp_op.padStart(op.params + 2, '0');
@@ -128,11 +130,11 @@ class Computer {
 		let values = [];
 		for (let i = 0; i < modes.length; i++) {
 			let mode = modes[i];
-			let value = this.input[this.pointer + i];
+			let value = this.memory[this.pointer + i];
 
 			const can_switch_to_position = !write || i < modes.length - 1;
 			if (can_switch_to_position && mode === POSITION_MODE) {
-				value = this.input[value];
+				value = this.memory[value];
 			}
 
 			values.push(value);
@@ -147,9 +149,7 @@ class Computer {
 	}
 
 	output(v) {
-		if (v !== 0) {
-			console.log(v);
-		}
+		this.outputs.push(v);
 	}
 
 	// For debugging
@@ -158,4 +158,29 @@ class Computer {
 	// }
 }
 
-module.exports = Computer;
+class Circuit {
+	constructor(memory, phase_settings) {
+		this.memory = memory;
+		this.phase_settings = phase_settings;
+	}
+
+	run(return_last_output = true) {
+		// First computer gets 0 as its second input
+		let last_computer_output = [0];
+		for (let phase_seting of this.phase_settings) {
+			let computer = new Computer(this.memory, [
+				phase_seting,
+				...last_computer_output,
+			]);
+			last_computer_output = computer.run();
+		}
+
+
+		return return_last_output ? last_computer_output.pop() : last_computer_output;
+	}
+}
+
+module.exports = {
+	Computer,
+	Circuit,
+};

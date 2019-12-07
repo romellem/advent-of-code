@@ -1,8 +1,8 @@
 # Answers
 
-|   Part 1  |   Part 2  |
-|-----------|-----------|
-| ` ` | ` ` |
+|  Part 1 |   Part 2  |
+|---------|-----------|
+| `87138` | ` ` |
 
 ## --- Day 7: Amplification Circuit ---
 
