@@ -12,7 +12,10 @@ const POSITION_MODE = '0';
 const IMMEDIATE_MODE = '1';
 
 class Computer {
-	constructor(memory, inputs, clone_memory = false) {
+	constructor(memory, inputs, id, clone_memory = false) {
+		// For debugging
+		this.id = String.fromCharCode('A'.charCodeAt(0) + id);
+
 		this.original_memory = clone_memory && memory.slice(0);
 		this.memory = memory.slice(0);
 		this.pointer = 0;
@@ -51,7 +54,7 @@ class Computer {
 			[STP]: {
 				name: STP,
 				params: 0,
-				fn: (...a) => console.log('STOP', a),
+				fn: () => (this.halted = true),
 			},
 
 			[JIT]: {
@@ -94,13 +97,22 @@ class Computer {
 				write: true,
 			},
 		};
+
+		this.halted = false;
 	}
 
 	run() {
 		let op = this.parseOp();
 
-		while (op.name !== STP) {
+		while (!this.halted) {
 			this.runOp(op);
+
+			// Pause executing the computer so this output can be given to the next computer
+			// Additionally, break if we've halted
+			if (op.name === OUT || this.halted) {
+				break;
+			}
+
 			op = this.parseOp();
 		}
 
@@ -153,30 +165,63 @@ class Computer {
 	}
 
 	// For debugging
-	// get _() {
-	// 	return this.input.slice(Math.max(0, this.pointer - 1), this.pointer + 8);
-	// }
+	get _() {
+		return this.memory.slice(
+			Math.max(0, this.pointer - 1),
+			this.pointer + 8
+		);
+	}
 }
 
 class Circuit {
-	constructor(memory, phase_settings) {
+	constructor(memory, phase_settings, circuit_size = 5) {
 		this.memory = memory;
 		this.phase_settings = phase_settings;
+		this.circuit = Array(circuit_size)
+			.fill()
+			.map((c, i) => {
+				let phase_setting = [phase_settings[i]];
+				if (i === 0) {
+					// "The first amplifier's input value is 0"
+					phase_setting.push(0);
+				}
+
+				return new Computer(memory, phase_setting, i);
+			});
+
+		this.current_computer = 0;
 	}
 
-	run(return_last_output = true) {
-		// First computer gets 0 as its second input
-		let last_computer_output = [0];
-		for (let phase_seting of this.phase_settings) {
-			let computer = new Computer(this.memory, [
-				phase_seting,
-				...last_computer_output,
-			]);
-			last_computer_output = computer.run();
+	run() {
+		let computer = this.circuit[this.current_computer];
+		let output, last_output;
+
+		while (!computer.halted) {
+			let new_output = computer.run();
+			if (computer.halted) {
+				break;
+			}
+
+			output = new_output;
+
+			let next_computer = this.moveToNextComputer();
+
+			// `output.pop` removes the value from the computers `this.outputs` array,
+			// meaning the next computer effectively "consumes" the value
+			last_output = output.shift();
+			next_computer.inputs.push(last_output);
+
+			computer = next_computer;
 		}
 
+		return last_output;
+	}
 
-		return return_last_output ? last_computer_output.pop() : last_computer_output;
+	moveToNextComputer() {
+		this.current_computer++;
+		this.current_computer %= this.circuit.length;
+
+		return this.circuit[this.current_computer];
 	}
 }
 
