@@ -1,8 +1,8 @@
 # Answers
 
-| Part 1 | Part 2 |
-|--------|--------|
-| `1224` |  ` ` |
+| Part 1 |  Part 2 |
+|--------|---------|
+| `1224` | `EBZUR` |
 
 ## --- Day 8: Space Image Format ---
 
