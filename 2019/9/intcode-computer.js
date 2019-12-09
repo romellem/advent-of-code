@@ -153,12 +153,15 @@ class Computer {
 
 	parseOp() {
 		let temp_op = String(this.memory[this.pointer]).padStart(2, '0');
+
+		// "The opcode is a two-digit number based only on the ones and tens digit of the value, that is, the opcode is the rightmost two digits of the first value in an instruction"
 		let op = this.OPS[temp_op.substr(-2, 2)];
 
 		let full_op = temp_op.padStart(op.params + 2, '0');
 
 		let modes = [];
 
+		// "Parameter modes are single digits, one per parameter, read **right-to-left** from the opcode"
 		for (let i = op.params - 1; i >= 0; i--) {
 			modes.push(full_op[i]);
 		}
@@ -181,11 +184,78 @@ class Computer {
 				value = 0;
 			}
 
+			// Immediate Mode uses the value as is, no need to make adjustments
 			if (mode !== IMMEDIATE_MODE) {
+				/**
+				 * While working in Position or Relative Mode, it is (at first)
+				 * unituitive why I need to _skip_ the value re-mapping if we
+				 * are at the _last_ value to calculate.
+				 * 
+				 * Consider the ADD operation `1001,9,8,7`.
+				 * 
+				 * Parsing this out gives us:
+				 * 
+				 *     ABCDE
+				 *      1001
+				 *     
+				 *     DE - two-digit opcode,      01 == opcode 1
+				 *      C - mode of 1st parameter,  0 == position mode
+				 *      B - mode of 2nd parameter,  1 == immediate mode
+				 *      A - mode of 3rd parameter,  0 == position mode,
+				 *                                  omitted due to being a leading zero
+				 * 
+				 * If I were to write this addition operation as a standard made equation,
+				 * where number literals (immediate mode) are written as the number, and
+				 * position numbers are written with a prefixed `@` symbol, the equation
+				 * might look like
+				 * 
+				 *     @3 = @1 + 2
+				 * 
+				 * Now, if I were to re-map the pointer'd `@` symbols, I'd get
+				 * 
+				 *     @3 = @1 + 2
+				 * 
+				 * But _that isn't what we want!_ Namely, it doesn't make sense
+				 * to set the _literal_ number 7 equal to some addition operation.
+				 * 
+				 * So, the assignment part _always_ retains its pointer aspect.
+				 * 
+				 *     @3 = 9 + 2
+				 * 
+				 * Because of this, when I do the re-mapping, I skip the last arugment
+				 * whenever I am performing an operation that writes to memory. On operations
+				 * that _don't_ write to memory, I can re-map regardless of which parameter I am
+				 * inspecting.
+				 * 
+				 * For example, on a JIT operation `5,3,4` (implicitly `0005,3,4`) on the computer
+				 * `5,3,4,1001,0` would be executed as:
+				 * 
+				 *     if @3 != 0; then Jump to @4
+				 * 
+				 * Re-mapping these pointers to the values from memory, the code becomes
+				 * 
+				 *     if 1001 != 0; then Jump to 0
+				 * 
+				 * That is, even though the `@4` position parameter was the last parameter,
+				 * I still performed the look up because the JIT op does _not_ write to memory.
+				 * 
+				 * To, to recap, I want to re-map my value to the value stored in memory at
+				 * a certain _position_ if:
+				 * 
+				 * - I am running an op that does _not_ write to memory
+				 * - Or if I am not at the last parameter in the op
+				 */
 				const can_switch_to_position = !write || i < modes.length - 1;
+
 				if (can_switch_to_position && mode === POSITION_MODE) {
 					value = this.memory[value];
 				} else if (mode === RELATIVE_MODE) {
+					/**
+					 * In relative mode, value is always updated. However, again for the reasons
+					 * above, the last parameter on operations that write to memory should only
+					 * have the value adjusted by the relative base. For all other instances,
+					 * the value should be looked up from memory (in a relative fashion, of course).
+					 */
 					if (can_switch_to_position) {
 						value = this.memory[value + this.relative_base];
 					} else {
