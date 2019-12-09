@@ -141,7 +141,7 @@ class Computer {
 			 * In circuits, computer execution should be paused on outout so that value can be passed to the next computer.
 			 * Additionally, execution should immediately stopped if we have halted.
 			 */
-			if ((this.pause_on_output && op.name === OUT )|| this.halted) {
+			if ((this.pause_on_output && op.name === OUT) || this.halted) {
 				break;
 			}
 
@@ -190,11 +190,11 @@ class Computer {
 				 * While working in Position or Relative Mode, it is (at first)
 				 * unituitive why I need to _skip_ the value re-mapping if we
 				 * are at the _last_ value to calculate.
-				 * 
+				 *
 				 * Consider the ADD operation `1001,9,8,7`.
-				 * 
+				 *
 				 * Parsing this out gives us:
-				 * 
+				 *
 				 *     ABCDE
 				 *      1001
 				 *     
@@ -203,45 +203,45 @@ class Computer {
 				 *      B - mode of 2nd parameter,  1 == immediate mode
 				 *      A - mode of 3rd parameter,  0 == position mode,
 				 *                                  omitted due to being a leading zero
-				 * 
+				 *
 				 * If I were to write this addition operation as a standard made equation,
 				 * where number literals (immediate mode) are written as the number, and
 				 * position numbers are written with a prefixed `@` symbol, the equation
 				 * might look like
-				 * 
+				 *
 				 *     @3 = @1 + 2
-				 * 
+				 *
 				 * Now, if I were to re-map the pointer'd `@` symbols, I'd get
-				 * 
+				 *
 				 *     @3 = @1 + 2
-				 * 
+				 *
 				 * But _that isn't what we want!_ Namely, it doesn't make sense
 				 * to set the _literal_ number 7 equal to some addition operation.
-				 * 
+				 *
 				 * So, the assignment part _always_ retains its pointer aspect.
-				 * 
+				 *
 				 *     @3 = 9 + 2
-				 * 
+				 *
 				 * Because of this, when I do the re-mapping, I skip the last arugment
 				 * whenever I am performing an operation that writes to memory. On operations
 				 * that _don't_ write to memory, I can re-map regardless of which parameter I am
 				 * inspecting.
-				 * 
+				 *
 				 * For example, on a JIT operation `5,3,4` (implicitly `0005,3,4`) on the computer
 				 * `5,3,4,1001,0` would be executed as:
-				 * 
+				 *
 				 *     if @3 != 0; then Jump to @4
-				 * 
+				 *
 				 * Re-mapping these pointers to the values from memory, the code becomes
-				 * 
+				 *
 				 *     if 1001 != 0; then Jump to 0
-				 * 
+				 *
 				 * That is, even though the `@4` position parameter was the last parameter,
 				 * I still performed the look up because the JIT op does _not_ write to memory.
-				 * 
+				 *
 				 * To, to recap, I want to re-map my value to the value stored in memory at
 				 * a certain _position_ if:
-				 * 
+				 *
 				 * - I am running an op that does _not_ write to memory
 				 * - Or if I am not at the last parameter in the op
 				 */
@@ -286,10 +286,7 @@ class Computer {
 
 	// For debugging
 	get _() {
-		return this.memory.slice(
-			Math.max(0, this.pointer - 1),
-			this.pointer + 8
-		);
+		return this.memory.slice(Math.max(0, this.pointer - 1), this.pointer + 8);
 	}
 }
 
