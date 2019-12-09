@@ -14,7 +14,7 @@ const IMMEDIATE_MODE = '1';
 const RELATIVE_MODE = '2';
 
 class Computer {
-	constructor(memory, inputs, id = 0, clone_memory = false) {
+	constructor(memory, inputs, pause_on_output = true, id = 0, clone_memory = false) {
 		// For debugging
 		this.id = String.fromCharCode('A'.charCodeAt(0) + id);
 
@@ -22,10 +22,10 @@ class Computer {
 		this.memory = memory.slice(0);
 		this.pointer = 0;
 		this.relative_base = 0;
+		this.pause_on_output = pause_on_output;
 
 		this.inputs = Array.isArray(inputs) ? inputs.slice(0) : [inputs];
 		this.outputs = [];
-		this.ticks = 0;
 
 		this.OPS = {
 			[ADD]: {
@@ -136,12 +136,12 @@ class Computer {
 
 		while (!this.halted) {
 			this.runOp(op);
-			this.ticks++;
 
-			// Pause executing the computer so this output can be given to the next computer
-			// Additionally, break if we've halted
-			if (op.name === OUT || this.halted) {
-				console.log('ticks', this.ticks);
+			/**
+			 * In circuits, computer execution should be paused on outout so that value can be passed to the next computer.
+			 * Additionally, execution should immediately stopped if we have halted.
+			 */
+			if ((this.pause_on_output && op.name === OUT )|| this.halted) {
 				break;
 			}
 
@@ -338,6 +338,7 @@ class Circuit {
 	}
 
 	moveToNextComputer() {
+		// Move through array in circular fashion
 		this.current_computer++;
 		this.current_computer %= this.circuit.length;
 
