@@ -33,14 +33,6 @@ class Computer {
 				realName: 'ADD',
 				params: 3,
 				fn: (a, b, c) => {
-					// let length = this.memory.length;
-					// if (c > length - 1) {
-					// 	let increase_by = c - (this.memory.length - 1);
-					// 	for (let i = 0; i < increase_by; i++) {
-					// 		this.memory[length + i] = 0;
-					// 	}
-					// }
-
 					this.memory[c] = a + b;
 				},
 				write: true,
@@ -51,14 +43,6 @@ class Computer {
 				realName: 'MUL',
 				params: 3,
 				fn: (a, b, c) => {
-					// let length = this.memory.length;
-					// if (c > length - 1) {
-					// 	let increase_by = c - (this.memory.length - 1);
-					// 	for (let i = 0; i < increase_by; i++) {
-					// 		this.memory[length + i] = 0;
-					// 	}
-					// }
-
 					this.memory[c] = a * b;
 				},
 				write: true,
@@ -69,14 +53,6 @@ class Computer {
 				realName: 'INP',
 				params: 1,
 				fn: a => {
-					// let length = this.memory.length;
-					// if (a > length - 1) {
-					// 	let increase_by = a - (this.memory.length - 1);
-					// 	for (let i = 0; i < increase_by; i++) {
-					// 		this.memory[length + i] = 0;
-					// 	}
-					// }
-
 					this.memory[a] = this.inputs.shift();
 				},
 				write: true,
@@ -136,13 +112,6 @@ class Computer {
 				realName: 'LTH',
 				params: 3,
 				fn: (a, b, c) => {
-					// let length = this.memory.length;
-					// if (c > length - 1) {
-					// 	let increase_by = c - (this.memory.length - 1);
-					// 	for (let i = 0; i < increase_by; i++) {
-					// 		this.memory[length + i] = 0;
-					// 	}
-					// }
 					this.memory[c] = a < b ? 1 : 0;
 				},
 				write: true,
@@ -153,13 +122,6 @@ class Computer {
 				realName: 'EQU',
 				params: 3,
 				fn: (a, b, c) => {
-					// let length = this.memory.length;
-					// if (c > length - 1) {
-					// 	let increase_by = c - (this.memory.length - 1);
-					// 	for (let i = 0; i < increase_by; i++) {
-					// 		this.memory[length + i] = 0;
-					// 	}
-					// }
 					this.memory[c] = a === b ? 1 : 0;
 				},
 				write: true,
@@ -173,7 +135,6 @@ class Computer {
 		let op = this.parseOp();
 
 		while (!this.halted) {
-			// console.log(op.realName);
 			this.runOp(op);
 			this.ticks++;
 
@@ -215,7 +176,10 @@ class Computer {
 			let mode = modes[i];
 			let value = this.memory[this.pointer + i];
 
-			if (value === undefined) value = 0;
+			// Values can overflow existing memory. If so, value should be 0
+			if (value === undefined) {
+				value = 0;
+			}
 
 			const can_switch_to_position = !write || i < modes.length - 1;
 			if (can_switch_to_position && mode === POSITION_MODE) {
@@ -228,7 +192,10 @@ class Computer {
 				}
 			}
 
-			if (value === undefined) value = 0;
+			// After remapping (if any) again adjust to 0 if we overflowed our memory read
+			if (value === undefined) {
+				value = 0;
+			}
 
 			values.push(value);
 		}
