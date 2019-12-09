@@ -1,10 +1,7 @@
-const G = require('generatorics');
 const { input } = require('./input');
-const { Computer } = require('./circuit');
+const { Computer } = require('./intcode-computer');
 
-let c= new Computer(input, [2])
+let computer = new Computer(input, [2]);
+let output = computer.run();
 
-
-console.log(
-	c.run()
-);
+console.log(output);
