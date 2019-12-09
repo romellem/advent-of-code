@@ -181,14 +181,16 @@ class Computer {
 				value = 0;
 			}
 
-			const can_switch_to_position = !write || i < modes.length - 1;
-			if (can_switch_to_position && mode === POSITION_MODE) {
-				value = this.memory[value];
-			} else if (mode === RELATIVE_MODE) {
-				if (can_switch_to_position) {
-					value = this.memory[value + this.relative_base];
-				} else {
-					value = value + this.relative_base;
+			if (mode !== IMMEDIATE_MODE) {
+				const can_switch_to_position = !write || i < modes.length - 1;
+				if (can_switch_to_position && mode === POSITION_MODE) {
+					value = this.memory[value];
+				} else if (mode === RELATIVE_MODE) {
+					if (can_switch_to_position) {
+						value = this.memory[value + this.relative_base];
+					} else {
+						value = value + this.relative_base;
+					}
 				}
 			}
 
