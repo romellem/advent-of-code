@@ -1,4 +1,8 @@
-const inputToArray = inputStr => String(inputStr).trim().split('\n').map(row => row.split(''));
+const inputToArray = inputStr =>
+	String(inputStr)
+		.trim()
+		.split('\n')
+		.map(row => row.split(''));
 
 const main_input = `#.....#...#.........###.#........#..
 ....#......###..#.#.###....#......##
@@ -99,6 +103,7 @@ const sample_input_5 = `.#..##.###...#######
 
 
 module.exports = {
+	parseInt: inputToArray,
 	input: inputToArray(main_input),
 	sampleInputs: [
 		{
