@@ -60,18 +60,23 @@ class Grid {
 	getVectorsFromPoint(coord) {
 		let slopes = {};
 		const [x1, y1] = coord;
-		const points = this.getEdgePointsFrom(coord);
 
-		for (let point of points) {
-			const [y2, x2] = point;
-			let rise = y2 - y1;
-			let run = x2 - x1;
+		// This isn't optimized (its O(n^2)) but it works for grids of this size.
+		for (let y2 = 0; y2 <= this.max_y; y2++) {
+			for (let x2 = 0; x2 <= this.max_x; x2++) {
+				if (x1 === x2 && y1 === y2) {
+					continue;
+				}
 
-			let divisor = gcd(rise, run);
-			rise /= divisor;
-			run /= divisor;
+				let rise = y2 - y1;
+				let run = x2 - x1;
 
-			slopes[`${rise}/${run}`] = true;
+				let divisor = Math.abs(gcd(rise, run));
+				rise /= divisor;
+				run /= divisor;
+
+				slopes[`${rise}/${run}`] = true;
+			}
 		}
 
 		const vectors_to_travel = Object.keys(slopes).map(slope_str =>
@@ -83,23 +88,23 @@ class Grid {
 
 	// Part one
 	getAsteroidWithHighestCountInLineOfSight() {
-		let max_count = -1;
-		let max_asteroid = null;
+		let best_count = -1;
+		let best_coords = null;
 		for (let asteroid of this.asteroids) {
 			let vectors = this.getVectorsFromPoint(asteroid);
 			let count = vectors
 				.map(vector => this.collisionAlongVector(asteroid, vector))
 				.reduce((a, b) => a + b, 0);
 
-			if (count > max_count) {
-				max_count = count;
-				max_asteroid = asteroid;
+			if (count > best_count) {
+				best_count = count;
+				best_coords = asteroid;
 			}
 		}
 
 		return {
-			best_count: max_count,
-			best_coords: max_asteroid,
+			best_count,
+			best_coords,
 		};
 	}
 
