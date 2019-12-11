@@ -328,8 +328,8 @@ class Direction {
 		if (x === 0 && y === -1) {
 			this.direction = [1, 0];
 		} else if (x === 1 && y === 0) {
-			this.direction = [0, -1];
-		} else if (x === 0 && y === -1) {
+			this.direction = [0, 1];
+		} else if (x === 0 && y === 1) {
 			this.direction = [-1, 0];
 		} else if (x === -1 && y === 0) {
 			this.direction = [0, -1];
