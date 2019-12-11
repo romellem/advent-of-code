@@ -17,7 +17,7 @@ const gcd = (a, b) => {
  *     7     3
  *      6 5 4
  */
-const coordToAngle = (x, y) => {
+const coordToAngle = ([y, x]) => {
 	let deg = (Math.atan2(-y, x) * 180) / Math.PI;
 
 	// Pretty sure this can be simplified with a modulus, but can't see it
@@ -31,21 +31,6 @@ const coordToAngle = (x, y) => {
 
 	return deg;
 };
-
-/**
- * @param {Array} coord
- */
-const memoizedCoordToAngle = (() => {
-	let lookup = {};
-	return ([y, x]) => {
-		const coord = `${x},${y}`;
-		if (lookup[coord] !== undefined) {
-			return coord;
-		}
-
-		return coordToAngle(x, y);
-	};
-})();
 
 class Grid {
 	constructor(input) {
@@ -100,8 +85,8 @@ class Grid {
 
 		if (sorted_clockwise) {
 			vectors_to_travel.sort((p1, p2) => {
-				let p1_d = memoizedCoordToAngle(p1);
-				let p2_d = memoizedCoordToAngle(p2);
+				let p1_d = coordToAngle(p1);
+				let p2_d = coordToAngle(p2);
 				return p1_d - p2_d;
 			});
 		}
@@ -116,7 +101,7 @@ class Grid {
 		for (let asteroid of this.asteroids) {
 			let vectors = this.getVectorsFromPoint(asteroid);
 			let count = vectors
-				.map(vector => this.getCollisionAlongVector(asteroid, vector) ? 1 : 0)
+				.map(vector => (this.getCollisionAlongVector(asteroid, vector) ? 1 : 0))
 				.reduce((a, b) => a + b, 0);
 
 			if (count > best_count) {
@@ -136,7 +121,7 @@ class Grid {
 		if (!start_from) {
 			({ best_coords: start_from } = this.getAsteroidWithHighestCountInLineOfSight());
 		}
-		
+
 		let total_vaporized = 0;
 		let vaporized = [];
 		do {
@@ -151,7 +136,6 @@ class Grid {
 
 				if (total_vaporized === 200) {
 					let [x, y] = collision_coord;
-					console.log(x, y);
 					return (x * 100) + y;
 				}
 			}
