@@ -37,7 +37,7 @@ const coordToAngle = (x, y) => {
  */
 const memoizedCoordToAngle = (() => {
 	let lookup = {};
-	return ([x, y]) => {
+	return ([y, x]) => {
 		const coord = `${x},${y}`;
 		if (lookup[coord] !== undefined) {
 			return coord;
@@ -161,10 +161,13 @@ class Grid {
 	}
 
 	// Part two
-	vaporizeAsteroidsAndReturn200thCoordHash() {
-		let { best_coords: start_from } = this.getAsteroidWithHighestCountInLineOfSight();
+	vaporizeAsteroidsFrom(start_from) {
+		if (!start_from) {
+			({ best_coords: start_from } = this.getAsteroidWithHighestCountInLineOfSight());
+		}
 		
 		let total_vaporized = 0;
+		let vaporized = [];
 		do {
 			let clockwise_vectors_from_start = this.getVectorsFromPoint(start_from, true);
 			for (let vector of clockwise_vectors_from_start) {
@@ -172,6 +175,7 @@ class Grid {
 				if (collision_coord) {
 					total_vaporized++;
 					this.vaporize(collision_coord);
+					vaporized.push(collision_coord);
 				}
 
 				if (total_vaporized === 200) {
