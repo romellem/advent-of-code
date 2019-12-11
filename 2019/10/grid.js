@@ -1,3 +1,4 @@
+// @link https://en.wikipedia.org/wiki/Euclidean_algorithm#Implementations
 const gcd = (a, b) => {
 	if (b === 0) return a;
 	return gcd(b, a % b);
@@ -17,7 +18,7 @@ const gcd = (a, b) => {
  *     7     3
  *      6 5 4
  */
-const coordToAngle = ([y, x]) => {
+const coordToAngle = ([x, y]) => {
 	let deg = (Math.atan2(-y, x) * 180) / Math.PI;
 
 	// Pretty sure this can be simplified with a modulus, but can't see it
@@ -68,14 +69,15 @@ class Grid {
 					continue;
 				}
 
-				let rise = y2 - y1;
-				let run = x2 - x1;
+				let dy = y2 - y1;
+				let dx = x2 - x1;
 
-				let divisor = Math.abs(gcd(rise, run));
-				rise /= divisor;
-				run /= divisor;
+				let divisor = Math.abs(gcd(dy, dx));
+				dy /= divisor;
+				dx /= divisor;
 
-				slopes[`${rise}/${run}`] = true;
+				// Technically I'm storing inverse slopes of `x/y` but that is so my `map` function below spits out `[x, y]` coords
+				slopes[`${dx}/${dy}`] = true;
 			}
 		}
 
@@ -146,7 +148,7 @@ class Grid {
 	getCollisionAlongVector(from, vector) {
 		let collision_coord = null;
 		const [x, y] = from;
-		const [vy, vx] = vector;
+		const [vx, vy] = vector;
 		let new_x = x + vx;
 		let new_y = y + vy;
 
