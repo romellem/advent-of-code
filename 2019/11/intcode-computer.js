@@ -393,14 +393,6 @@ class Ship {
 		return Object.keys(this.ship).length;
 	}
 
-	moveToNextComputer() {
-		// Move through array in circular fashion
-		this.current_computer++;
-		this.current_computer %= this.circuit.length;
-
-		return this.circuit[this.current_computer];
-	}
-
 	printShip() {
 		let coords = Object.keys(this.ship).map(c => c.split(',').map(v => parseInt(v, 10)));
 		let xs = coords.map(c => c[0]);
