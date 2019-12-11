@@ -37,5 +37,6 @@ const pts = [
 ];
 
 for (let pt of pts) {
+	// These should be output in increasing order
     console.log(pt, memoizedCoordToAngle(pt));
 }
