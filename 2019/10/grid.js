@@ -17,6 +17,15 @@ const gcd = (a, b) => {
  *     8     2
  *     7     3
  *      6 5 4
+ *
+ * In addition, my plane has negative y's going up
+ * and positive y's going down.
+ * 
+ *      -y ^
+ *         |
+ *  -x <---+---> +x
+ *         |
+ *      +y v
  */
 const coordToAngle = ([x, y]) => {
 	let deg = (Math.atan2(-y, x) * 180) / Math.PI;
