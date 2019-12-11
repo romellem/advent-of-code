@@ -1,7 +1,7 @@
 const { input } = require('./input');
-const { Computer } = require('./intcode-computer');
+const { Ship } = require('./intcode-computer');
 
-let computer = new Computer(input, [2]);
-let output = computer.run();
+let ship = new Ship(input, 1);
+ship.run();
 
-console.log(output);
+ship.printShip();

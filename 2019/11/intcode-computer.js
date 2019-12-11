@@ -350,10 +350,10 @@ class Direction {
 }
 
 class Ship {
-	constructor(memory) {
-		this.computer = new Computer(memory, [0], 0);
+	constructor(memory, starting_color = 0) {
+		this.computer = new Computer(memory, [starting_color], starting_color);
 
-		this.ship = {};
+		this.ship = { '0,0': starting_color };
 		this.direction = new Direction(0, 0);
 	}
 
@@ -399,6 +399,30 @@ class Ship {
 		this.current_computer %= this.circuit.length;
 
 		return this.circuit[this.current_computer];
+	}
+
+	printShip() {
+		let coords = Object.keys(this.ship).map(c => c.split(',').map(v => parseInt(v, 10)));
+		let xs = coords.map(c => c[0]);
+		let ys = coords.map(c => c[1]);
+
+		xs.sort((a, b) => a - b);
+		ys.sort((a, b) => a - b);
+
+		let min_x = xs[0];
+		let max_x = xs[xs.length - 1];
+		let min_y = ys[0];
+		let max_y = ys[ys.length - 1];
+
+		let str = '';
+		for (let y = min_y; y <= max_y; y++) {
+			for (let x = min_x; x <= max_x; x++) {
+				let cell = `${x},${y}`;
+				str += this.ship[cell] ? '#' : ' ';
+			}
+			str += '\n';
+		}
+		console.log(str);
 	}
 }
 
