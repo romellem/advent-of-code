@@ -3,6 +3,50 @@ const gcd = (a, b) => {
 	return gcd(b, a % b);
 };
 
+/**
+ * Given an x,y point, returns an angle 0-360
+ * such that the top of the circle is 0, and then
+ * we rotate clockwise.
+ *
+ * So in the below ascii circle, if you start at
+ * point `0`, then you'll visit the points 1, 2, 3,
+ * etc., in order.
+ *
+ *      9 0 1
+ *     8     2
+ *     7     3
+ *      6 5 4
+ */
+const coordToAngle = (x, y) => {
+	let deg = (Math.atan2(y, x) * 180) / Math.PI;
+
+	// Pretty sure this can be simplified with a modulus, but can't see it
+	if (deg <= 90 && deg >= 0) {
+		deg = Math.abs(deg - 90);
+	} else if (deg < 0) {
+		deg = Math.abs(deg) + 90;
+	} else {
+		deg = 450 - deg;
+	}
+
+	return deg;
+};
+
+/**
+ * @param {Array} coord
+ */
+const memoizedCoordToAngle = (() => {
+	let lookup = {};
+	return ([x, y]) => {
+		const coord = `${x},${y}`;
+		if (lookup[coord] !== undefined) {
+			return coord;
+		}
+
+		return coordToAngle(x, y);
+	};
+})();
+
 class Grid {
 	constructor(input) {
 		// `1` is an asteroid, `0` is open space
@@ -57,7 +101,7 @@ class Grid {
 		return points;
 	}
 
-	getVectorsFromPoint(coord) {
+	getVectorsFromPoint(coord, sorted_clockwise = false) {
 		let slopes = {};
 		const [x1, y1] = coord;
 
@@ -82,6 +126,14 @@ class Grid {
 		const vectors_to_travel = Object.keys(slopes).map(slope_str =>
 			slope_str.split('/').map(v => parseInt(v, 10))
 		);
+
+		if (sorted_clockwise) {
+			vectors_to_travel.sort((p1, p2) => {
+				let p1_d = memoizedCoordToAngle(p1);
+				let p2_d = memoizedCoordToAngle(p2);
+				return p1_d - p2_d;
+			});
+		}
 
 		return vectors_to_travel;
 	}
@@ -108,6 +160,28 @@ class Grid {
 		};
 	}
 
+	// Part two
+	vaporizeAsteroidsAndReturn200thCoordHash() {
+		let { best_coords: start_from } = this.getAsteroidWithHighestCountInLineOfSight();
+		
+		let total_vaporized = 0;
+		do {
+			let clockwise_vectors_from_start = this.getVectorsFromPoint(start_from, true);
+			for (let vector of clockwise_vectors_from_start) {
+				let collision_coord = this.getCollisionAlongVector(start_from, vector);
+				if (collision_coord) {
+					total_vaporized++;
+					this.vaporize(collision_coord);
+				}
+
+				if (total_vaporized === 200) {
+					let [y, x] = collision_coord;
+					return (x * 100) + y;
+				}
+			}
+		} while (this.sumAllAsteroids() > 1);
+	}
+
 	getCollisionAlongVector(from, vector) {
 		let collision_coord = null;
 		const [x, y] = from;
@@ -127,8 +201,23 @@ class Grid {
 		return collision_coord;
 	}
 
+	vaporize([y, x]) {
+		this.grid[y][x] = 0;
+	}
+
 	pointInGrid(x, y) {
 		return x >= this.min_x && x <= this.max_x && y >= this.min_y && y <= this.max_y;
+	}
+
+	sumAllAsteroids() {
+		let sum = 0;
+		for (let y = 0; y < this.grid.length; y++) {
+			for (let x = 0; x < this.grid[y].length; x++) {
+				sum += this.grid[y][x];
+			}
+		}
+
+		return sum;
 	}
 }
 
