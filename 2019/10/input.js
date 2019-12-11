@@ -135,6 +135,7 @@ module.exports = {
 			grid: inputToArray(sample_input_5),
 			best_count: 210,
 			best_coords: [11, 13],
+			partTwo: 802, // 8 * 100 + 2
 		},
 		{
 			grid: inputToArray(sample_input_part_2),
