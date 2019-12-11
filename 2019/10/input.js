@@ -101,6 +101,12 @@ const sample_input_5 = `.#..##.###...#######
 #.#.#.#####.####.###
 ###.##.####.##.#..##`;
 
+const sample_input_part_2 = `.#....#####...#..
+##...##.#####..##
+##...#...#.#####.
+..#.....#...###..
+..#.#.....#....##`;
+
 module.exports = {
 	parseInt: inputToArray,
 	input: inputToArray(main_input),
@@ -130,5 +136,8 @@ module.exports = {
 			best_count: 210,
 			best_coords: [11, 13],
 		},
+		{
+			grid: inputToArray(sample_input_part_2),
+		}
 	],
 };
