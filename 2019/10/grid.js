@@ -177,7 +177,7 @@ class Grid {
 		return collision_coord;
 	}
 
-	vaporize([y, x]) {
+	vaporize([x, y]) {
 		this.grid[y][x] = 0;
 	}
 
