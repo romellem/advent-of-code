@@ -139,7 +139,8 @@ class Grid {
 					return (x * 100) + y;
 				}
 			}
-		} while (this.sumAllAsteroids() > 1);
+		// } while (this.sumAllAsteroids() > 1);
+		} while (total_vaporized < 200);
 	}
 
 	getCollisionAlongVector(from, vector) {
