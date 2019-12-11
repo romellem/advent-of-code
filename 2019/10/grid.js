@@ -18,7 +18,7 @@ const gcd = (a, b) => {
  *      6 5 4
  */
 const coordToAngle = (x, y) => {
-	let deg = (Math.atan2(y, x) * 180) / Math.PI;
+	let deg = (Math.atan2(-y, x) * 180) / Math.PI;
 
 	// Pretty sure this can be simplified with a modulus, but can't see it
 	if (deg <= 90 && deg >= 0) {
