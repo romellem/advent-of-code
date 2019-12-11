@@ -93,7 +93,7 @@ class Grid {
 		for (let asteroid of this.asteroids) {
 			let vectors = this.getVectorsFromPoint(asteroid);
 			let count = vectors
-				.map(vector => this.collisionAlongVector(asteroid, vector))
+				.map(vector => this.getCollisionAlongVector(asteroid, vector) ? 1 : 0)
 				.reduce((a, b) => a + b, 0);
 
 			if (count > best_count) {
@@ -108,23 +108,23 @@ class Grid {
 		};
 	}
 
-	collisionAlongVector(from, vector) {
+	getCollisionAlongVector(from, vector) {
+		let collision_coord = null;
 		const [x, y] = from;
 		const [vy, vx] = vector;
 		let new_x = x + vx;
 		let new_y = y + vy;
 
-		let in_line_of_sight = 0;
 		while (this.pointInGrid(new_x, new_y)) {
 			if (this.grid[new_y][new_x]) {
-				in_line_of_sight = 1;
+				collision_coord = [new_x, new_y];
 				break;
 			}
 			new_x += vx;
 			new_y += vy;
 		}
 
-		return in_line_of_sight;
+		return collision_coord;
 	}
 
 	pointInGrid(x, y) {
