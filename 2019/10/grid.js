@@ -57,20 +57,6 @@ class Grid {
 		this.min_y = 0;
 		this.max_x = this.grid[0].length - 1;
 		this.max_y = this.grid.length - 1;
-
-		// To be iteratered over later (stores coord in [y, x] format)
-		this.top_edge = Array(this.grid[0].length)
-			.fill(0)
-			.map((_, x) => [0, x]);
-		this.bottom_edge = Array(this.grid[0].length)
-			.fill(0)
-			.map((_, x) => [this.max_y, x]);
-		this.left_edge = Array(this.grid.length)
-			.fill(0)
-			.map((_, y) => [y, 0]);
-		this.right_edge = Array(this.grid.length)
-			.fill(0)
-			.map((_, y) => [y, this.max_x]);
 	}
 
 	getAsteroidsList() {
@@ -84,21 +70,6 @@ class Grid {
 		}
 
 		return asteroids;
-	}
-
-	getEdgePointsFrom([x, y]) {
-		const top = y === 0;
-		const right = x === this.grid[0].length - 1;
-		const bottom = y === this.grid.length - 1;
-		const left = x === 0;
-
-		let points = [];
-		if (!top) points.push(...this.top_edge);
-		if (!right) points.push(...this.right_edge);
-		if (!bottom) points.push(...this.bottom_edge);
-		if (!left) points.push(...this.left_edge);
-
-		return points;
 	}
 
 	getVectorsFromPoint(coord, sorted_clockwise = false) {
@@ -179,7 +150,8 @@ class Grid {
 				}
 
 				if (total_vaporized === 200) {
-					let [y, x] = collision_coord;
+					let [x, y] = collision_coord;
+					console.log(x, y);
 					return (x * 100) + y;
 				}
 			}

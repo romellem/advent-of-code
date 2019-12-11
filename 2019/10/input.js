@@ -138,6 +138,8 @@ module.exports = {
 		},
 		{
 			grid: inputToArray(sample_input_part_2),
+			best_count: 30,
+			best_coords: [8, 3],
 		}
 	],
 };
