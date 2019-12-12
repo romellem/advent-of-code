@@ -1,3 +1,4 @@
+const fs = require('fs');
 const G = require('generatorics');
 
 class Moon {
@@ -34,7 +35,7 @@ class Moon {
 	}
 
 	toString() {
-		return `p:<${this.x}, ${this.y}, ${this.z}> v:<${this.vx}, ${this.vy}, ${this.vz}>`;
+		return `${this.x},${this.y},${this.z},${this.vx},${this.vy},${this.vz}`;
 	}
 
 	atStart() {
@@ -55,12 +56,26 @@ class Moons {
 		this.time = 0;
 	}
 
-	orbit(steps = 1000) {
+	orbit(steps = 10000) {
+		let moon_logs = this.moons.map(m => 'time,x,y,z,vx,vy,vz\n');
 		do {
+			this.moons.forEach((moon, i) => {
+				moon_logs[i] += this.time + ',' + moon.toString() + '\n';
+			});
 			this.applyGravity();
 			this.updatePositions();
 			this.time++;
+			
 		} while (this.time < steps);
+
+		this.moons.forEach((moon, i) => {
+			moon_logs[i] += this.time + ',' + moon.toString() + '\n';
+		});
+
+		moon_logs.forEach((m, i) => {
+			fs.writeFileSync(`moon_${i}.csv`, m);
+		});
+		
 
 		return this.getTotalEnergy();
 	}
