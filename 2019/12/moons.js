@@ -1,4 +1,3 @@
-const fs = require('fs');
 const G = require('generatorics');
 
 class Moon {
@@ -16,10 +15,11 @@ class Moon {
 		this.vz = 0;
 	}
 
-	move() {
-		this.x += this.vx;
-		this.y += this.vy;
-		this.z += this.vz;
+	move(dimensions) {
+		for (let dimension of dimensions) {
+			let velocity = `v${dimension}`;
+			this[dimension] += this[velocity];
+		}
 	}
 
 	getPotentialEnergy() {
@@ -38,15 +38,13 @@ class Moon {
 		return `${this.x},${this.y},${this.z},${this.vx},${this.vy},${this.vz}`;
 	}
 
-	atStart() {
-		return (
-			this.vx === 0 &&
-			this.vy === 0 &&
-			this.vz === 0 &&
-			this.initial_x === this.x &&
-			this.initial_y === this.y &&
-			this.initial_z === this.z
-		);
+	// @param {Enum<string>} - A dimension, 'x', 'y', or 'z'
+	atStart(dimension) {
+		const position = this[dimension];
+		const initial_position = this[`initial_${dimension}`];
+		const velocity = this[`v${dimension}`];
+
+		return position === initial_position && velocity === 0
 	}
 }
 
@@ -54,54 +52,32 @@ class Moons {
 	constructor(moons) {
 		this.moons = moons.map(moon_position => new Moon(moon_position));
 		this.time = 0;
+
+		this.time_dimensions = { x: 0, y: 0, z: 0 };
 	}
 
-	orbit(steps = 10000) {
-		let moon_logs = this.moons.map(m => 'time,x,y,z,vx,vy,vz\n');
+	orbit(steps = 1000) {
 		do {
-			this.moons.forEach((moon, i) => {
-				moon_logs[i] += this.time + ',' + moon.toString() + '\n';
-			});
 			this.applyGravity();
 			this.updatePositions();
 			this.time++;
-			
 		} while (this.time < steps);
-
-		this.moons.forEach((moon, i) => {
-			moon_logs[i] += this.time + ',' + moon.toString() + '\n';
-		});
-
-		moon_logs.forEach((m, i) => {
-			fs.writeFileSync(`moon_${i}.csv`, m);
-		});
-		
 
 		return this.getTotalEnergy();
 	}
 
 	orbitUntilRepeat() {
-		let not_repeated = true
-		while (not_repeated === true) {
-			this.applyGravity();
-			this.updatePositions();
-			this.time++;
-
-			if (this.moons.every(moon => moon.atStart())) {
-				not_repeated = false;
-				return this.time;
-			}
-		}
+		
 	}
 
-	applyGravity() {
+	applyGravity(dimensions = ['x', 'y', 'z']) {
 		for (let pair of G.combination(this.moons, 2)) {
-			Moons.applyGravityToTwoMoons(pair);
+			Moons.applyGravityToTwoMoons(pair, dimensions);
 		}
 	}
 
-	static applyGravityToTwoMoons([moon_a, moon_b]) {
-		for (let position of ['x', 'y', 'z']) {
+	static applyGravityToTwoMoons([moon_a, moon_b], dimensions) {
+		for (let position of dimensions) {
 			let velocity = `v${position}`;
 
 			// If the positions on a given axis are the same,
@@ -116,19 +92,14 @@ class Moons {
 		}
 	}
 
-	updatePositions() {
+	updatePositions(dimensions = ['x', 'y', 'z']) {
 		for (let moon of this.moons) {
-			moon.move();
+			moon.move(dimensions);
 		}
 	}
 
 	getTotalEnergy() {
 		return this.moons.map(moon => moon.getTotalEnergy()).reduce((a, b) => a + b, 0);
-	}
-
-	// For debugging
-	get _() {
-		return this.moons.map(m => m.toString());
 	}
 }
 
