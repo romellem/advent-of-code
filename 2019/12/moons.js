@@ -2,12 +2,15 @@ const G = require('generatorics');
 
 class Moon {
 	constructor([x, y, z]) {
+		this.initial_x = x;
 		this.x = x;
 		this.vx = 0;
 
+		this.initial_y = y;
 		this.y = y;
 		this.vy = 0;
 
+		this.initial_z = z;
 		this.z = z;
 		this.vz = 0;
 	}
@@ -33,6 +36,17 @@ class Moon {
 	toString() {
 		return `p:<${this.x}, ${this.y}, ${this.z}> v:<${this.vx}, ${this.vy}, ${this.vz}>`;
 	}
+
+	atStart() {
+		return (
+			this.vx === 0 &&
+			this.vy === 0 &&
+			this.vz === 0 &&
+			this.initial_x === this.x &&
+			this.initial_y === this.y &&
+			this.initial_z === this.z
+		);
+	}
 }
 
 class Moons {
@@ -49,6 +63,20 @@ class Moons {
 		} while (this.time < steps);
 
 		return this.getTotalEnergy();
+	}
+
+	orbitUntilRepeat() {
+		let not_repeated = true
+		while (not_repeated === true) {
+			this.applyGravity();
+			this.updatePositions();
+			this.time++;
+
+			if (this.moons.every(moon => moon.atStart())) {
+				not_repeated = false;
+				return this.time;
+			}
+		}
 	}
 
 	applyGravity() {
