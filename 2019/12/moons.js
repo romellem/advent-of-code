@@ -1,5 +1,20 @@
 const G = require('generatorics');
 
+// @link https://en.wikipedia.org/wiki/Euclidean_algorithm#Implementations
+const gcd = (a, b) => {
+	if (b === 0) return a;
+	return gcd(b, a % b);
+};
+
+// @link https://github.com/nickleefly/node-lcm/blob/5d44997/index.js
+const _lcm = (a, b) => {
+	if (b === 0) return 0;
+	return (a * b) / gcd(a, b);
+};
+
+// @link https://stackoverflow.com/a/147523/864233
+const lcm = (...args) => args.reduce((a, b) => _lcm(a, b));
+
 class Moon {
 	constructor([x, y, z]) {
 		this.initial_x = x;
@@ -44,7 +59,7 @@ class Moon {
 		const initial_position = this[`initial_${dimension}`];
 		const velocity = this[`v${dimension}`];
 
-		return position === initial_position && velocity === 0
+		return position === initial_position && velocity === 0;
 	}
 }
 
@@ -67,7 +82,18 @@ class Moons {
 	}
 
 	orbitUntilRepeat() {
-		
+		for (let dimension of ['x', 'y', 'z']) {
+			let at_start = false;
+			while (!at_start) {
+				this.applyGravity([dimension]);
+				this.updatePositions([dimension]);
+				this.time_dimensions[dimension]++;
+
+				at_start = this.moons.every(moon => moon.atStart(dimension));
+			}
+		}
+
+		return lcm(...Object.values(this.time_dimensions));
 	}
 
 	applyGravity(dimensions = ['x', 'y', 'z']) {
