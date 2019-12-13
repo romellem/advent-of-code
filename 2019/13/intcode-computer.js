@@ -301,59 +301,18 @@ class Computer {
 	}
 }
 
-class Direction {
-	constructor(x, y) {
-		this.x = x;
-		this.y = y;
-		this.direction = [0, -1];
-	}
-
-	rotateLeft() {
-		const [x, y] = this.direction;
-		if (x === 0 && y === -1) {
-			this.direction = [-1, 0];
-		} else if (x === -1 && y === 0) {
-			this.direction = [0, 1];
-		} else if (x === 0 && y === 1) {
-			this.direction = [1, 0];
-		} else if (x === 1 && y === 0) {
-			this.direction = [0, -1];
-		}
-
-		this.move();
-	}
-
-	rotateRight() {
-		const [x, y] = this.direction;
-		if (x === 0 && y === -1) {
-			this.direction = [1, 0];
-		} else if (x === 1 && y === 0) {
-			this.direction = [0, 1];
-		} else if (x === 0 && y === 1) {
-			this.direction = [-1, 0];
-		} else if (x === -1 && y === 0) {
-			this.direction = [0, -1];
-		}
-
-		this.move();
-	}
-
-	move() {
-		const [x, y] = this.direction;
-		this.x += x;
-		this.y += y;
-	}
-
-	get coord() {
-		return `${this.x},${this.y}`;
-	}
-}
-
 const EMPTY = 0;
 const WALL = 1;
 const BLOCK = 2;
 const PADDLE = 3;
 const BALL = 4;
+const DRAW_MAP = {
+	[EMPTY]: ' ',
+	[WALL]: '#',
+	[BLOCK]: '@',
+	[PADDLE]: '=',
+	[BALL]: 'o',
+};
 
 class Tile {
 	constructor(x, y, tile_id) {
@@ -361,16 +320,67 @@ class Tile {
 		this.y = y;
 		this.tile_id = tile_id;
 	}
+
+	toString() {
+		return DRAW_MAP[this.tile_id] || ' ';
+	}
+}
+
+class Grid {
+	constructor(tiles) {
+		this.grid = {};
+		this.tiles = tiles;
+		tiles.forEach(({ x, y, tile_id }) => {
+			this.grid[`${x},${y}`] = tile_id;
+		});
+
+		// { x: [min_x, max_x], y: [min_y, max_y] }
+		this.boundaries = this.setBoundariesFromTiles();
+	}
+
+	getNumberOfTilesOfType(type) {
+		return this.tiles.filter(tile => tile.tile_id === type).length;
+	}
+
+	printGrid() {
+		let screen = '';
+		let [min_x, max_x] = this.boundaries.x;
+		let [min_y, max_y] = this.boundaries.y;
+
+		for (let y = min_y; y <= max_y; y++) {
+			for (let x = min_x; x <= max_x; x++) {
+				let coord = `${x},${y}`;
+				screen += this.grid[coord].toString();
+			}
+			screen += '\n';
+		}
+
+		console.log(screen);
+	}
+
+	setBoundariesFromTiles() {
+		// Technically we sort our `this.tiles` array but that probably doesn't matter.
+		let tiles_x_sorted = this.tiles.sort((a, b) => a.x - b.x);
+		// [min_x, max_x]
+		let x = [tiles_x_sorted[0].x, tiles_x_sorted[tiles_x_sorted.length - 1].x];
+
+		let tiles_y_sorted = this.tiles.sort((a, b) => a.y - b.y);
+		// [min_y, max_y]
+		let y = [tiles_y_sorted[0].y, tiles_y_sorted[tiles_y_sorted.length - 1].y];
+
+		return { x, y };
+	}
 }
 
 class Arcade {
 	constructor(memory) {
 		this.computer = new Computer({ memory, pause_on_output: false });
+		this.grid;
 	}
 
-	run() {
+	runAndGetGrid() {
 		let computer = this.computer;
-		let output;
+		let output = this.computer.outputs;
 
 		while (!computer.halted) {
 			output = computer.run();
@@ -388,12 +398,13 @@ class Arcade {
 			tiles.push(new Tile(x, y, tile_id));
 		}
 
-		let blocks = tiles.filter(tile => tile.tile_id === BLOCK);
-		return blocks.length;
+		this.grid = new Grid(tiles);
+		return this.grid;
 	}
 }
 
 module.exports = {
 	Computer,
 	Arcade,
+	TYPES: { EMPTY, WALL, BLOCK, PADDLE, BALL },
 };

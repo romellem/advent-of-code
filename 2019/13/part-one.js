@@ -1,7 +1,8 @@
 const { input } = require('./input');
-const { Arcade } = require('./intcode-computer');
+const { Arcade, TYPES } = require('./intcode-computer');
 
 let arcade = new Arcade(input);
-let output = arcade.run();
+let grid = arcade.runAndGetGrid();
+let output = grid.getNumberOfTilesOfType(TYPES.BLOCK);
 
 console.log(output);
