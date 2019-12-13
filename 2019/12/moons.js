@@ -81,6 +81,25 @@ class Moons {
 		return this.getTotalEnergy();
 	}
 
+	/**
+	 * This was a tough one. Not sure I would have been able to
+	 * figure it out on my own; the trick is fairly subtle.
+	 * 
+	 * The idea is that, the planets are periodic _on a single dimension_.
+	 * So imagine if they only moved in the 'x' dimension. If after n_x ticks
+	 * all the planets were back at their original position and original
+	 * velocity, then we'd begin the period again.
+	 * 
+	 * Since then that the planets can only affect each other within
+	 * a single dimension at a time, what we do is calculate the period
+	 * for _each_ dimension separately. Once we have those periods,
+	 * we get the least common multiple (LCM) between them.
+	 * 
+	 * So the trick is two-fold:
+	 * 
+	 * - Calculate the period for the four planets _within each dimension separately._
+	 * - Calculate the _LCM_ between those periods.
+	 */
 	orbitUntilRepeat() {
 		for (let dimension of ['x', 'y', 'z']) {
 			let at_start = false;
