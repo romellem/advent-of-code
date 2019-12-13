@@ -330,8 +330,9 @@ class Grid {
 	constructor(tiles) {
 		this.grid = {};
 		this.tiles = tiles;
-		tiles.forEach(({ x, y, tile_id }) => {
-			this.grid[`${x},${y}`] = tile_id;
+		tiles.forEach(tile => {
+			const { x, y } = tile;
+			this.grid[`${x},${y}`] = tile;
 		});
 
 		// { x: [min_x, max_x], y: [min_y, max_y] }
