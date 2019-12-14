@@ -3,7 +3,7 @@ const { Arcade } = require('./intcode-computer');
 
 (async () => {
     input[0] = 2;
-    let arcade = new Arcade(input, { pause_on_output: true, replenish_input: -1 });
+    let arcade = new Arcade(input, { pause_on_output: true, replenish_input: 0 });
     await arcade.freePlay();
 
     // Memory address 0 represents the number of quarters that have been inserted;

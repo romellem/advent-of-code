@@ -463,10 +463,14 @@ class Arcade {
 				const x = output.shift();
 				const y = output.shift();
 				const tile_id = output.shift();
+				let ms = 1;
+				if (tile_id === BALL) {
+					ms = 1000;
+				}
 				this.screen.paint(x, y, tile_id);
 				readline.cursorTo(process.stdout, 0, 0);
 				console.log(this.screen.toString());
-				await wait(10);
+				await wait(ms);
 			}
 		}
 	}
