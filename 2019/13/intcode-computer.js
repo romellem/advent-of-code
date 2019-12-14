@@ -1,3 +1,5 @@
+const readline = require('readline');
+
 const ADD = '01'; // Add
 const MUL = '02'; // Multiply
 const INP = '03'; // Input
@@ -308,8 +310,8 @@ const PADDLE = 3;
 const BALL = 4;
 const DRAW_MAP = {
 	[EMPTY]: ' ',
-	[WALL]: '#',
-	[BLOCK]: '@',
+	[WALL]: '+',
+	[BLOCK]: '#',
 	[PADDLE]: '=',
 	[BALL]: 'o',
 };
@@ -373,10 +375,53 @@ class Grid {
 	}
 }
 
+class Screen {
+	constructor(boundaries = { x: [ 0, 37 ], y: [ 0, 20 ] }) {
+		this.grid = {};
+		this.score = 0;
+
+		// { x: [min_x, max_x], y: [min_y, max_y] }
+		this.boundaries = boundaries;
+	}
+
+	paint(x, y, tile_id) {
+		if (x === -1 && y === 0) {
+			return this.score = tile_id;
+		}
+
+		const coord = x + ',' + y;
+		if (!this.grid[coord]) {
+			this.grid[coord] = new Tile(x, y);
+		}
+
+		this.grid[coord].tile_id = tile_id;
+	}
+
+	toString() {
+		let screen = '';
+		let [min_x, max_x] = this.boundaries.x;
+		let [min_y, max_y] = this.boundaries.y;
+
+		for (let y = min_y; y <= max_y; y++) {
+			for (let x = min_x; x <= max_x; x++) {
+				let coord = `${x},${y}`;
+				let tile = this.grid[coord] || ' ';
+				screen += tile.toString();
+			}
+			screen += '\n';
+		}
+
+		return screen;
+	}
+}
+
+const wait = (ms = 500) => new Promise(r => setTimeout(r, ms));
+
 class Arcade {
-	constructor(memory) {
-		this.computer = new Computer({ memory, pause_on_output: false });
+	constructor(memory, options = {}) {
+		this.computer = new Computer({ memory, pause_on_output: false, ...options });
 		this.grid;
+		this.screen = new Screen();
 	}
 
 	runAndGetGrid() {
@@ -401,6 +446,29 @@ class Arcade {
 
 		this.grid = new Grid(tiles);
 		return this.grid;
+	}
+
+	// Run after changing position `0` in the memory to the value `2`
+	async freePlay() {
+		let computer = this.computer;
+		let output = this.computer.outputs;
+
+		while (!computer.halted) {
+			output = computer.run();
+			if (computer.halted) {
+				break;
+			}
+
+			if (output.length >= 3) {
+				const x = output.shift();
+				const y = output.shift();
+				const tile_id = output.shift();
+				this.screen.paint(x, y, tile_id);
+				readline.cursorTo(process.stdout, 0, 0);
+				console.log(this.screen.toString());
+				await wait(10);
+			}
+		}
 	}
 }
 
