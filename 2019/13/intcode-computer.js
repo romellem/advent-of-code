@@ -1,4 +1,5 @@
 const readline = require('readline');
+const { green, cyan } = require('colors');
 
 const ADD = '01'; // Add
 const MUL = '02'; // Multiply
@@ -376,9 +377,10 @@ class Grid {
 }
 
 class Screen {
-	constructor(boundaries = { x: [ 0, 37 ], y: [ 0, 20 ] }) {
+	constructor(boundaries = { x: [0, 37], y: [0, 20] }) {
 		this.grid = {};
 		this.score = 0;
+		this.paddle;
 
 		// { x: [min_x, max_x], y: [min_y, max_y] }
 		this.boundaries = boundaries;
@@ -386,7 +388,7 @@ class Screen {
 
 	paint(x, y, tile_id) {
 		if (x === -1 && y === 0) {
-			return this.score = tile_id;
+			return (this.score = tile_id);
 		}
 
 		const coord = x + ',' + y;
@@ -395,6 +397,10 @@ class Screen {
 		}
 
 		this.grid[coord].tile_id = tile_id;
+
+		if (tile_id === PADDLE) {
+			this.paddle = this.grid[coord];
+		}
 	}
 
 	toString() {
@@ -407,6 +413,9 @@ class Screen {
 				let coord = `${x},${y}`;
 				let tile = this.grid[coord] || ' ';
 				screen += tile.toString();
+			}
+			if (y === min_y) {
+				screen += ' Score: ' + this.score;
 			}
 			screen += '\n';
 		}
@@ -422,6 +431,12 @@ class Arcade {
 		this.computer = new Computer({ memory, pause_on_output: false, ...options });
 		this.grid;
 		this.screen = new Screen();
+		this.print_game = options.print_game;
+
+		if (this.print_game) {
+			readline.cursorTo(process.stdout, 0, 0);
+			readline.clearLine(process.stdout);
+		}
 	}
 
 	runAndGetGrid() {
@@ -463,16 +478,35 @@ class Arcade {
 				const x = output.shift();
 				const y = output.shift();
 				const tile_id = output.shift();
-				let ms = 1;
-				if (tile_id === BALL) {
-					ms = 1000;
+				let ms = 0;
+				if (tile_id === BALL && this.screen.paddle) {
+					ms = 3;
+					// See if ball is to the left or right of paddle
+					if (x < this.screen.paddle.x) {
+						computer.inputs[0] = -1;
+					} else if (x > this.screen.paddle.x) {
+						computer.inputs[0] = 1;
+					}
 				}
 				this.screen.paint(x, y, tile_id);
-				readline.cursorTo(process.stdout, 0, 0);
-				console.log(this.screen.toString());
-				await wait(ms);
+
+				if (this.print_game) {
+					readline.cursorTo(process.stdout, 0, 0);
+					console.log(this.screen.toString());
+					await wait(ms);
+				}
 			}
 		}
+
+		let score_length = String(this.screen.score).length;
+		let border = Array(2 + 2 + score_length).fill('-');
+		border[0] = '+';
+		border[border.length - 1] = '+';
+		border = border.join('');
+
+		console.log(cyan(border));
+		console.log(green(`| ${this.screen.score} |`));
+		console.log(cyan(border));
 	}
 }
 
