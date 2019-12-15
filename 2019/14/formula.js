@@ -1,9 +1,6 @@
 class Formula {
 	constructor(recipes) {
-		this.recipes = JSON.parse(JSON.stringify(recipes));
-		this.formula_lookup = {};
-		this.reverse_lookup = {};
-		this.leftover = {};
+		this.recipes = recipes;
 	}
 
 	/*
@@ -56,12 +53,15 @@ class Formula {
 		let { creates, needs } = this.recipes[element];
 		let sum = 0;
 		for (let [piece_element, piece_amount] of needs) {
-
 		}
 	}
 
 	calculateOreTo(element, amount = 1) {
-		this.leftover = {};
+		// Initialize leftovers to be 0 (including ORE)
+		this.leftover = Object.keys(this.recipes).reduce(
+			(obj, element) => ((obj[element] = 0), obj),
+			{ ORE: 0 }
+		);
 		let ore = this.recursiveCalculateOreTo(element, amount);
 
 		return {
@@ -74,23 +74,31 @@ class Formula {
 			return amount;
 		}
 
-		if (this.formula_lookup[element] !== undefined) {
-			return this.formula_lookup[element];
-		}
-
 		// Get formula pieces (the "needs")
 		let { creates, needs } = this.recipes[element];
-		let sum = 0;
+		let ore_sum = 0;
 		for (let [piece_element, piece_amount] of needs) {
-			let multiplier = Math.ceil(amount / creates);
-			let remainder = creates % amount;
-			this.addToLeftover(element, remainder);
-			sum +=
+			let amount_minus_leftover = amount - this.leftover[piece_element];
+			if (amount_minus_leftover <= 0) {
+				/**
+				 * We already have enough created, we don't need to synthesize more.
+				 * Adjust our leftover and return 0, don't need to spend any more ORE.
+				 */
+				this.leftover[piece_element] -= amount;
+				return 0;
+			}
+
+			let multiplier = Math.ceil(amount_minus_leftover / creates);
+			let remainder = multiplier * creates - amount_minus_leftover;
+
+			this.leftover[piece_element] = remainder;
+
+			ore_sum +=
 				multiplier *
 				this.recursiveCalculateOreTo(piece_element, piece_amount);
 		}
 
-		return sum;
+		return ore_sum;
 	}
 
 	addToLeftover(element, amount) {
