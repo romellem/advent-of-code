@@ -14,9 +14,15 @@ const parseLines = raw_lines => {
 		let needs_parsed = needs.split(', ').map(raw_need => {
 			let [needs_amount, needs_element] = raw_need.split(' ');
 			needs_amount = parseInt(needs_amount, 10);
-			return { [needs_element]: needs_amount };
+
+			// [A, 1]
+			return [needs_element, needs_amount ];
 		});
-		formula[creates_element] = needs_parsed;
+
+		formula[creates_element] = {
+			creates: creates_amount,
+			needs: needs_parsed,
+		}
 	});
 
 	return formula;
@@ -147,4 +153,5 @@ module.exports = {
 		{ formula: parseLines(sampleInput_5), ore: 2210736 },
 	],
 	input: parseLines(input),
+	parseLines,
 };
