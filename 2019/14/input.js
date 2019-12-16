@@ -154,9 +154,9 @@ module.exports = {
 	sampleInputs: [
 		{ formula: parseLines(sampleInput_1), ore: 31 },
 		{ formula: parseLines(sampleInput_2), ore: 165 },
-		{ formula: parseLines(sampleInput_3), ore: 13312 },
-		{ formula: parseLines(sampleInput_4), ore: 180697 },
-		{ formula: parseLines(sampleInput_5), ore: 2210736 },
+		{ formula: parseLines(sampleInput_3), ore: 13312, max_fuel: 82892753 },
+		{ formula: parseLines(sampleInput_4), ore: 180697, max_fuel: 5586022 },
+		{ formula: parseLines(sampleInput_5), ore: 2210736, max_fuel: 460664 },
 		{ formula: parseLines(sampleInput_6), ore: 10 },
 	],
 	input: parseLines(input),

@@ -78,6 +78,27 @@ class Formula {
 
 		return ore_sum;
 	}
+
+	calculateMaxFuelGivenOre(total_ore = 1000000000000) {
+		// Binary search
+		let lower_bound = 1;
+		let upper_bound = total_ore;
+		while (upper_bound - lower_bound > 1) {
+			// @see https://en.wikipedia.org/wiki/Binary_search_algorithm#Algorithm
+			let midway_point = Math.floor((upper_bound + lower_bound) / 2);
+			let { ore } = this.calculateOreTo('FUEL', midway_point);
+			
+			if (ore > total_ore) {
+				upper_bound = midway_point - 1;
+			} else if (ore < total_ore) {
+				lower_bound = midway_point + 1;
+			} else {
+				return midway_point;
+			}
+		}
+
+		return lower_bound;
+	}
 }
 
 module.exports = Formula;
