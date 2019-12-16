@@ -92,7 +92,7 @@ class Formula {
 		// Otherwise, we need to synthesize this element
 		let ore_sum = 0;
 		for (let [piece_element, piece_amount] of needs) {
-			ore_sum += multiplier * this.recursiveCalculateOreTo(piece_element, piece_amount);
+			ore_sum += this.recursiveCalculateOreTo(piece_element, multiplier * piece_amount);
 		}
 
 		return ore_sum;

@@ -84,6 +84,12 @@ const sampleInput_5 = `171 ORE => 8 CNZTR
 7 XCVML => 6 RJRHP
 5 BHXH, 4 VRPVC => 5 LTCX`;
 
+const sampleInput_6 = `10 ORE => 10 A
+1 A => 1 B
+1 B => 1 C
+1 C => 1 D
+4 A, 2 B, 2 C, 1 D => 1 FUEL`;
+
 const input = `3 JQFM, 5 QMQB, 20 WQCT => 8 PHBMP
 2 XJFQR => 1 WQCT
 133 ORE => 3 KFKWH
@@ -151,6 +157,7 @@ module.exports = {
 		{ formula: parseLines(sampleInput_3), ore: 13312 },
 		{ formula: parseLines(sampleInput_4), ore: 180697 },
 		{ formula: parseLines(sampleInput_5), ore: 2210736 },
+		{ formula: parseLines(sampleInput_6), ore: 10 },
 	],
 	input: parseLines(input),
 	parseLines,
