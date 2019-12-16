@@ -3,59 +3,6 @@ class Formula {
 		this.recipes = recipes;
 	}
 
-	/*
-	1 ORE => 2 A
-	4 A => 3 B
-	13 B => 1 FUEL
-
-	formula = {
-		FUEL: {
-			creates: 1,
-			needs: [
-				['B', 12]
-			]
-		},
-		B: {
-			creates: 3,
-			needs: [
-				['A', 4]
-			]
-		},
-		A: {
-			creates: 2,
-			needs: [
-				['ORE', 1]
-			]
-		}
-	};
-
-	formula = {
-		FUEL: {
-			creates: 1,
-			needs: [
-				['A', 1]
-			]
-		},
-		A: {
-			creates: 10,
-			needs: [
-				['ORE', 10]
-			]
-		}
-	};
-
-	*/
-	calculateOreFrom(element, amount = 1) {
-		if (this.reverse_lookup[element] !== undefined) {
-			return this.reverse_lookup[element];
-		}
-
-		let { creates, needs } = this.recipes[element];
-		let sum = 0;
-		for (let [piece_element, piece_amount] of needs) {
-		}
-	}
-
 	calculateOreTo(element, amount = 1) {
 		// Initialize leftovers to be 0 (including ORE)
 		this.leftover = Object.keys(this.recipes).reduce(
@@ -69,6 +16,7 @@ class Formula {
 			leftover: this.leftover,
 		};
 	}
+
 	recursiveCalculateOreTo(element, amount = 1) {
 		if (element === 'ORE') {
 			return amount;
@@ -96,13 +44,6 @@ class Formula {
 		}
 
 		return ore_sum;
-	}
-
-	addToLeftover(element, amount) {
-		if (this.leftover[element] === undefined) {
-			this.leftover[element] = 0;
-		}
-		this.leftover[element] += amount;
 	}
 }
 
