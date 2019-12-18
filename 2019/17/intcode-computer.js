@@ -332,6 +332,8 @@ class Grid {
 	}
 }
 
+const wait = (ms = 500) => new Promise(r => setTimeout(r, ms));
+
 class ASCII {
 	constructor(memory, options = { pause_on_output: false }) {
 		this.computer = new Computer({ memory, ...options });
@@ -343,6 +345,52 @@ class ASCII {
 
 		let grid = new Grid(grid_str);
 		return grid.countIntersections();
+	}
+
+	// Run after changing position `0` in the memory to the value `2`
+	async freePlay() {
+		let computer = this.computer;
+		let output = this.computer.outputs;
+
+		while (!computer.halted) {
+			output = computer.run();
+			if (computer.halted) {
+				break;
+			}
+
+			if (output.length >= 3) {
+				const x = output.shift();
+				const y = output.shift();
+				const tile_id = output.shift();
+				let ms = 0;
+				if (tile_id === BALL && this.screen.paddle) {
+					ms = 3;
+					// See if ball is to the left or right of paddle
+					if (x < this.screen.paddle.x) {
+						computer.inputs[0] = -1;
+					} else if (x > this.screen.paddle.x) {
+						computer.inputs[0] = 1;
+					}
+				}
+				this.screen.paint(x, y, tile_id);
+
+				if (this.print_game) {
+					readline.cursorTo(process.stdout, 0, 0);
+					console.log(this.screen.toString());
+					await wait(ms);
+				}
+			}
+		}
+
+		let score_length = String(this.screen.score).length;
+		let border = Array(2 + 2 + score_length).fill('-');
+		border[0] = '+';
+		border[border.length - 1] = '+';
+		border = border.join('');
+
+		console.log(cyan(border));
+		console.log(green(`| ${this.screen.score} |`));
+		console.log(cyan(border));
 	}
 }
 
