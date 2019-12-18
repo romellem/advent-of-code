@@ -304,12 +304,49 @@ class Computer {
 	}
 }
 
+class Grid {
+	constructor(grid_str) {
+		this.grid = grid_str.split('\n').map(row => row.split(''));
+	}
+
+	countIntersections() {
+		let intersection_sum = 0;
+		for (let y = 0; y < this.grid.length; y++) {
+			for (let x = 0; x < this.grid[y].length; x++) {
+				let cell = this.grid[y][x];
+
+				if (cell === '#') {
+					let top = this.grid[y - 1] && this.grid[y - 1][x];
+					let bottom = this.grid[y + 1] && this.grid[y + 1][x];
+					let left = this.grid[y][x - 1];
+					let right = this.grid[y][x + 1];
+					let valid = [top, bottom, left, right].filter(v => v);
+					if (valid.every(v => v === '#')) {
+						intersection_sum += (x * y);
+					}
+				}
+			}
+		}
+
+		return intersection_sum;
+	}
+}
+
 class ASCII {
-	constructor(memory) {
-		
+	constructor(memory, options = { pause_on_output: false }) {
+		this.computer = new Computer({ memory, ...options });
+	}
+
+	partOne() {
+		this.computer.run();
+		let grid_str = this.computer.outputs.map(c => String.fromCharCode(c)).join('');
+
+		let grid = new Grid(grid_str);
+		return grid.countIntersections();
 	}
 }
 
 module.exports = {
 	Computer,
+	ASCII,
 };
