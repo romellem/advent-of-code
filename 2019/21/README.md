@@ -93,3 +93,19 @@ This one-instruction program sets `J` to _true_ if and only if there is no groun
 However, if the springdroid successfully makes it across, it will use an output instruction to indicate the _amount of damage to the hull_ as a single giant integer outside the normal ASCII range.
 
 Program the springdroid with logic that allows it to survey the hull without falling into space. _What amount of hull damage does it report?_
+
+## --- Part Two ---
+
+There are many areas the springdroid can't reach. You flip through the manual and discover a way to _increase its sensor range_.
+
+Instead of ending your springcode program with `WALK`, use `RUN`. Doing this will enable _extended sensor mode_, capable of sensing ground up to _nine tiles away_. This data is available in _five new read-only registers_:
+
+*   Register `E` indicates whether there is ground _five_ tiles away.
+*   Register `F` indicates whether there is ground _six_ tiles away.
+*   Register `G` indicates whether there is ground _seven_ tiles away.
+*   Register `H` indicates whether there is ground _eight_ tiles away.
+*   Register `I` indicates whether there is ground _nine_ tiles away.
+
+All other functions remain the same.
+
+Successfully survey the rest of the hull by ending your program with `RUN`. _What amount of hull damage does the springdroid now report?_
