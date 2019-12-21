@@ -44,5 +44,5 @@ WALK
 `);
 
 let ascii = new ASCII(memory, { inputs, pause_on_output: false });
-ascii.partOne();
+ascii.run();
 console.log(ascii.computer.flushOutputs());

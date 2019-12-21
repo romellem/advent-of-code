@@ -317,14 +317,12 @@ class Computer {
 	}
 }
 
-const wait = (ms = 500) => new Promise(r => setTimeout(r, ms));
-
 class ASCII {
 	constructor(memory, options = {}) {
 		this.computer = new Computer({ memory, ...options });
 	}
 
-	partOne() {
+	run() {
 		this.computer.run();
 	}
 }
