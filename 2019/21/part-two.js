@@ -31,6 +31,8 @@ const { ASCII, Computer } = require('./intcode-computer');
 //     @...@...@...@
 // #####.#.#...#.###
 
+// #####...####.####
+
 /**
  * Current program:
  * (Hole 1 away OR
@@ -48,6 +50,7 @@ OR T J
 NOT A T
 OR T J
 AND D J
+AND H J
 RUN
 `);
 
