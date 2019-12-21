@@ -3,7 +3,8 @@ const { ASCII, Computer } = require('./intcode-computer');
 
 // NOT N == Hole at N
 
-let inputs = Computer.parseAsciiInputToArray(`WALK
+let inputs = Computer.parseAsciiInputToArray(`NOT B J
+WALK
 `);
 
 let ascii = new ASCII(memory, { inputs, pause_on_output: false });
