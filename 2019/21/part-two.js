@@ -31,8 +31,6 @@ const { ASCII, Computer } = require('./intcode-computer');
 //   @...@
 // #####.#@###.#.###
 
-// 1. (0 || (0 || (1 && 1))) && 1) && 
-//   @........
 // #####.#.###.#.###
 
 // 1. ((1 || 0 || (1 && 1))) && 1) && 1
@@ -67,6 +65,8 @@ NOT B T
 OR T J
 NOT A T
 OR T J
+AND D J
+AND G J
 AND H J
 RUN
 `);
