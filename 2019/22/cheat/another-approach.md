@@ -19,7 +19,7 @@ Then I ask:
 
 At the end of the day, this isn't an optimisation problem, nor a pattern-finding problem, nor a disassemble-the-assembly-and-implement-it-yourself puzzle. It's a maths problem. This isn't Advent of Math. The icing on the cake, of course, is that you need to go fetch some bigint library to do this, because doing the multiplications naively result in u64 overflows (or so I heard).
 
-as [/u/jrfondren](/u/jrfondren) said very nicely:
+as [/u/jrfondren](https://www.reddit.com/r/adventofcode/comments/ee0rqi/2019_day_22_solutions/fbo6ea3/) said very nicely:
 
 > after you spoil someone who couldn't get it, they will be angry. There was no possible way to do it at all. All the time they put into thinking about the problem was wasted, and any further time would've been wasted as well.
 
@@ -35,7 +35,7 @@ Just my 2 cents.
 
 EDIT: for the benefit of people seeing this later, here are the main points myself and others have made:
 
-1.  solving today's puzzle without explicit knowledge of modular arithmetic is nigh impossible. [/u/MegaGreenLightning](/u/MegaGreenLightning) has shown that it is not _actually_ impossible — y'all should read their post. For (most) other days, a naive implementation of DFS or BFS will get you a solution for the graph problems, even if it runs slow — not the case for today.
+1.  solving today's puzzle without explicit knowledge of modular arithmetic is nigh impossible. [/u/MegaGreenLightning](https://www.reddit.com/r/adventofcode/comments/ee56wh/2019_day_22_part_2_so_whats_the_purpose_of_this/fbr0vjb/) has shown that it is not _actually_ impossible — y'all should read their post. For (most) other days, a naive implementation of DFS or BFS will get you a solution for the graph problems, even if it runs slow — not the case for today.
     
 2.  modular arithmetic is not "common knowledge" among programmers, especially those that are self-taught or below undergrad level of education. not gonna split hairs about specific people's specific experiences. Other things that are perhaps not so common are generally led-up-to (eg. intcode), explicitly mentioned (see point 3), or are common components of prior AoC puzzles.
     
