@@ -1,4 +1,58 @@
-> https://www.reddit.com/r/adventofcode/comments/ee56wh/2019_day_22_part_2_so_whats_the_purpose_of_this/fbr0vjb/
+Here is dicussion on a [reddit post](https://redd.it/ee56wh), with a comment explaining an alternate approach to solving this that doesn't require Number Theory knowledge. [Jump to the explanation on the alternate approach](#another-approach).
+
+# [2019 Day 22 Part 2] So what's the purpose of this puzzle, exactly? + Feedback
+
+From the sidebar:
+
+> programming puzzles for a variety of skill sets and skill levels ... Code should be fun ... AoC is a fun, non-threatening way to work ...
+
+Doing AoC rarely upsets me, and I think it should _not_ be an upsetting affair (unless of course one aims for the leaderboard) --- but this puzzle really takes the cake. Are we really expecting people to be fluent with university-level math to be able to do this puzzle? Oh, but you say: you can just google the algorithm and implement it!
+
+Then I ask:
+
+1.  is AoC a programming challenge or a googling challenge?
+    
+2.  AoC should feel like a net gain for one's programming/optimisation/problem-solving skills. Is copying an algorithm really a way to learn these skills?
+    
+3.  Modulo arithmetic is not intuitive, especially when dealing with congruences and modular inverses. I just took a discrete maths class this semester, and I was completely unable to wrap my head around that topic, and I don't expect the average programmer to be able to do something like that easily either. As someone else said in the solution thread, I think the main demographic of these puzzles are people who are (mostly) self-taught, with _practical_ programming skills --- not mathematicians.
+    
+
+At the end of the day, this isn't an optimisation problem, nor a pattern-finding problem, nor a disassemble-the-assembly-and-implement-it-yourself puzzle. It's a maths problem. This isn't Advent of Math. The icing on the cake, of course, is that you need to go fetch some bigint library to do this, because doing the multiplications naively result in u64 overflows (or so I heard).
+
+as [/u/jrfondren](/u/jrfondren) said very nicely:
+
+> after you spoil someone who couldn't get it, they will be angry. There was no possible way to do it at all. All the time they put into thinking about the problem was wasted, and any further time would've been wasted as well.
+
+Feedback:
+
+I really enjoyed AoC from 2015-2017 -- even though I was a far worse programmer back then than I am now. I had some troubles with the graph-search related problems (notably the one with lifts and things that couldn't be on the same floor), but it was fun. For me, 2018 had obtuse puzzles that were more about implementing a very specific specification than any "real" problem solving (recall day 15).
+
+This year has been quite fun (the recurring intcode puzzles were a bit off-putting at first, but there were some stand-out puzzles -- like the breakout one, the donut one was a fun twist on maze-search without an explosive problem space) -- but I felt like I had to say something about this puzzle.
+
+I get that topaz is trying to come up with more creative puzzles, under the impression that we don't want the "same old boring stuff" from past years. But my gut feeling after doing this for 5 years is that everything is getting more and more contrived for no real reason.
+
+Just my 2 cents.
+
+EDIT: for the benefit of people seeing this later, here are the main points myself and others have made:
+
+1.  solving today's puzzle without explicit knowledge of modular arithmetic is nigh impossible. [/u/MegaGreenLightning](/u/MegaGreenLightning) has shown that it is not _actually_ impossible — y'all should read their post. For (most) other days, a naive implementation of DFS or BFS will get you a solution for the graph problems, even if it runs slow — not the case for today.
+    
+2.  modular arithmetic is not "common knowledge" among programmers, especially those that are self-taught or below undergrad level of education. not gonna split hairs about specific people's specific experiences. Other things that are perhaps not so common are generally led-up-to (eg. intcode), explicitly mentioned (see point 3), or are common components of prior AoC puzzles.
+    
+3.  the puzzle gives no hints, nor mentions explicitly by name, modular arithmetic. it is very difficult to search for this kind of thing without knowledge of what exactly it is. contrast this with things like pathfinding, or angles between points, which will get you BFS or A\* or atan2 in the first 5 results even with vague queries like "maze shortest path".
+    
+4.  AoC is, eponymously, advent of _Code_, and the puzzles should be focused on programming challenges — datastructures, algorithms, optimisation, etc. It is not a maths puzzle, and it shouldn't be one. this is my opinion, but I'd wager most people would stick to project euler for maths challenges.
+    
+5.  people who insist that this puzzle was easy are speaking from the high ground a position of knowledge. objectively, looking at the statistics, this has been one of the hardest puzzles of the year, if not of the past 4 years. there's nothing wrong with knowing exactly how to approach this problem, but it's disingenuous to expect that everybody who wants to have fun with AoC during the holidays has the same background.
+    
+6.  at the end of the day, we're all doing AoC to have fun, and i'm sure we all appreciate some free puzzles to nudge our brains on. this post is feedback that i personally, and some others, did not in fact find this fun, nor rewarding, to solve. it is _not_ a whiny complaint session.
+
+-----
+
+> [_source_](https://www.reddit.com/r/adventofcode/comments/ee56wh/2019_day_22_part_2_so_whats_the_purpose_of_this/fbr0vjb/)  
+> [_Go code_](https://github.com/GreenLightning/aoc19/blob/ed5de84/day22/main.go)
+
+## Another Approach
 
 I disagree. As a disclaimer, I have 3 university math classes under my belt, BUT I solved it without seeing the connection between the puzzle and the math (might be caused by still being half-asleep when the puzzle is released at 6:00 AM local time...) and without any googling or looking at reddit or whatever. It was quite a surprise when I looked at the solution thread after I solved the puzzle.
 
