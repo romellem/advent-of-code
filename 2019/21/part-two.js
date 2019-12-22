@@ -27,10 +27,21 @@ const { ASCII, Computer } = require('./intcode-computer');
 //   @...@.
 // #####.#@#...#.###
 
+// 1. ((0 || 0 || (1 && 0))) && 1) && 1
+//   @...@
+// #####.#@###.#.###
+
+// #####.#.###.#.###
+
 // 1. ((1 || 0 || (1 && 1))) && 1) && 1
 //     @...@...@...@
 // #####.#.#...#.###
 
+//     @
+// #####@..####.####
+
+//
+//     @...@
 // #####...####.####
 
 /**
@@ -43,6 +54,7 @@ const { ASCII, Computer } = require('./intcode-computer');
  *      )
  *      AND ground 4 away
  * )
+ * AND ground 7 away
  * AND ground 8 away
  */
 
@@ -54,6 +66,7 @@ OR T J
 NOT A T
 OR T J
 AND D J
+AND G J
 AND H J
 RUN
 `);
