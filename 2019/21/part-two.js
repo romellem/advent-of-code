@@ -27,7 +27,7 @@ const { ASCII, Computer } = require('./intcode-computer');
 //   @...@.
 // #####.#@#...#.###
 
-// 1. (1 || 0 || (1 && 1))) && 1
+// 1. ((1 || 0 || (1 && 1))) && 1) && 1
 //     @...@...@...@
 // #####.#.#...#.###
 
@@ -35,11 +35,15 @@ const { ASCII, Computer } = require('./intcode-computer');
 
 /**
  * Current program:
- * (Hole 1 away OR
- *      (Hole 2 away OR
- *          (Hole 3 away AND ground 4 away)
+ * (
+ *      (Hole 1 away OR
+ *          (Hole 2 away OR
+ *              (Hole 3 away AND ground 4 away)
+ *          )
  *      )
- * ) AND ground 4 away
+ *      AND ground 4 away
+ * )
+ * AND ground 8 away
  */
 
 let inputs = Computer.parseAsciiInputToArray(
