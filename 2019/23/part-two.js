@@ -1,0 +1,2 @@
+const { input } = require('./input');
+
