@@ -480,7 +480,6 @@ class Game {
 	}
 
 	move(direction) {
-		this.map.move(direction);
 		this.computer.inputs.push(...Computer.parseAsciiInputToArray(direction + '\n'));
 	}
 
@@ -503,18 +502,23 @@ class Game {
 
 	addEventListeners() {
 		window.addEventListener('keydown', e => {
+			let should_move = false;
 			if (e.code === 'ArrowUp') {
 				console.log('north');
 				this.move('north');
+				should_move = 'north';
 			} else if (e.code === 'ArrowLeft') {
 				console.log('west');
 				this.move('west');
+				should_move = 'west';
 			} else if (e.code === 'ArrowRight') {
 				console.log('east');
 				this.move('east');
+				should_move = 'east';
 			} else if (e.code === 'ArrowDown') {
 				console.log('south');
 				this.move('south');
+				should_move = 'south';
 			} else if (e.code === 'KeyT') {
 				this.take();
 			} else if (e.code === 'KeyD') {
@@ -529,6 +533,12 @@ class Game {
 			this.current_room_str = this.runUntilCommand();
 			this.parseCurrentRoom();
 			this.render();
+
+			if (should_move && !/You can't go that way/.test(this.current_room_str) && !/you are ejected back to the checkpoint/.test(this.current_room_str)) {
+				this.map.move(should_move);
+				this.render();
+			}
+			
 		});
 	}
 
