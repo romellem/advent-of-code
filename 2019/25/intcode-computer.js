@@ -298,15 +298,35 @@ class Computer {
 		this.outputs.push(v);
 	}
 
+	peekLastNOutputs(n) {
+		if (this.outputs.length < n) return '';
+
+		let output_slice = '';
+		for (let i = 1; i <= n; i++) {
+			let char = String.fromCharCode(this.outputs[this.outputs.length - i]);
+			output_slice = char + output_slice;
+		}
+
+		return output_slice;
+	}
+
 	static parseAsciiInputToArray(input_str) {
 		return input_str.split('').map(c => c.charCodeAt(0));
 	}
 
-	flushOutputs(as_ascii = true) {
+	getOutputs(as_ascii = true) {
 		const MAX_ASCII_NUM = 127;
 		let outputs_str = as_ascii
-			? this.outputs.map(c => (c > MAX_ASCII_NUM ? `\n${c}\n` : String.fromCharCode(c))).join('')
+			? this.outputs
+					.map(c => (c > MAX_ASCII_NUM ? `\n${c}\n` : String.fromCharCode(c)))
+					.join('')
 			: this.outputs.join(',');
+
+		return outputs_str;
+	}
+
+	flushOutputs(as_ascii = true) {
+		let outputs_str = this.getOutputs(as_ascii);
 		this.outputs = [];
 		return outputs_str;
 	}
@@ -317,13 +337,91 @@ class Computer {
 	}
 }
 
+class Airlock {
+	constructor() {
+		this.map = { '0,0': null };
+		this.x = 0;
+		this.y = 0;
+	}
+
+	move(direction) {
+		switch (direction) {
+			case 'north':
+				return this.y--;
+
+			case 'south':
+				return this.y++;
+
+			case 'east':
+				return this.x++;
+
+			case 'west':
+				return this.x--;
+		}
+	}
+
+	/**
+	 * Example room string:
+	 *
+	 *     == Storage ==
+	 *     The boxes just contain more boxes.  Recursively.
+	 *
+	 *     Doors here lead:
+	 *     - north
+	 *     - south
+	 *
+	 *     Items here:
+	 *     - giant electromagnet
+	 */
+	parseRoom(room_str) {
+		let lines = room_str.split('\n');
+
+		let doors = [];
+		let items = [];
+		for (let line of lines) {
+			// All doors / items start with the string '- '
+			if (line.indexOf('- ')) {
+				if (/- (north|south|east|west)/.test(line)) {
+					let [, door] = /- (north|south|east|west)/.exec(line);
+					doors.push(door);
+				} else {
+					// Its an item
+					let item = line.slice(2);
+					items.push(item);
+				}
+			}
+		}
+
+		return { doors, items };
+	}
+}
+
 class ASCII {
 	constructor(memory, options = {}) {
-		this.computer = new Computer({ memory, ...options });
+		this.computer = new Computer({
+			memory,
+			pause_on_output: true,
+			...options,
+		});
 	}
 
 	run() {
-		this.computer.run();
+		const COMMAND_LENGTH = 'Command?'.length;
+		while (this.computer.inputs.length) {
+			this.computer.run();
+			let peeked = this.computer.peekLastNOutputs(COMMAND_LENGTH);
+
+			if (peeked === 'Command?') {
+				console.log(this.computer.flushOutputs());
+			}
+			// process.stdout.write(iterations + '\r')
+			// console.log(this.computer.getOutputs());
+			// if (this.computer.getOutputs() === 'Command?') {
+			// 	this.computer.inputs.push(...Computer.parseAsciiInputToArray(`north\n`));
+			// }
+		}
+
+		console.log(this.computer.flushOutputs());
 	}
 }
 

@@ -1,0 +1,61 @@
+
+
+
+== Hull Breach ==
+You got in through a hole in the floor here. To keep your ship from also freezing, the hole has been sealed.
+
+Doors here lead:
+- east
+- south
+- west
+
+Command?
+
+
+
+
+== Stables ==
+Reindeer-sized. They're all empty.
+
+Doors here lead:
+- south
+- west
+
+Command?
+
+
+
+
+== Storage ==
+The boxes just contain more boxes.  Recursively.
+
+Doors here lead:
+- north
+- south
+
+Items here:
+- giant electromagnet
+
+Command?
+
+
+
+
+== Arcade ==
+None of the cabinets seem to have power.
+
+Doors here lead:
+- north
+
+Items here:
+- hologram
+
+Command?
+
+
+You take the hologram.
+
+Command?
+
+
+
