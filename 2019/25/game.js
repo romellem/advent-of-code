@@ -463,7 +463,7 @@ class Game {
 		let items = [];
 		for (let line of lines) {
 			// All doors / items start with the string '- '
-			if (line.indexOf('- ')) {
+			if (line.indexOf('- ') === 0) {
 				if (/- (north|south|east|west)/.test(line)) {
 					let [, door] = /- (north|south|east|west)/.exec(line);
 					doors.push(door);
@@ -484,7 +484,7 @@ class Game {
 	}
 
 	take() {
-		if (!this.items.length) return;
+		if (!this.current_room.items.length) return;
 		let item = this.current_room.items.pop();
 		this.computer.inputs.push(...Computer.parseAsciiInputToArray('take ' + item + '\n'));
 		this.items.push(item);
@@ -520,8 +520,10 @@ class Game {
 				this.move('south');
 				should_move = 'south';
 			} else if (e.code === 'KeyT') {
+				debugger;
 				this.take();
 			} else if (e.code === 'KeyD') {
+				debugger;
 				this.drop();
 			} else if (e.code === 'KeyI') {
 				this.inventory();
