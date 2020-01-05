@@ -457,6 +457,7 @@ class Game {
 	 *     - giant electromagnet
 	 */
 	parseCurrentRoom(room_str = this.current_room_str) {
+		if (!room_str) return;
 		let lines = room_str.split('\n');
 
 		let doors = [];
@@ -523,7 +524,7 @@ class Game {
 				debugger;
 				this.take();
 			} else if (e.code === 'KeyD') {
-				debugger;
+				// debugger;
 				this.drop();
 			} else if (e.code === 'KeyI') {
 				this.inventory();
