@@ -22,7 +22,7 @@
     "double-ended-queue": "^2.1.0-0",
     "generatorics": "^1.1.0",
     "get-divisors": "^1.0.0",
-    "jimp": "^0.6.4",
+    "jimp": "^0.16.0",
     "jsnetworkx": "^0.3.4",
     "lodash": "^4.17.20",
     "looped-list": "^0.1.1",
