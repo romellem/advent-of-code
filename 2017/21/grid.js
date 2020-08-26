@@ -171,6 +171,28 @@ function pickSubgrid(grid, x_offset, y_offset, size) {
 }
 
 /**
+ * Returns a string representation of our grid, to be immediately used as an expansion rule
+ * @param {Array<Array>} grid
+ * @param {Number} x_offset
+ * @param {Number} y_offset
+ * @param {Number} size Size of the subgrid to pick out
+ * @returns {String}
+ */
+function pickSubgridAsRule(grid, x_offset, y_offset, size) {
+	let subgrid = '';
+	for (let y = y_offset; y < y_offset + size; y++) {
+		for (let x = x_offset; x < x_offset + size; x++) {
+			subgrid += grid[y][x];
+		}
+		if (y < y_offset + size - 1) {
+			subgrid += '/';
+		}
+	}
+
+	return subgrid;
+}
+
+/**
  * @param {Array<Array>} grid - A 2d grid of our '#' and '.' pixels
  * @param {Object} rules
  */
@@ -198,8 +220,11 @@ function expandGrid(grid, rules) {
 
 		for (let x_chunk = 0; x_chunk < chunks; x_chunk++) {
 			let x_offset = x_chunk * intial_size;
-			let subgrid = pickSubgrid(grid, x_offset, y_offset, intial_size);
-			let subgrid_as_rule = joinGridRule(subgrid);
+
+			// Slightly more optimized to use `pickSubgridAsRule`. Original code shown below
+			// let subgrid = pickSubgrid(grid, x_offset, y_offset, intial_size);
+			// let subgrid_as_rule = joinGridRule(subgrid);
+			let subgrid_as_rule = pickSubgridAsRule(grid, x_offset, y_offset, intial_size);
 			let expansion = rules[subgrid_as_rule];
 
 			for (let y = 0; y < expansion.length; y++) {
@@ -235,6 +260,13 @@ function iterativelyExpandGrid(input, iterations, grid = STARTING_GRID) {
 	return grid;
 }
 
+/**
+ * Counts the number of "on" and "off" pixels.
+ * "On" is denoted via a '#' character.
+ * "Off" is denoted via a '.' character.
+ * @param {Array<Array>} grid 
+ * @returns {Object<Number>} Returns `{ pixels_on, pixels_off }`
+ */
 function countPixelsInGrid(grid) {
 	// Assumes a square grid
 	let total_pixels = grid.length * grid.length;
