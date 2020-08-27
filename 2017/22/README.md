@@ -106,3 +106,106 @@ By this time, `41` bursts of activity caused an infection (though most of those 
 After a total of `10000` bursts of activity, `5587` bursts will have caused an infection.
 
 Given your actual map, after `10000` bursts of activity, _how many bursts cause a node to become infected_? (Do not count nodes that begin infected.)
+
+-----------------
+
+## --- Part Two ---
+
+As you go to remove the virus from the infected nodes, it _evolves_ to resist your attempt.
+
+Now, before it infects a clean node, it will _weaken_ it to disable your defenses. If it encounters an infected node, it will instead _flag_ the node to be cleaned in the future. So:
+
+*   _Clean_ nodes become _weakened_.
+*   _Weakened_ nodes become _infected_.
+*   _Infected_ nodes become _flagged_.
+*   _Flagged_ nodes become _clean_.
+
+Every node is always in exactly one of the above states.
+
+The virus carrier still functions in a similar way, but now uses the following logic during its bursts of action:
+
+*   Decide which way to turn based on the _current node_:
+    *   If it is _clean_, it turns _left_.
+    *   If it is _weakened_, it does _not_ turn, and will continue moving in the same direction.
+    *   If it is _infected_, it turns _right_.
+    *   If it is _flagged_, it _reverses_ direction, and will go back the way it came.
+*   Modify the state of the _current node_, as described above.
+*   The virus carrier moves _forward_ one node in the direction it is facing.
+
+Start with the same map (still using `.` for _clean_ and `#` for infected) and still with the virus carrier starting in the middle and facing _up_.
+
+Using the same initial state as the previous example, and drawing _weakened_ as `W` and _flagged_ as `F`, the middle of the infinite grid looks like this, with the virus carrier's position again marked with `[ ]`:
+
+    . . . . . . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    . . . . . # . . .
+    . . . #[.]. . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    
+
+This is the same as before, since no initial nodes are _weakened_ or _flagged_. The virus carrier is on a clean node, so it still turns left, instead _weakens_ the node, and moves left:
+
+    . . . . . . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    . . . . . # . . .
+    . . .[#]W . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    
+
+The virus carrier is on an infected node, so it still turns right, instead _flags_ the node, and moves up:
+
+    . . . . . . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    . . .[.]. # . . .
+    . . . F W . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    
+
+This process repeats three more times, ending on the previously-flagged node and facing right:
+
+    . . . . . . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    . . W W . # . . .
+    . . W[F]W . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    
+
+Finding a flagged node, it reverses direction and _cleans_ the node:
+
+    . . . . . . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    . . W W . # . . .
+    . .[W]. W . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    
+
+The _weakened_ node becomes infected, and it continues in the same direction:
+
+    . . . . . . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    . . W W . # . . .
+    .[.]# . W . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    
+
+Of the first `100` bursts, `26` will result in _infection_. Unfortunately, another feature of this evolved virus is _speed_; of the first `10000000` bursts, `2511944` will result in _infection_.
+
+Given your actual map, after `10000000` bursts of activity, _how many bursts cause a node to become infected_? (Do not count nodes that begin infected.)
