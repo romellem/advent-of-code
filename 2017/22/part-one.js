@@ -1,11 +1,18 @@
 const { input } = require('./input');
-const { GridComputingCluster } = require('./grid');
+const { GridComputingCluster, INFECTED } = require('./grid');
 
 let grid = new GridComputingCluster();
 grid.parseInput(input);
 
-for (let i = 0; i < 10000; i++) {
+const STEPS = 10000;
+const ONE_PERCENT = STEPS / 100;
+for (let i = 0; i < STEPS; i++) {
+	if (i % ONE_PERCENT === 0) {
+		process.stdout.write(`${Math.round((i / STEPS) * 100)}%   \r`);
+	}
+
 	grid.burst();
 }
 
-console.log(grid.infected);
+console.log('=========================');
+console.log(grid.count[INFECTED]);

@@ -1,12 +1,13 @@
 const { sampleInput, input } = require('./input');
-const { EvolvedGridComputingCluster } = require('./grid');
+const { GridComputingCluster, INFECTED } = require('./grid');
 
-let grid = new EvolvedGridComputingCluster();
+let grid = new GridComputingCluster({ evolved: true });
 grid.parseInput(input);
 
 const STEPS = 10000000;
+const ONE_PERCENT = STEPS / 100;
 for (let i = 0; i < STEPS; i++) {
-	if (i % 10007 === 0) {
+	if (i % ONE_PERCENT === 0) {
 		process.stdout.write(`${Math.round((i / STEPS) * 100)}%   \r`);
 	}
 
@@ -14,5 +15,4 @@ for (let i = 0; i < STEPS; i++) {
 }
 
 console.log('=========================');
-console.log(grid.infected);
-
+console.log(grid.count[INFECTED]);

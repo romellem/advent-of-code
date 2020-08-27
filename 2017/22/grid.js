@@ -24,102 +24,11 @@ const CLEAN = '.';
  */
 class GridComputingCluster {
 	/**
-	 * @param {String} opt.input - Puzzle input
+	 * @param {String} [opt.evolved=false] - Where or not virus is "evolved" or not
 	 */
-	constructor({ x = 0, y = 0 } = {}) {
-		// this.maxX = -Infinity;
-		// this.minX = Infinity;
-		// this.maxY = -Infinity;
-		// this.minY = Infinity;
+	constructor({ evolved = false } = {}) {
+		this.evolved = evolved;
 
-		this.grid = {};
-
-		this.x = x;
-		this.y = y;
-
-		this.directions = [UP, RIGHT, DOWN, LEFT];
-		this.direction = this.directions.indexOf(UP);
-
-		this.infected = 0;
-		this.cleaned = 0;
-		this.bursts = 0;
-	}
-
-	set(x, y, value) {
-		let id = this._getId(x, y);
-		this.grid[id] = value;
-	}
-
-	_getId(x, y) {
-		return `${x},${y}`;
-	}
-
-	parseInput(input) {
-		let grid = input.split('\n').map((row) => row.split(''));
-		this.y = Math.floor(grid.length / 2);
-		this.x = Math.floor(grid[0].length / 2);
-
-		for (let y = 0; y < grid.length; y++) {
-			for (let x = 0; x < grid[y].length; x++) {
-				let value = grid[y][x] === '#' ? INFECTED : CLEAN;
-				this.set(x, y, value);
-			}
-		}
-	}
-
-	move() {
-		let direction = this.directions[this.direction];
-		let [x, y] = direction;
-		this.x += x;
-		this.y += y;
-	}
-
-	rotateLeft() {
-		if (this.direction === 0) {
-			this.direction = this.directions.length - 1;
-		} else {
-			this.direction--;
-		}
-	}
-
-	rotateRight() {
-		if (this.direction === this.directions.length - 1) {
-			this.direction = 0;
-		} else {
-			this.direction++;
-		}
-	}
-
-	/**
-	 * 1. If the current node is infected, it turns to its right.
-	 *    Otherwise, it turns to its left. (Turning is done in-place; the
-	 *    current node does not change.)
-	 * 2. If the current node is clean, it becomes infected.
-	 *    Otherwise, it becomes cleaned. (This is done after the node is
-	 *    considered for the purposes of changing direction.)
-	 * 3. The virus carrier moves forward one node in the direction it is facing.
-	 */
-	burst() {
-		let current_xy = this._getId(this.x, this.y);
-		this.bursts++;
-		if (this.grid[current_xy] === INFECTED) {
-			this.rotateRight();
-			this.grid[current_xy] = CLEAN;
-			this.cleaned++;
-		} else {
-			this.rotateLeft();
-			this.grid[current_xy] = INFECTED;
-			this.infected++;
-		}
-		this.move();
-	}
-}
-
-class EvolvedGridComputingCluster {
-	/**
-	 * @param {String} opt.input - Puzzle input
-	 */
-	constructor({ x = 0, y = 0 } = {}) {
 		this.max_x = -Infinity;
 		this.min_x = Infinity;
 		this.max_y = -Infinity;
@@ -127,18 +36,42 @@ class EvolvedGridComputingCluster {
 
 		this.grid = {};
 
-		this.x = x;
-		this.y = y;
+		this.x = 0;
+		this.y = 0;
 
 		this.directions = [UP, RIGHT, DOWN, LEFT];
 		this.direction = this.directions.indexOf(UP);
 
-		this.infected = 0;
-		this.cleaned = 0;
-		this.weakened = 0;
-		this.flagged = 0;
+		this.count = {
+			[CLEAN]: 0,
+			[INFECTED]: 0,
+			[WEAKENED]: 0,
+			[FLAGGED]: 0,
+			bursts: 0,
+		};
 
-		// this.bursts = 0;
+		/**
+		 * Evolved:
+		 * - Clean nodes become weakened.
+		 * - Weakened nodes become infected.
+		 * - Infected nodes become flagged.
+		 * - Flagged nodes become clean.
+		 *
+		 * Non-evolved:
+		 * - Clean nodes become infected.
+		 * - Infected nodes become clean.
+		 */
+		this.transition_map = this.evolved
+			? {
+					[CLEAN]: WEAKENED,
+					[WEAKENED]: INFECTED,
+					[INFECTED]: FLAGGED,
+					[FLAGGED]: CLEAN,
+			  }
+			: {
+					[CLEAN]: INFECTED,
+					[INFECTED]: CLEAN,
+			  };
 	}
 
 	set(x, y, value) {
@@ -149,6 +82,8 @@ class EvolvedGridComputingCluster {
 		if (x < this.min_x) this.min_x = x;
 		if (y > this.max_y) this.max_y = y;
 		if (y < this.min_y) this.min_y = y;
+
+		return this.grid[id];
 	}
 
 	_getId(x, y) {
@@ -162,8 +97,7 @@ class EvolvedGridComputingCluster {
 
 		for (let y = 0; y < grid.length; y++) {
 			for (let x = 0; x < grid[y].length; x++) {
-				let value = grid[y][x] === '#' ? INFECTED : CLEAN;
-				this.set(x, y, value);
+				this.set(x, y, grid[y][x]);
 			}
 		}
 	}
@@ -201,11 +135,6 @@ class EvolvedGridComputingCluster {
 	}
 
 	/**
-	 * - Clean nodes become weakened.
-	 * - Weakened nodes become infected.
-	 * - Infected nodes become flagged.
-	 * - Flagged nodes become clean.
-	 *
 	 * 1. Decide which way to turn based on the current node:
 	 *     a. If it is clean, it turns left.
 	 *     b. If it is weakened, it does not turn, and will continue moving in the same direction.
@@ -216,34 +145,36 @@ class EvolvedGridComputingCluster {
 	 */
 	burst() {
 		let current_xy = this._getId(this.x, this.y);
-		// this.bursts++;
-		switch (this.grid[current_xy]) {
+		this.count.bursts++;
+
+		// Importantly, set undefined values to `CLEAN`
+		let current_cell = this.grid[current_xy] || CLEAN;
+		switch (current_cell) {
 			case WEAKENED:
-				this.grid[current_xy] = INFECTED;
-				this.infected++;
+				// Do nothing
 				break;
+
 			case FLAGGED:
 				this.reverse();
-				this.grid[current_xy] = CLEAN;
-				this.cleaned++;
 				break;
+
 			case INFECTED:
 				this.rotateRight();
-				this.grid[current_xy] = FLAGGED;
-				this.flagged++;
 				break;
 
 			case CLEAN:
-
-			// Importantly, set the `default` to the same as CLEAN,
-			// since moving onto an unset cell will be `undefined` at first
 			default:
 				this.rotateLeft();
-				this.grid[current_xy] = WEAKENED;
-				this.weakened++;
 				break;
 		}
 
+		// 2. Modify current node based on the transformation map
+		let new_value = this.set(this.x, this.y, this.transition_map[current_cell]);
+
+		// Increment count for what we just changed
+		this.count[new_value]++;
+
+		// Move forward in the direction we are facing
 		this.move();
 	}
 
@@ -263,5 +194,8 @@ class EvolvedGridComputingCluster {
 
 module.exports = {
 	GridComputingCluster,
-	EvolvedGridComputingCluster,
+	CLEAN,
+	INFECTED,
+	WEAKENED,
+	FLAGGED,
 };
