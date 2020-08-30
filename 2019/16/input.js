@@ -2,6 +2,11 @@ const input = `59766977873078199970107568349014384917072096886862753001181795467
 	.split('')
 	.map(v => +v);
 
+const inputTimes10 = [];
+for (let i = 0; i < 10; i++) {
+	inputTimes10.push(...input);
+}
+
 const partTwoInput = [];
 for (let i = 0; i < 10000; i++) {
 	partTwoInput.push(...input);
@@ -9,5 +14,6 @@ for (let i = 0; i < 10000; i++) {
 
 module.exports = {
 	input,
+	inputTimes10,
 	partTwoInput,
 };
