@@ -46,8 +46,7 @@ for (let phase = 1; phase <= 100; phase++) {
 			sum += new_val;
 		}
 
-		let last_char = String(sum).substr(-1, 1);
-		let last_digit = parseInt(last_char, 10);
+		let last_digit = Math.abs(sum % 10);
 
 		new_arr.push(last_digit);
 	}
