@@ -1,27 +1,5 @@
 const { input } = require('./input');
 
-let cachedPatterns = {};
-const fillPattern = n => {
-	if (cachedPatterns[n]) {
-		return cachedPatterns[n];
-	}
-
-	let pattern = [];
-	for (let num of [0, 1, 0, -1]) {
-		for (let i = 0; i < n; i++) {
-			pattern.push(num);
-		}
-	}
-
-	// Offset the whole pattern left by one
-	let first_digit = pattern.shift();
-	pattern.push(first_digit);
-
-	cachedPatterns[n] = pattern;
-
-	return pattern;
-};
-
 const base_pattern = [0, 1, 0, -1];
 let current = input;
 
