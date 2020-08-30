@@ -22,17 +22,26 @@ const fillPattern = n => {
 	return pattern;
 };
 
+const base_pattern = [0, 1, 0, -1];
 let current = input;
 
 for (let phase = 1; phase <= 100; phase++) {
 	let new_arr = [];
 	for (let n = 0; n < current.length; n++) {
-		let pattern = fillPattern(n + 1);
 		let sum = 0;
+
+		let index = 0;
+		let position = n + 1;
 		for (let i = 0; i < current.length; i++) {
+			position--;
+			if (position <= 0) {
+				position = n + 1;
+				index = (index + 1) % base_pattern.length;
+			}
+
 			let v = current[i];
-			let index = i % pattern.length;
-			let new_val = v * pattern[index];
+			let scalar = base_pattern[index];
+			let new_val = v * scalar;
 
 			sum += new_val;
 		}
