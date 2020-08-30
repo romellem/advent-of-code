@@ -1,4 +1,4 @@
-const PROGRAM = [
+const INSTRUCTIONS =  [
 	{ op: 'set', args: ['b', 67] },
 	{ op: 'set', args: ['c', 'b'] },
 	{ op: 'jnz', args: ['a', 2] },
@@ -33,6 +33,4 @@ const PROGRAM = [
 	{ op: 'jnz', args: [1, -23] },
 ];
 
-module.exports = {
-	input: PROGRAM,
-};
+export default INSTRUCTIONS;
