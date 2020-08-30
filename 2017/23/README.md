@@ -2,7 +2,7 @@
 
 | Part 1 | Part 2 |
 |--------|--------|
-| `4225` | ` ` |
+| `4225` | `905` |
 
 ## --- Day 23: Coprocessor Conflagration ---
 

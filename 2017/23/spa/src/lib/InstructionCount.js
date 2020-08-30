@@ -6,7 +6,7 @@ const InstructionCount = ({ intructionCount } = {}) => {
 		<div style={{ marginLeft: '1em' }}>
 			<b>Instruction Count</b>
 			<ul style={{ margin: 0, paddingLeft: '10px' }}>
-				{VALID_OPS.map((v) => (
+				{VALID_OPS?.map((v) => (
 					<li key={v}>{v}: {intructionCount[v]}</li>
 				))}
 			</ul>
