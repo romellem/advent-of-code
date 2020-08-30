@@ -1,7 +1,7 @@
-const { input } = require('./input');
+const { input, inputTimes10 } = require('./input');
 
 const base_pattern = [0, 1, 0, -1];
-let current = input;
+let current = inputTimes10;
 
 for (let phase = 1; phase <= 100; phase++) {
 	let new_arr = [];
