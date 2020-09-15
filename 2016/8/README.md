@@ -51,14 +51,6 @@ There seems to be an intermediate check of the voltage used by the display: afte
 
 ----
 
-## Part Two
-
-You notice that the screen is only capable of displaying capital letters; in the font it uses, each letter is 5 pixels wide and 6 tall.
-
-After you swipe your card, what code should is the screen trying to display?
-
------------------
-
 ## --- Part Two ---
 
 You notice that the screen is only capable of displaying capital letters; in the font it uses, each letter is `5` pixels wide and `6` tall.

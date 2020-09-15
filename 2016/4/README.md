@@ -2,7 +2,7 @@
 
 |  Part 1  | Part 2 |
 |----------|--------|
-| `185371` | ` ` |
+| `185371` |  `984` |
 
 ## --- Day 4: Security Through Obscurity ---
 

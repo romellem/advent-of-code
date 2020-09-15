@@ -27,7 +27,7 @@ _How many viable pairs_ of nodes are there?
 
 -----------------
 
---- Part Two ---
+## --- Part Two ---
 
 Now that you have a better understanding of the grid, it's time to get to work.
 
