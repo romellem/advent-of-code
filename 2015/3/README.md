@@ -1,3 +1,9 @@
+# Answers
+
+| Part 1 | Part 2 |
+|--------|--------|
+| `2592` | `2360` |
+
 ## --- Day 3: Perfectly Spherical Houses in a Vacuum ---
 
 Santa is delivering presents to an infinite two-dimensional grid of houses.

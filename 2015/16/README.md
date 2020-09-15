@@ -49,13 +49,3 @@ As you're about to send the thank you note, something in the MFCSAM's instructio
 In particular, the `cats` and `trees` readings indicates that there are _greater than_ that many (due to the unpredictable nuclear decay of cat dander and tree pollen), while the `pomeranians` and `goldfish` readings indicate that there are _fewer than_ that many (due to the modial interaction of magnetoreluctance).
 
 What is the _number_ of the real Aunt Sue?
-
------------------
-
-## --- Part Two ---
-
-As you're about to send the thank you note, something in the MFCSAM's instructions catches your eye. Apparently, it has an outdated [retroencabulator](https://www.youtube.com/watch?v=RXJKdh1KZ0w), and so the output from the machine isn't exact values - some of them indicate ranges.
-
-In particular, the `cats` and `trees` readings indicates that there are _greater than_ that many (due to the unpredictable nuclear decay of cat dander and tree pollen), while the `pomeranians` and `goldfish` readings indicate that there are _fewer than_ that many (due to the modial interaction of magnetoreluctance).
-
-What is the _number_ of the real Aunt Sue?
