@@ -1,2 +1,6 @@
 theme: jekyll-theme-primer
 google_analytics: "UA-103164724-3"
+
+markdown: kramdown
+kramdown:
+  parse_block_html: true
