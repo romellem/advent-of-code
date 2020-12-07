@@ -42,12 +42,20 @@ class Bag {
 		this.parent_bags.push(parent_bag);
 	}
 
-	countAllParents() {
-		let total = this.parent_bags.length;
+	countUniqueParents() {
+		let lookup = this._getUniqueAncestorsLookup({});
+		return Object.keys(lookup).length;
+	}
+
+	_getUniqueAncestorsLookup(lookup) {
 		for (let parent of this.parent_bags) {
-			total += parent.countAllParents();
+			lookup[parent.name] = parent;
+			if (parent.parent_bags.length) {
+				parent._getUniqueAncestorsLookup(lookup);
+			}
 		}
-		return total;
+
+		return lookup;
 	}
 }
 
