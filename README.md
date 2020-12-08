@@ -19,7 +19,7 @@ of manual tinkering.
 
 ## 2020 Puzzles List
 
-Completed: **4 / 25** (16%)
+Completed: **5 / 25** (20%)
 
 *  [✅ Day 1](2020/1/)
 *  [✅ Day 2](2020/2/)
@@ -27,6 +27,7 @@ Completed: **4 / 25** (16%)
 *  Day 4
 *  Day 5
 *  [✅ Day 6](2020/6/)
+*  [✅ Day 7](2020/7/)
 
 ## 2019 Puzzles List
 
