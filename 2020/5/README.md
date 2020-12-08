@@ -36,7 +36,7 @@ For example, consider just the last 3 characters of `FBFBBFFRLR`:
 
 So, decoding `FBFBBFFRLR` reveals that it is the seat at _row `44`, column `5`_.
 
-Every seat also has a unique _seat ID_: multiply the row by 8, then add the column. In this example, the seat has ID `44 * 8 + 5 = _357_`.
+Every seat also has a unique _seat ID_: multiply the row by 8, then add the column. In this example, the seat has ID <code>44 * 8 + 5 = <em>357</em></code>.
 
 Here are some other boarding passes:
 
