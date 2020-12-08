@@ -1,3 +1,6 @@
 const { input } = require('./input');
+const { Computer } = require('./computer');
 
-console.log( );
+
+let c = new Computer(input)
+console.log( c.runUntil2nd());
