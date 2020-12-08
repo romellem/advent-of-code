@@ -1,5 +1,3 @@
-const trimEnd = require('lodash/trimEnd');
-
 class Luggage {
 	constructor(raw_rules) {
 		this.bags_lookup = this.parseToBagsLookup(raw_rules);
@@ -16,7 +14,7 @@ class Luggage {
 			if (children.includes('no other')) {
 				continue;
 			}
-			children = trimEnd(children, '.').split(', ');
+			children = children.split(', ');
 			for (let child of children) {
 				let [, count, name] = /(\d+) (\w+ \w+) bag/.exec(child);
 				count = parseInt(count, 10);
@@ -42,7 +40,7 @@ class Luggage {
 			if (children.includes('no other')) {
 				continue;
 			}
-			children = trimEnd(children, '.').split(', ');
+			children = children.split(', ');
 			for (let child of children) {
 				let [, count, name] = /(\d+) (\w+ \w+) bag/.exec(child);
 				count = parseInt(count, 10);
