@@ -275,6 +275,6 @@ For example, using the same cave system as above, starting in the top left corne
     ||.|==.|.|.||=||
     
 
-This is tied with other routes as the _fastest way to reach the target_: `_45_` minutes. In it, `21` minutes are spent switching tools (three times, seven minutes each) and the remaining `24` minutes are spent moving.
+This is tied with other routes as the _fastest way to reach the target_: _`45`_ minutes. In it, `21` minutes are spent switching tools (three times, seven minutes each) and the remaining `24` minutes are spent moving.
 
 _What is the fewest number of minutes you can take to reach the target?_

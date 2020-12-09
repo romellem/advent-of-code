@@ -157,7 +157,7 @@ For example, suppose the lumber collection area is instead only 10 by 10 acres w
     ||||||||||
     
 
-After 10 minutes, there are `37` wooded acres and `31` lumberyards. Multiplying the number of wooded acres by the number of lumberyards gives the total _resource value_ after ten minutes: `37 * 31 = _1147_`.
+After 10 minutes, there are `37` wooded acres and `31` lumberyards. Multiplying the number of wooded acres by the number of lumberyards gives the total _resource value_ after ten minutes: <code>37 * 31 = <em>1147</em></code>.
 
 _What will the total resource value of the lumber collection area be after 10 minutes?_
 

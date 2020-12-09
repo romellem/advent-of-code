@@ -71,7 +71,7 @@ The generation is shown along the left, where `0` is the initial state. The pot 
 
 After one generation, only seven plants remain. The one in pot `0` matched the rule looking for `..#..`, the one in pot `4` matched the rule looking for `.#.#.`, pot `9` matched `.##..`, and so on.
 
-In this example, after 20 generations, the pots shown as `#` contain plants, the furthest left of which is pot `-2`, and the furthest right of which is pot `34`. Adding up all the numbers of plant-containing pots after the 20th generation produces `_325_`.
+In this example, after 20 generations, the pots shown as `#` contain plants, the furthest left of which is pot `-2`, and the furthest right of which is pot `34`. Adding up all the numbers of plant-containing pots after the 20th generation produces _`325`_.
 
 _After `20` generations, what is the sum of the numbers of all pots which contain a plant?_
 

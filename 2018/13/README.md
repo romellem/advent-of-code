@@ -170,7 +170,7 @@ After following their respective paths for a while, the carts eventually crash. 
     5  \------/   
     
 
-In this example, the location of the first crash is `_7,3_`.
+In this example, the location of the first crash is _`7,3`_.
 
 -----------------
 

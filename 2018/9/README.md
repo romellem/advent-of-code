@@ -46,7 +46,7 @@ For example, suppose there are 9 players. After the marble with value `0` is pla
     [7]  0 16  8 17  4 18 19  2 24 20(25)10 21  5 22 11  1 12  6 13  3 14  7 15
     
 
-The goal is to be the _player with the highest score_ after the last marble is used up. Assuming the example above ends after the marble numbered `25`, the winning score is `23+9=_32_` (because player 5 kept marble `23` and removed marble `9`, while no other player got any points in this very short example game).
+The goal is to be the _player with the highest score_ after the last marble is used up. Assuming the example above ends after the marble numbered `25`, the winning score is <code>23+9=<em>32</em></code> (because player 5 kept marble `23` and removed marble `9`, while no other player got any points in this very short example game).
 
 Here are a few more examples:
 

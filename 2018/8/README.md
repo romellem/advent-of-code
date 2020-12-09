@@ -37,7 +37,7 @@ In this example, each node of the tree is also marked with an underline starting
 *   `C`, which has `1` child node (`D`) and `1` metadata entry (`2`).
 *   `D`, which has `0` child nodes and `1` metadata entry (`99`).
 
-The first check done on the license file is to simply add up all of the metadata entries. In this example, that sum is `1+1+2+10+11+12+2+99=_138_`.
+The first check done on the license file is to simply add up all of the metadata entries. In this example, that sum is <code>1+1+2+10+11+12+2+99=<em>138</em></code>.
 
 _What is the sum of all metadata entries?_
 
@@ -56,7 +56,7 @@ However, if a node _does have child nodes_, the metadata entries become indexes 
 For example, again using the above nodes:
 
 *   Node `C` has one metadata entry, `2`. Because node `C` has only one child node, `2` references a child node which does not exist, and so the value of node `C` is `0`.
-*   Node `A` has three metadata entries: `1`, `1`, and `2`. The `1` references node `A`'s first child node, `B`, and the `2` references node `A`'s second child node, `C`. Because node B has a value of `33` and node `C` has a value of `0`, the value of node `A` is `33+33+0=_66_`.
+*   Node `A` has three metadata entries: `1`, `1`, and `2`. The `1` references node `A`'s first child node, `B`, and the `2` references node `A`'s second child node, `C`. Because node B has a value of `33` and node `C` has a value of `0`, the value of node `A` is <code>33+33+0=<em>66</em></code>.
 
 So, in this example, the value of the root node is `66`.
 

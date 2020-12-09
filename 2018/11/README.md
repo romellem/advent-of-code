@@ -27,14 +27,14 @@ The power level in a given fuel cell can be found through the following process:
 
 For example, to find the power level of the fuel cell at `3,5` in a grid with serial number `8`:
 
-*   The rack ID is `3 + 10 = _13_`.
-*   The power level starts at `13 * 5 = _65_`.
-*   Adding the serial number produces `65 + 8 = _73_`.
-*   Multiplying by the rack ID produces `73 * 13 = _949_`.
-*   The hundreds digit of `_9_49` is `_9_`.
-*   Subtracting 5 produces `9 - 5 = _4_`.
+*   The rack ID is <code>3 + 10 = <em>13</em></code>.
+*   The power level starts at <code>13 * 5 = <em>65</em></code>.
+*   Adding the serial number produces <code>65 + 8 = <em>73</em></code>.
+*   Multiplying by the rack ID produces <code>73 * 13 = <em>949</em></code>.
+*   The hundreds digit of <code><em>9</em>49</code> is _`9`_.
+*   Subtracting 5 produces <code>9 - 5 = <em>4</em></code>.
 
-So, the power level of this fuel cell is `_4_`.
+So, the power level of this fuel cell is _`4`_.
 
 Here are some more example power levels:
 
@@ -44,7 +44,7 @@ Here are some more example power levels:
 
 Your goal is to find the 3x3 square which has the largest total power. The square must be entirely within the 300x300 grid. Identify this square using the `X,Y` coordinate of its _top-left fuel cell_. For example:
 
-For grid serial number `18`, the largest total 3x3 square has a top-left corner of `_33,45_` (with a total power of `29`); these fuel cells appear in the middle of this 5x5 region:
+For grid serial number `18`, the largest total 3x3 square has a top-left corner of _`33,45`_ (with a total power of `29`); these fuel cells appear in the middle of this 5x5 region:
 
     -2  -4   4   4   4
     -4   4   4   4  -5
@@ -53,7 +53,7 @@ For grid serial number `18`, the largest total 3x3 square has a top-left corner 
     -1   0   2  -5  -2
     
 
-For grid serial number `42`, the largest 3x3 square's top-left is `_21,61_` (with a total power of `30`); they are in the middle of this region:
+For grid serial number `42`, the largest 3x3 square's top-left is _`21,61`_ (with a total power of `30`); they are in the middle of this region:
 
     -3   4   2   2   2
     -4   4   3   3   4
@@ -74,7 +74,7 @@ Realizing this, you now must find the _square of any size with the largest total
 
 For example:
 
-*   For grid serial number `18`, the largest total square (with a total power of `113`) is 16x16 and has a top-left corner of `90,269`, so its identifier is `_90,269,16_`.
-*   For grid serial number `42`, the largest total square (with a total power of `119`) is 12x12 and has a top-left corner of `232,251`, so its identifier is `_232,251,12_`.
+*   For grid serial number `18`, the largest total square (with a total power of `113`) is 16x16 and has a top-left corner of `90,269`, so its identifier is _`90,269,16`_.
+*   For grid serial number `42`, the largest total square (with a total power of `119`) is 12x12 and has a top-left corner of `232,251`, so its identifier is _`232,251,12`_.
 
 _What is the `X,Y,size` identifier of the square with the largest total power?_

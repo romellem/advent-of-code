@@ -40,7 +40,7 @@ Two points are in the same _constellation_ if their manhattan distance apart is 
     12,0,0,0
     
 
-In the above list, the first six points form a single constellation: `0,0,0,0` is exactly distance `3` from the next four, and the point at `0,0,0,6` is connected to the others by being `3` away from `0,0,0,3`, which is already in the constellation. The bottom two points, `9,0,0,0` and `12,0,0,0` are in a separate constellation because no point is close enough to connect them to the first constellation. So, in the above list, the number of constellations is `_2_`. (If a point at `6,0,0,0` were present, it would connect `3,0,0,0` and `9,0,0,0`, merging all of the points into a single giant constellation instead.)
+In the above list, the first six points form a single constellation: `0,0,0,0` is exactly distance `3` from the next four, and the point at `0,0,0,6` is connected to the others by being `3` away from `0,0,0,3`, which is already in the constellation. The bottom two points, `9,0,0,0` and `12,0,0,0` are in a separate constellation because no point is close enough to connect them to the first constellation. So, in the above list, the number of constellations is _`2`_. (If a point at `6,0,0,0` were present, it would connect `3,0,0,0` and `9,0,0,0`, merging all of the points into a single giant constellation instead.)
 
 In this example, the number of constellations is `4`:
 

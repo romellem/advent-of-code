@@ -146,7 +146,7 @@ Over time, the points listed above would move like this:
     ......................
     
 
-After 3 seconds, the message appeared briefly: `_HI_`. Of course, your message will be much longer and will take many more seconds to appear.
+After 3 seconds, the message appeared briefly: _`HI`_. Of course, your message will be much longer and will take many more seconds to appear.
 
 _What message will eventually appear in the sky?_
 
@@ -154,6 +154,6 @@ _What message will eventually appear in the sky?_
 
 ## --- Part Two ---
 
-Good thing you didn't have to wait, because that would have taken a long time - much longer than the `_3_` seconds in the example above.
+Good thing you didn't have to wait, because that would have taken a long time - much longer than the _`3`_ seconds in the example above.
 
 Impressed by your sub-hour communication capabilities, the Elves are curious: _exactly how many seconds would they have needed to wait for that message to appear?_
