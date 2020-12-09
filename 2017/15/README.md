@@ -56,8 +56,8 @@ In the interest of trying to align a little better, the generators get more pick
 
 They still generate values in the same way, but now they only hand a value to the judge when it meets their _criteria_:
 
-*   Generator A looks for values that are multiples of `_4_`.
-*   Generator B looks for values that are multiples of `_8_`.
+*   Generator A looks for values that are multiples of _`4`_.
+*   Generator B looks for values that are multiples of _`8`_.
 
 Each generator functions completely _independently_: they both go through values entirely on their own, only occasionally handing an acceptable value to the judge, and otherwise working through the same sequence of values as before until they find one.
 

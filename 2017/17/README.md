@@ -12,7 +12,7 @@ If you don't move quickly, fixing that printer will be the least of your problem
 
 This spinlock's algorithm is simple but efficient, quickly consuming everything in its path. It starts with a circular buffer containing only the value `0`, which it marks as the _current position_. It then steps forward through the circular buffer some number of steps (your puzzle input) before inserting the first new value, `1`, after the value it stopped on. The inserted value becomes the _current position_. Then, it steps forward from there the same number of steps, and wherever it stops, inserts after it the second new value, `2`, and uses that as the new _current position_ again.
 
-It repeats this process of _stepping forward_, _inserting a new value_, and _using the location of the inserted value as the new current position_ a total of `_2017_` times, inserting `2017` as its final operation, and ending with a total of `2018` values (including `0`) in the circular buffer.
+It repeats this process of _stepping forward_, _inserting a new value_, and _using the location of the inserted value as the new current position_ a total of _`2017`_ times, inserting `2017` as its final operation, and ending with a total of `2018` values (including `0`) in the circular buffer.
 
 For example, if the spinlock were to step `3` times per insert, the circular buffer would begin to evolve like this (using parentheses to mark the current position after each iteration of the algorithm):
 

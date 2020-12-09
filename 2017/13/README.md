@@ -168,7 +168,7 @@ Your plan is to hitch a ride on a packet about to move through the firewall. The
 
 In this situation, you are _caught_ in layers `0` and `6`, because your packet entered the layer when its scanner was at the top when you entered it. You are _not_ caught in layer `1`, since the scanner moved into the top of the layer once you were already there.
 
-The _severity_ of getting caught on a layer is equal to its _depth_ multiplied by its _range_. (Ignore layers in which you do not get caught.) The severity of the whole trip is the sum of these values. In the example above, the trip severity is `0*3 + 6*4 = _24_`.
+The _severity_ of getting caught on a layer is equal to its _depth_ multiplied by its _range_. (Ignore layers in which you do not get caught.) The severity of the whole trip is the sum of these values. In the example above, the trip severity is <code>0\*3 + 6\*4 = <em>24</em></code>.
 
 Given the details of the firewall you've recorded, if you leave immediately, _what is the severity of your whole trip_?
 
