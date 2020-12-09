@@ -20,7 +20,7 @@ The important difference is that relative mode parameters don't count from addre
 
 The address a relative mode parameter refers to is itself _plus_ the current _relative base_. When the relative base is `0`, relative mode parameters and position mode parameters with the same value refer to the same address.
 
-For example, given a relative base of `50`, a relative mode parameter of `-7` refers to memory address `50 + -7 = _43_`.
+For example, given a relative base of `50`, a relative mode parameter of `-7` refers to memory address <code>50 + -7 = <em>43</em></code>.
 
 The relative base is modified with the _relative base offset_ instruction:
 

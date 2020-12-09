@@ -10,7 +10,7 @@ As you approach the rings of Saturn, your ship's _low fuel_ indicator turns on. 
 
 You ask the nanofactory to produce a list of the _reactions_ it can perform that are relevant to this process (your puzzle input). Every reaction turns some quantities of specific _input chemicals_ into some quantity of an _output chemical_. Almost every _chemical_ is produced by exactly one reaction; the only exception, `ORE`, is the raw material input to the entire process and is not produced by a reaction.
 
-You just need to know how much `_ORE_` you'll need to collect before you can produce one unit of `_FUEL_`.
+You just need to know how much _`ORE`_ you'll need to collect before you can produce one unit of _`FUEL`_.
 
 Each reaction gives specific quantities for its inputs and output; reactions cannot be partially run, so only whole integer multiples of these quantities can be used. (It's okay to have leftover chemicals when you're done, though.) For example, the reaction `1 A, 2 B, 3 C => 2 D` means that exactly 2 units of chemical `D` can be produced by consuming exactly 1 `A`, 2 `B` and 3 `C`. You can run the full reaction as many times as necessary; for example, you could produce 10 `D` by consuming 5 `A`, 10 `B`, and 15 `C`.
 

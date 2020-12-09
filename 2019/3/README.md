@@ -73,9 +73,9 @@ The number of steps a wire takes is the total number of grid squares the wire ha
     ...........
     
 
-In the above example, the intersection closest to the central port is reached after `8+5+5+2 = _20_` steps by the first wire and `7+6+4+3 = _20_` steps by the second wire for a total of `20+20 = _40_` steps.
+In the above example, the intersection closest to the central port is reached after <code>8+5+5+2 = <em>20</em></code> steps by the first wire and <code>7+6+4+3 = <em>20</em></code> steps by the second wire for a total of <code>20+20 = <em>40</em></code> steps.
 
-However, the top-right intersection is better: the first wire takes only `8+5+2 = _15_` and the second wire takes only `7+6+2 = _15_`, a total of `15+15 = _30_` steps.
+However, the top-right intersection is better: the first wire takes only <code>8+5+2 = <em>15</em></code> and the second wire takes only <code>7+6+2 = <em>15</em></code>, a total of <code>15+15 = <em>30</em></code> steps.
 
 Here are the best steps for the extra examples from above:
 

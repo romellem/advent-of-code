@@ -105,7 +105,7 @@ Then, it might help to calculate the _total energy in the system_. The total ene
     Sum of total energy: 36 + 45 + 80 + 18 = 179
     
 
-In the above example, adding together the total energy for all moons after 10 steps produces the total energy in the system, `_179_`.
+In the above example, adding together the total energy for all moons after 10 steps produces the total energy in the system, _`179`_.
 
 Here's a second example:
 

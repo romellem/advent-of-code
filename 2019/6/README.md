@@ -59,7 +59,7 @@ Here, we can count the total number of orbits as follows:
 *   `L` directly orbits `K` and indirectly orbits `J`, `E`, `D`, `C`, `B`, and `COM`, a total of `7` orbits.
 *   `COM` orbits nothing.
 
-The total number of direct and indirect orbits in this example is `_42_`.
+The total number of direct and indirect orbits in this example is _`42`_.
 
 _What is the total number of direct and indirect orbits_ in your map data?
 
