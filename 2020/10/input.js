@@ -7,7 +7,7 @@ const input = fs
 	.trim()
 	.split('\n')
 	.map((v) => {
-		return v;
+		return parseInt(v,10);
 	});
 
 module.exports = {
