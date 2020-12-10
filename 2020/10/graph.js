@@ -1,17 +1,8 @@
-class Node {
-	constructor(val, index) {
+class TreeNode {
+	constructor(val) {
 		this.val = val;
-		this.index = index;
-		this.children = [];
-	}
-
-	tryToAddChildren(children, base) {
-		for (let i = 0; i < children.length; i++) {
-			let c = children[i];
-			if (c - this.val <= 3 && c > this.val) {
-				this.children.push(new Node(c, base + i + 1));
-			}
-		}
+		this.firstChild = undefined;
+		this.nextSibling = undefined;
 	}
 }
 
@@ -19,21 +10,16 @@ class Graph {
 	constructor(input) {
 		this.input = input.slice(0);
 		this.input.sort((a, b) => a - b);
-		this.head = new Node(0, 0);
-		this.build(this.head, 0, []);
+		this.head = new TreeNode(0);
+		this.build(this.head);
 	}
 
-	build(node, index, iters) {
-		// do {
-			let slice = this.input.slice(index, index + 3);
-			node.tryToAddChildren(slice, index);
-			for (let child of node.children) {
-				this.build(child, child.index, iters);
-			}
-		// } while (iters.length);
-		// for (fn of iters) {
-		// 	fn();
-		// }
+	build(node) {
+		let current_node = node;
+		for (let num of this.input) {
+			let a = new TreeNode(num);
+			current_node.firstChild = a;
+		}
 	}
 
 	_print(node, acc = '') {
