@@ -7,9 +7,11 @@ const input = fs
 	.trim()
 	.split('\n')
 	.map((v) => {
-		return parseInt(v,10);
+		return parseInt(v, 10);
 	});
 
 module.exports = {
 	input,
 };
+
+fs.writeFileSync('asdf')

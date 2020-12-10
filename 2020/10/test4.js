@@ -109,6 +109,7 @@ class Node {
 	constructor(value, index) {
 		this.value = value;
 		this.index = index;
+		this.parents = [];
 		this.connections = [];
 	}
 }
@@ -130,6 +131,7 @@ class DiGraph {
 				if (!next) break;
 				if (next.value - current.value <= 3) {
 					current.connections.push(next);
+					next.parents.push(current);
 				}
 			}
 		}
@@ -140,7 +142,7 @@ class DiGraph {
 		// destination, then increment count
 		if (u === d) {
 			pathCount++;
-			pathCount % 10000000 === 0 && process.stdout.write(pathCount.toLocaleString() + '\r')
+			pathCount % 10000000 === 0 && process.stdout.write(pathCount.toLocaleString() + '\r');
 		}
 
 		// Recur for all the vertices
@@ -150,7 +152,6 @@ class DiGraph {
 			for (let connection of node.connections) {
 				pathCount = this.countPathsUtil(connection.index, d, pathCount);
 			}
-			
 		}
 		return pathCount;
 	}
@@ -158,8 +159,14 @@ class DiGraph {
 	countPaths() {
 		let pathCount = this.countPathsUtil(0, this.items.length - 1, 0);
 		return pathCount;
-    }
-    
-    alt
-}
+	}
 
+	altCountPaths() {
+		let total = 1;
+		for (let node of this.items) {
+			for (let child of node.children) {
+				child.parent_count = node.parent_count * node.children.length;
+			}
+		}
+	}
+}
