@@ -1,19 +1,19 @@
-class Node {
-	constructor(val, index) {
-		this.val = val;
-		this.index = index;
-		this.children = [];
-	}
+// class Node {
+// 	constructor(val, index) {
+// 		this.val = val;
+// 		this.index = index;
+// 		this.children = [];
+// 	}
 
-	tryToAddChildren(children, base) {
-		for (let i = 0; i < children.length; i++) {
-			let c = children[i];
-			if (c - this.val <= 3 && c > this.val) {
-				this.children.push(new Node(c, base + i + 1));
-			}
-		}
-	}
-}
+// 	tryToAddChildren(children, base) {
+// 		for (let i = 0; i < children.length; i++) {
+// 			let c = children[i];
+// 			if (c - this.val <= 3 && c > this.val) {
+// 				this.children.push(new Node(c, base + i + 1));
+// 			}
+// 		}
+// 	}
+// }
 
 class Graph {
 	constructor(input) {
@@ -105,30 +105,33 @@ class LinkedList {
 	}
 }
 
+class Node {
+	constructor(value, index) {
+		this.value = value;
+		this.index = index;
+		this.connections = [];
+	}
+}
+
 class DiGraph {
 	constructor(items) {
-		this.items = items.slice(0);
-		this.adjacents = [];
-		for (let i = 0; i < this.items.length; i++) {
-			this.adjacents.push(new LinkedList());
-		}
-
-		let start = new ListNode(0, 0);
-		this.adjacents.unshift(new LinkedList(start));
+		// Assumes `items` is already sorted
+		let max = items[items.length - 1] + 3;
+		this.items = [0, ...items, max].map((v, i) => new Node(v, i));
 		this.buildEdges();
 	}
 
 	buildEdges() {
 		for (let i = 0; i < this.items.length; i++) {
-			let a = this.items[i];
-			let b = this.items[i + 1];
-			let c = this.items[i + 2];
+			let current = this.items[i];
 
-			/** @type {LinkedList} */
-			let current = this.adjacents[i];
-			if (a !== undefined && a - current.tail() <= 3) current.add(a, i + 1);
-			if (b !== undefined && b - current.tail() <= 3) current.add(b, i + 1);
-			if (c !== undefined && c - current.tail() <= 3) current.add(c, i + 1);
+			for (let n = 1; n <= 3; n++) {
+				let next = this.items[i + n];
+				if (!next) break;
+				if (next.value - current.value <= 3) {
+					current.connections.push(next);
+				}
+			}
 		}
 	}
 
@@ -137,28 +140,23 @@ class DiGraph {
 		// destination, then increment count
 		if (u === d) {
 			pathCount++;
+			pathCount % 10000000 === 0 && process.stdout.write(pathCount.toLocaleString() + '\r')
 		}
 
 		// Recur for all the vertices
 		// adjacent to this vertex
 		else {
-			let list = this.adjacents[u];
-			let is_first = true;
-			if (list) {
-				for (let node of list) {
-					if (is_first) {
-						is_first = false;
-						continue;
-					}
-					pathCount = this.countPathsUtil(node.index, d, pathCount);
-				}
+			let node = this.items[u];
+			for (let connection of node.connections) {
+				pathCount = this.countPathsUtil(connection.index, d, pathCount);
 			}
+			
 		}
 		return pathCount;
 	}
 
-	countPaths(s, d) {
-		let pathCount = this.countPathsUtil(s, d, 0);
+	countPaths() {
+		let pathCount = this.countPathsUtil(0, this.items.length - 1, 0);
 		return pathCount;
 	}
 }
