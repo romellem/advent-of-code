@@ -25,11 +25,11 @@ class Graph {
 
 	build(node, index, iters) {
 		// do {
-			let slice = this.input.slice(index, index + 3);
-			node.tryToAddChildren(slice, index);
-			for (let child of node.children) {
-				this.build(child, child.index, iters);
-			}
+		let slice = this.input.slice(index, index + 3);
+		node.tryToAddChildren(slice, index);
+		for (let child of node.children) {
+			this.build(child, child.index, iters);
+		}
 		// } while (iters.length);
 		// for (fn of iters) {
 		// 	fn();
@@ -52,6 +52,107 @@ class Graph {
 		this.total = 0;
 		this._print(this.head);
 		return this.total;
+	}
+}
+
+class ListNode {
+	constructor(value, index) {
+		this.value = value;
+		this.index = index;
+		this.next = undefined;
+	}
+}
+
+class LinkedList {
+	constructor(head) {
+		this.head = head;
+		this.last = head;
+	}
+
+	add(list_node) {
+		if (!(list_node instanceof ListNode)) {
+			list_node = new ListNode(list_node);
+		}
+		if (!this.head) {
+			this.head = list_node;
+		} else {
+			this.last.next = list_node;
+		}
+		this.last = list_node;
+		return this.last;
+	}
+
+	tail() {
+		return this.last && this.last.value;
+	}
+
+	toString() {
+		let acc = '';
+		let node = this.head;
+		while (node) {
+			acc += !acc ? node.value : `,${node.value}`;
+			node = node.next;
+		}
+		return acc;
+	}
+
+	*[Symbol.iterator]() {
+		let node = this.head;
+		while (node) {
+			yield node.value;
+			node = node.next;
+		}
+	}
+}
+
+class DiGraph {
+	constructor(items) {
+		this.items = items.slice(0);
+		this.adjacents = [];
+		for (let i = 0; i < this.items.length; i++) {
+			this.adjacents.push(new LinkedList());
+		}
+
+		let start = new ListNode(0);
+		this.adjacents.unshift(new LinkedList(start));
+	}
+
+	buildEdges() {
+		for (let i = 0; i < this.items.length; i++) {
+			let a = this.items[i];
+			let b = this.items[i + 1];
+			let c = this.items[i + 2];
+
+			/** @type {LinkedList} */
+			let current = this.adjacents[i];
+			if (a !== undefined && a - current.tail() <= 3) current.add(a, i + 1);
+			if (b !== undefined && b - current.tail() <= 3) current.add(b, i + 1);
+			if (c !== undefined && c - current.tail() <= 3) current.add(c, i + 1);
+		}
+	}
+
+	countPathsUtil(u, d, pathCount) {
+		// If current vertex is same as
+		// destination, then increment count
+		if (u === d) {
+			pathCount++;
+		}
+
+		// Recur for all the vertices
+		// adjacent to this vertex
+		else {
+			let list = this.adjacents[u];
+			for (let node of list) {
+				pathCount = this.countPathsUtil(node.index, d, pathCount);
+			}
+
+		}
+		return pathCount;
+	}
+
+	countPaths(s, d) {
+		let pathCount = countPathsUtil(s, d, 0);
+		return pathCount;
 	}
 }
 
