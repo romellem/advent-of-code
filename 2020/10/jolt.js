@@ -12,24 +12,28 @@ class Jolts {
     }
 
     buildGraph(input) {
+        let tips = [0];
         let sorted_input = input.sort((a, b) => a - b);
+        sorted_input.push(this.max)
         let input_map = input.reduce((obj, v) => ((obj[v] = true), obj), {});
-        let start = 0;
-        let counts = [0,0,0,0];
-        for (let num of sorted_input) {
-            // console.log(num)
-            if (num - start <= 3) {
-                counts[num - start]++;
-
-                start = num;
-            } else {
-                console.log('ear')
-                return counts[1] * counts[3];
+        for (let i = 0; i < sorted_input.length; i++) {
+            for (let t = 0;t < tips.length; t++) {
+                let tip = tips[t];
+                let slice = sorted_input.slice(i, i + 3);
+                let filtered = slice.filter(s => (s - tip <= 3) || s < tip);
+                let 
+            }
+            
+            slice.filter(s => )
+            for (let s of slice) {
+                
+                    
+                    if (s - tip <= 3) {
+                        tips[t] = s;
+                    }
+                }
             }
         }
-
-        console.log(counts)
-        return counts[1] * (counts[3] + 1);
     }
 }
 
