@@ -47,21 +47,34 @@ class Graph {
 		// }
 	}
 
-	_print(node, acc = '') {
-		acc += node.val + ', ';
+	_print(node, acc = '', groups) {
+		acc += node.val + ',';
 		if (!node.children.length) {
 			this.total++;
-			console.log(acc);
+            let lines = acc.slice(0, -1).split(',').map((v, i, a) => i === a.length - 1 ? '' : `${v} --> ${a[i+1]}`);
+            lines.pop(); // last one is empty
+            groups.push(lines);
 		} else {
 			for (let c of node.children) {
-				this._print(c, acc);
+				this._print(c, acc, groups);
 			}
 		}
 	}
 
 	print() {
-		this.total = 0;
-		this._print(this.head);
+        this.total = 0;
+        let groups = [];
+        this._print(this.head, '', groups);
+        // let i = 0;
+        let sts = groups.reduce((styles, lines) => {
+            const randomColor = Math.floor(Math.random() * 16777215).toString(16);
+			lines.forEach((line, j) => {
+				styles.push(`linkStyle ${styles.length} stroke-width:2px,stroke:#${randomColor},fill:none;`);
+            });
+            return styles;
+        }, []).join('\n')
+        console.log(groups.flat().join('\n'));
+        console.log(sts);
 		return this.total;
 	}
 }

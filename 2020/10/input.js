@@ -13,5 +13,3 @@ const input = fs
 module.exports = {
 	input,
 };
-
-fs.writeFileSync('asdf')
