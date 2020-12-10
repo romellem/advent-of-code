@@ -99,7 +99,7 @@ class LinkedList {
 	*[Symbol.iterator]() {
 		let node = this.head;
 		while (node) {
-			yield node.value;
+			yield node;
 			node = node.next;
 		}
 	}
@@ -113,8 +113,9 @@ class DiGraph {
 			this.adjacents.push(new LinkedList());
 		}
 
-		let start = new ListNode(0);
+		let start = new ListNode(0, 0);
 		this.adjacents.unshift(new LinkedList(start));
+		this.buildEdges();
 	}
 
 	buildEdges() {
@@ -142,18 +143,24 @@ class DiGraph {
 		// adjacent to this vertex
 		else {
 			let list = this.adjacents[u];
-			for (let node of list) {
-				pathCount = this.countPathsUtil(node.index, d, pathCount);
+			let is_first = true;
+			if (list) {
+				for (let node of list) {
+					if (is_first) {
+						is_first = false;
+						continue;
+					}
+					pathCount = this.countPathsUtil(node.index, d, pathCount);
+				}
 			}
-
 		}
 		return pathCount;
 	}
 
 	countPaths(s, d) {
-		let pathCount = countPathsUtil(s, d, 0);
+		let pathCount = this.countPathsUtil(s, d, 0);
 		return pathCount;
 	}
 }
 
-module.exports = { Node, Graph };
+module.exports = { Node, Graph, DiGraph, LinkedList, ListNode };
