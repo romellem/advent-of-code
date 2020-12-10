@@ -11,7 +11,16 @@ class Jolts {
 
     }
 
+    _build(input, tips, index) {
+        let v = input[index];
+        for (let i = index; i  < 3; i++) {
+            if ()
+        }
+    }
+
     buildGraph(input) {
+        let sorted_input = input.sort((a, b) => a - b);
+        return this._build(sorted_input, [0], 0);
         let tips = [0];
         let sorted_input = input.sort((a, b) => a - b);
         sorted_input.push(this.max)
