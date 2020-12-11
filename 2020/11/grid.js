@@ -5,7 +5,7 @@ const FLOOR = '.';
 class Grid {
     constructor(initial_grid_state) {
         this.grid = JSON.parse(JSON.stringify(initial_grid_state));
-       
+       this.max = Math.max(this.grid.length, this.grid[0].length);
     }
 
     coordIsCorner(x, y) {
@@ -17,6 +17,7 @@ class Grid {
 	}
 	
 	getVisualNeighbors(x, y) {
+		let m = this.max;
 		let neighbors = [];
 		// up
 		for (let v = y - 1; v >= 0; v--) {
@@ -48,34 +49,45 @@ class Grid {
 		}
 
 		// ul
-		for (let s = 1; s - x >= 0 && s - y >= 0; s++) {
+		for (let s = 1; s < m; s++) {
+			if (this.grid[y - s] === undefined) break;
+			if (this.grid[y - s][x - s] === undefined) break;
 			if (this.grid[y - s] && this.grid[y - s][x - s] === OCCUPIED) {
 				neighbors.push([x - s, y - s]);
 				break;
 			}
 		}
 		// ur
-		for (let s = 1; s + x < this.grid[0].length && s - y >= 0; s++) {
+		for (let s = 1; s < m; s++) {
+			if (this.grid[y - s]=== undefined) break;
+			if (this.grid[y - s][x + s]=== undefined) break;
 			if (this.grid[y - s] && this.grid[y - s][x + s] === OCCUPIED) {
 				neighbors.push([x + s, y - s]);
 				break;
 			}
 		}
 		// dr
-		for (let s = 1; s + x < this.grid[0].length && s + y < this.grid.length; s++) {
+		for (let s = 1; s < m; s++) {
+			if (this.grid[y + s] === undefined) break;
+			if (this.grid[y + s][x + s] === undefined) break;
 			if (this.grid[y + s] && this.grid[y + s][x + s] === OCCUPIED) {
 				neighbors.push([x + s, y + s]);
 				break;
 			}
 		}
 		// dl
-		for (let s = 1; s - x >= 0 && s + y < this.grid.length; s++) {
+		for (let s = 1; s < m; s++) {
+			if (this.grid[y + s] === undefined) break;
+			if (this.grid[y + s][x - s] === undefined) break;
 			if (this.grid[y + s] && this.grid[y + s][x - s] === OCCUPIED) {
 				neighbors.push([x - s, y + s]);
 				break;
 			}
 		}
 
+		if (y === 5) {
+			void 0;
+		}
 		let n = neighbors.filter(([_x, _y]) => typeof (this.grid[_y] && this.grid[_y][_x]) !== 'undefined');
 		return n.map(([_x, _y]) => this.grid[_y][_x]);
 	}
