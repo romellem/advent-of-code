@@ -3,19 +3,52 @@ const OCCUPIED = '#';
 const FLOOR = '.';
 
 class Grid {
-    constructor(initial_grid_state) {
-        this.grid = JSON.parse(JSON.stringify(initial_grid_state));
-       this.max = Math.max(this.grid.length, this.grid[0].length);
-    }
-
-    coordIsCorner(x, y) {
-        if (y === 0 || y === this.grid.length - 1) {
-            return x === 0 || x === this.grid[0].length - 1;
-        }
-
-        return false;
+	constructor(initial_grid_state) {
+		this.grid = JSON.parse(JSON.stringify(initial_grid_state));
+		this.max = Math.max(this.grid.length, this.grid[0].length);
 	}
-	
+
+	coordIsCorner(x, y) {
+		if (y === 0 || y === this.grid.length - 1) {
+			return x === 0 || x === this.grid[0].length - 1;
+		}
+
+		return false;
+	}
+
+	getFirstInDir(_x, _y, [h, v]) {
+		let x = _x + h;
+		let y = _y + v;
+		while (this.grid[y] && this.grid[y][x]) {
+			if (
+				(this.grid[y] && this.grid[y][x] === OCCUPIED) ||
+				(this.grid[y] && this.grid[y][x] === EMPTY)
+			) {
+				return [x, y];
+			}
+			x += h;
+			y += v;
+		}
+
+		return;
+	}
+
+	getVN(x, y) {
+		return [
+			this.getFirstInDir(x, y, [0, 0 - 1]), // top
+			this.getFirstInDir(x, y, [0 + 1, 0 - 1]), // top right
+			this.getFirstInDir(x, y, [0 + 1, 0]), // right
+			this.getFirstInDir(x, y, [0 + 1, 0 + 1]), // bottom right
+			this.getFirstInDir(x, y, [0, 0 + 1]), // bottom
+			this.getFirstInDir(x, y, [0 - 1, 0 + 1]), // bottom left
+			this.getFirstInDir(x, y, [0 - 1, 0]), // left
+			this.getFirstInDir(x, y, [0 - 1, 0 - 1]), // top left
+		]
+			.filter((v) => v)
+			.filter(([_x, _y]) => typeof (this.grid[_y] && this.grid[_y][_x]) !== 'undefined')
+			.map(([_x, _y]) => this.grid[_y][_x]);
+	}
+
 	getVisualNeighbors(x, y) {
 		let m = this.max;
 		let neighbors = [];
@@ -59,8 +92,8 @@ class Grid {
 		}
 		// ur
 		for (let s = 1; s < m; s++) {
-			if (this.grid[y - s]=== undefined) break;
-			if (this.grid[y - s][x + s]=== undefined) break;
+			if (this.grid[y - s] === undefined) break;
+			if (this.grid[y - s][x + s] === undefined) break;
 			if (this.grid[y - s] && this.grid[y - s][x + s] === OCCUPIED) {
 				neighbors.push([x + s, y - s]);
 				break;
@@ -88,13 +121,15 @@ class Grid {
 		if (y === 5) {
 			void 0;
 		}
-		let n = neighbors.filter(([_x, _y]) => typeof (this.grid[_y] && this.grid[_y][_x]) !== 'undefined');
+		let n = neighbors.filter(
+			([_x, _y]) => typeof (this.grid[_y] && this.grid[_y][_x]) !== 'undefined'
+		);
 		return n.map(([_x, _y]) => this.grid[_y][_x]);
 	}
 
-    getNeighbors(x, y) {
-        // prettier-ignore
-        let neighbors = [
+	getNeighbors(x, y) {
+		// prettier-ignore
+		let neighbors = [
             [x, y - 1],     // top
             [x + 1, y - 1], // top right
             [x + 1, y],     // right
@@ -105,128 +140,124 @@ class Grid {
             [x - 1, y - 1], // top left
         ].filter(([_x, _y]) => typeof (this.grid[_y] && this.grid[_y][_x]) !== 'undefined');
 
-        return neighbors.map(([_x, _y]) => this.grid[_y][_x]);
-    }
+		return neighbors.map(([_x, _y]) => this.grid[_y][_x]);
+	}
 
-    tick(steps = 1) {
+	tick(steps = 1) {
 		let changed;
-        do {
-            let new_grid_state = Array(this.grid.length)
-                .fill()
+		do {
+			let new_grid_state = Array(this.grid.length)
+				.fill()
 				.map(() => Array(this.grid[0].length).fill());
 			changed = false;
 
-            for (let y = 0; y < this.grid.length; y++) {
-                for (let x = 0; x < this.grid[0].length; x++) {
-                    let cell = this.grid[y][x];
+			for (let y = 0; y < this.grid.length; y++) {
+				for (let x = 0; x < this.grid[0].length; x++) {
+					let cell = this.grid[y][x];
 
-                    let neighbors = this.getNeighbors(x, y);
-                    let occupied_neighbors = 0;
-                    let empty_neighbords = 0;
+					let neighbors = this.getNeighbors(x, y);
+					let occupied_neighbors = 0;
+					let empty_neighbords = 0;
 
-                    neighbors.forEach(n => {
-                        if (n === OCCUPIED) occupied_neighbors++;
-                        else if (n === EMPTY) empty_neighbords++;
+					neighbors.forEach((n) => {
+						if (n === OCCUPIED) occupied_neighbors++;
+						else if (n === EMPTY) empty_neighbords++;
 					});
-					
+
 					if (cell === FLOOR) {
 						new_grid_state[y][x] = FLOOR;
-					}else if (cell === EMPTY) {
+					} else if (cell === EMPTY) {
 						if (occupied_neighbors === 0) {
 							new_grid_state[y][x] = OCCUPIED;
-							changed =true
-						}else 
-						new_grid_state[y][x] = EMPTY;
+							changed = true;
+						} else new_grid_state[y][x] = EMPTY;
 					} else if (cell === OCCUPIED) {
 						if (occupied_neighbors >= 4) {
 							new_grid_state[y][x] = EMPTY;
-							changed=true
-						}else 
-						new_grid_state[y][x] = OCCUPIED;
+							changed = true;
+						} else new_grid_state[y][x] = OCCUPIED;
 					} else {
-						console.error('err')
+						console.error('err');
 					}
+				}
+			}
 
-                    
-                }
-            }
-
-            // Update our real grid
-            this.grid = new_grid_state;
+			// Update our real grid
+			this.grid = new_grid_state;
 		} while (changed);
-		
+
 		return this.countType();
 	}
-	
+
 	tick2(steps = 1) {
 		let changed;
-        do {
-            let new_grid_state = Array(this.grid.length)
-                .fill()
+		do {
+			let new_grid_state = Array(this.grid.length)
+				.fill()
 				.map(() => Array(this.grid[0].length).fill());
 			changed = false;
 
-            for (let y = 0; y < this.grid.length; y++) {
-                for (let x = 0; x < this.grid[0].length; x++) {
-                    let cell = this.grid[y][x];
+			for (let y = 0; y < this.grid.length; y++) {
+				for (let x = 0; x < this.grid[0].length; x++) {
+					let cell = this.grid[y][x];
 
-                    let neighbors = this.getVisualNeighbors(x, y);
-                    let occupied_neighbors = 0;
-                    let empty_neighbords = 0;
+					let neighbors = this.getVN(x, y);
+					let occupied_neighbors = 0;
+					let empty_neighbords = 0;
 
-                    neighbors.forEach(n => {
-                        if (n === OCCUPIED) occupied_neighbors++;
-                        else if (n === EMPTY) empty_neighbords++;
+					neighbors.forEach((n) => {
+						if (n === OCCUPIED) occupied_neighbors++;
+						else if (n === EMPTY) empty_neighbords++;
 					});
-					
+
 					if (cell === FLOOR) {
 						new_grid_state[y][x] = FLOOR;
-					}else if (cell === EMPTY) {
+					} else if (cell === EMPTY) {
 						if (occupied_neighbors === 0) {
 							new_grid_state[y][x] = OCCUPIED;
-							changed =true
-						}else 
-						new_grid_state[y][x] = EMPTY;
+							changed = true;
+						} else new_grid_state[y][x] = EMPTY;
 					} else if (cell === OCCUPIED) {
 						if (occupied_neighbors >= 5) {
 							new_grid_state[y][x] = EMPTY;
-							changed=true
-						}else 
-						new_grid_state[y][x] = OCCUPIED;
+							changed = true;
+						} else new_grid_state[y][x] = OCCUPIED;
 					} else {
-						console.error('err')
+						console.error('err');
 					}
+				}
+			}
 
-                    
-                }
-            }
-
-            // Update our real grid
-            this.grid = new_grid_state;
+			// Update our real grid
+			// this.printGrid();
+			// console.log();
+			this.grid = new_grid_state;
 		} while (changed);
-		
+		// this.printGrid();
+		// console.log();
+
 		return this.countType();
-    }
+	}
 
-    // Default state is ON
-    countType(type = OCCUPIED) {
-        let count = 0;
-        for (let y = 0; y < this.grid.length; y++) {
-            for (let x = 0; x < this.grid[0].length; x++) {
-                if (this.grid[y][x] === type) {
-                    count++;
-                }
-            }
-        }
+	// Default state is ON
+	countType(type = OCCUPIED) {
+		let count = 0;
+		for (let y = 0; y < this.grid.length; y++) {
+			for (let x = 0; x < this.grid[0].length; x++) {
+				if (this.grid[y][x] === type) {
+					count++;
+				}
+			}
+		}
 
-        return count;
-    }
+		return count;
+	}
 
-    printGrid() {
-        let grid_str = this.grid.map(row => row.map(c => (c ? ON : OFF)).join('')).join('\n');
+	printGrid() {
+		let grid_str = this.grid.map((row) => row.join('')).join('\n');
 
-        console.log(grid_str + '\n');
-    }
+		console.log(grid_str + '\n');
+	}
 }
 
-module.exports = {Grid};
+module.exports = { Grid };
