@@ -135,6 +135,12 @@ class DiGraph {
 		}
 	}
 
+	asMermaid() {
+		for (let i = 0; i < this.items.length; i++) {
+			
+		}
+	}
+
 	countPathsUtil(u, d, pathCount) {
 		// If current vertex is same as
 		// destination, then increment count
