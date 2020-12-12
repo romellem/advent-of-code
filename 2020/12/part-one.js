@@ -1,6 +1,6 @@
 const { input, sampleInput } = require('./input');
 const { Map } = require('./map');
 
-let map = new Map({ directions: input, debug: true });
+let map = new Map({ directions: input, debug: false });
 map.run();
 console.log(map.getDistanceFromCurrentLocationTo(0, 0));

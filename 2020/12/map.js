@@ -36,11 +36,15 @@ class Map {
 		initialRotation = DIRECTION_DEGREES[EAST],
 		x = 0,
 		y = 0,
+		useWaypoint = false,
+		waypoint = [10, -1],
 	}) {
 		this.original_directions_str = JSON.stringify(directions);
 		this.directions = JSON.parse(this.original_directions_str);
 		this.rotation = initialRotation;
 		this.debug = debug;
+		this.useWaypoint = useWaypoint;
+		this.waypoint = waypoint;
 
 		this.x = x;
 		this.y = y;
@@ -53,18 +57,22 @@ class Map {
 	run() {
 		for (let direction of this.directions) {
 			let { action, value } = direction;
+			let vector = DIRECTION_DEGREES[action];
+			if (vector !== undefined) {
+				vector = FORWARD_VECTORS[vector];
+			}
 			switch (action) {
 				case NORTH:
-					this.move(value, [0, -1]);
+					this.move(value, vector);
 					break;
 				case EAST:
-					this.move(value, [1, 0]);
+					this.move(value, vector);
 					break;
 				case SOUTH:
-					this.move(value, [0, 1]);
+					this.move(value, vector);
 					break;
 				case WEST:
-					this.move(value, [-1, 0]);
+					this.move(value, vector);
 					break;
 				case ROTATE_LEFT:
 					this.rotate(-1 * value);
@@ -96,8 +104,8 @@ class Map {
 	}
 
 	forward(value) {
-		let scalar = FORWARD_VECTORS[this.rotation];
-		return this.move(value, scalar);
+		let vector = FORWARD_VECTORS[this.rotation];
+		return this.move(value, vector);
 	}
 
 	getDistanceFromCurrentLocationTo(x = 0, y = 0) {
