@@ -27,7 +27,7 @@ const ROTATION_TO_DIRECTION = {
 	90: EAST,
 	180: SOUTH,
 	270: WEST,
-}
+};
 
 class Map {
 	constructor({
@@ -53,7 +53,6 @@ class Map {
 	run() {
 		for (let direction of this.directions) {
 			let { action, value } = direction;
-			this.log('Doing', direction, 'facing', ROTATION_TO_DIRECTION[this.rotation], 'from', { x: this.x, y: this.y });
 			switch (action) {
 				case NORTH:
 					this.move(value, [0, -1]);
@@ -79,13 +78,15 @@ class Map {
 				default:
 					throw new Error(`Unknown action: "${action}"`);
 			}
-			this.log('At', { x: this.x, y: this.y, rotation: this.rotation });
+			this.log(
+				`${action} ${value} : ${this.x}, ${this.y}, ${ROTATION_TO_DIRECTION[this.rotation]}`
+			);
 		}
 	}
 
 	rotate(degrees) {
 		this.rotation += degrees;
-		this.rotation = Math.abs(this.rotation);
+		if (this.rotation < 0) this.rotation += 360 * Math.ceil(Math.abs(this.rotation / 360));
 		this.rotation %= 360;
 	}
 
