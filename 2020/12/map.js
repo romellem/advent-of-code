@@ -1,4 +1,5 @@
 const manhattan = require('manhattan');
+const { LoopedList } = require('looped-list');
 
 const NORTH = 'N';
 const EAST = 'E';
@@ -29,6 +30,28 @@ const ROTATION_TO_DIRECTION = {
 	270: WEST,
 };
 
+pipe = (...fns) => x => fns.reduce((v, f) => f(v), x)
+
+const swap = arr => {
+	let t = arr[1];
+	arr[1] = arr[0];
+	arr[0] = t;
+	return arr
+};
+
+const ROTATION_VECTORS = new LoopedList([
+	[1, 0], // East
+	[0, 1], // South
+	[-1, 0], // West
+	[0, -1], // North
+]);
+const WAYPOINT_ROTATION_OPERATIONS = new LoopedList([
+	[1, 0], // East
+	[0, 1], // South
+	[-1, 0], // West
+	[0, -1], // North
+]);
+
 class Map {
 	constructor({
 		directions,
@@ -57,9 +80,16 @@ class Map {
 	run() {
 		for (let direction of this.directions) {
 			let { action, value } = direction;
-			let vector = DIRECTION_DEGREES[action];
-			if (vector !== undefined) {
-				vector = FORWARD_VECTORS[vector];
+
+			let vector;
+			if (this.useWaypoint) {
+				vector = this.waypoint;
+			} else {
+				// In lieu of optional chaining...
+				vector = DIRECTION_DEGREES[action];
+				if (vector !== undefined) {
+					vector = FORWARD_VECTORS[vector];
+				}
 			}
 			switch (action) {
 				case NORTH:
@@ -96,11 +126,21 @@ class Map {
 		this.rotation += degrees;
 		if (this.rotation < 0) this.rotation += 360 * Math.ceil(Math.abs(this.rotation / 360));
 		this.rotation %= 360;
+
+		if (this.useWaypoint) {
+			let [temp_x, temp_y] = this.waypoint;
+			if (this.rotation === 0)
+		}
 	}
 
 	move(value, [dx, dy]) {
-		this.x += value * dx;
-		this.y += value * dy;
+		if (this.useWaypoint) {
+			this.waypoint[0] += value * dx;
+			this.waypoint[1] += value * dy;
+		} else {
+			this.x += value * dx;
+			this.y += value * dy;
+		}
 	}
 
 	forward(value) {
