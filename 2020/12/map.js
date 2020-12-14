@@ -29,6 +29,19 @@ const ROTATION_TO_DIRECTION = {
 	270: WEST,
 };
 
+const rotateInPlace = (a, direction) => {
+	if (direction === ROTATE_LEFT) {
+		let t = a[1];
+		a[1] = -a[0];
+		a[0] = t;
+	} else if (direction === ROTATE_RIGHT) {
+		let t = a[1];
+		a[1] = a[0];
+		a[0] = -t;
+	}
+	return a;
+};
+
 class Map {
 	constructor({
 		directions,
@@ -61,51 +74,59 @@ class Map {
 			if (vector !== undefined) {
 				vector = FORWARD_VECTORS[vector];
 			}
+
 			switch (action) {
 				case NORTH:
-					this.move(value, vector);
-					break;
 				case EAST:
-					this.move(value, vector);
-					break;
 				case SOUTH:
-					this.move(value, vector);
-					break;
 				case WEST:
-					this.move(value, vector);
+					this.move(value, vector, this.useWaypoint);
 					break;
 				case ROTATE_LEFT:
-					this.rotate(-1 * value);
-					break;
 				case ROTATE_RIGHT:
-					this.rotate(value);
+					this.rotate(value, action);
 					break;
 				case FORWARD:
-					this.forward(value);
+					this.forward(value, false);
 					break;
 				default:
 					throw new Error(`Unknown action: "${action}"`);
 			}
 			this.log(
-				`${action} ${value} : ${this.x}, ${this.y}, ${ROTATION_TO_DIRECTION[this.rotation]}`
+				`${action} ${value} : ${this.useWaypoint ? 'wp:' + this.waypoint + ' ' : ''}x:${
+					this.x
+				}, y:${this.y}, ${ROTATION_TO_DIRECTION[this.rotation]}`
 			);
 		}
 	}
 
-	rotate(degrees) {
-		this.rotation += degrees;
-		if (this.rotation < 0) this.rotation += 360 * Math.ceil(Math.abs(this.rotation / 360));
-		this.rotation %= 360;
+	rotate(degrees, direction) {
+		if (this.useWaypoint) {
+			let count = degrees / 90;
+			for (let i = 0; i < count; i++) {
+				rotateInPlace(this.waypoint, direction);
+			}
+		} else {
+			if (direction === ROTATE_LEFT) degrees *= -1;
+			this.rotation += degrees;
+			if (this.rotation < 0) this.rotation += 360 * Math.ceil(Math.abs(this.rotation / 360));
+			this.rotation %= 360;
+		}
 	}
 
-	move(value, [dx, dy]) {
-		this.x += value * dx;
-		this.y += value * dy;
+	move(value, [dx, dy], moveWaypoint = false) {
+		if (moveWaypoint) {
+			this.waypoint[0] += value * dx;
+			this.waypoint[1] += value * dy;
+		} else {
+			this.x += value * dx;
+			this.y += value * dy;
+		}
 	}
 
-	forward(value) {
-		let vector = FORWARD_VECTORS[this.rotation];
-		return this.move(value, vector);
+	forward(value, moveWaypoint = false) {
+		let vector = this.useWaypoint ? this.waypoint : FORWARD_VECTORS[this.rotation];
+		return this.move(value, vector, moveWaypoint);
 	}
 
 	getDistanceFromCurrentLocationTo(x = 0, y = 0) {
