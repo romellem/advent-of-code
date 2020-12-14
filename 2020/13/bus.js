@@ -61,25 +61,20 @@ const _lcm = (a, b) => {
 // @link https://stackoverflow.com/a/147523/864233
 const lcm = (...args) => args.reduce((a, b) => _lcm(a, b));
 
-function extendedGcd(a, b) {
-    let old_r = a;
-    let r = b;
-    let old_s = 1;
-    let s = 0;
-    let old_t = 1;
-    let t = 0;
-
-    while (r !== 0) {
-        let quotient = old_r % r;
-        [old_r, r] = [r, old_r - quotient * r];
-        [old_s, s] = [s, old_s - quotient * s];
-        [old_t, t] = [t, old_t - quotient * t];
+function extgcd(a, b) {
+    if (a < b) {
+        let tmp = extgcd(b, a);
+        return {gcd: tmp.gcd, x: tmp.y, y: tmp.x};
     }
 
-    return {
-        old_s,old_t,old_r,t,s
+    if (b === 0) {
+        return {gcd: a, x: 1,y: 0};
     }
 
+    let r = a % b;
+    let tmp = extgcd(b, r);
+
+    return {gcd: tmp.gcd, x: tmp.y, y: (tmp.x-Math.floor(a/b)*tmp.y)};
 }
 
 module.exports = {
