@@ -39,6 +39,7 @@ const sampleInput = `mask = 000000000000000000000000000000X1001X
 		// mem[25292] = 672982926
 		if (line.includes('mask')) {
 			let [, value] = /mask = (.+)$/.exec(line);
+			value = value.split('');
 			return {
 				type: 'mask',
 				value,

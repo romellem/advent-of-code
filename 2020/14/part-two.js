@@ -1,4 +1,23 @@
-const { input } = require('./input');
+const { input: raw_input } = require('./input');
+
+// Process the input specifically for Part Two
+const input = raw_input.map((instruction) => {
+	let { type, address } = instruction;
+	if (type === 'write') {
+		// Convert the address to an array of 1s and 0s
+		let address_as_binary_num_arr = address
+			.toString(2)
+			.padStart(36, '0')
+			.split('')
+			.map((v) => +v);
+		return {
+			...instruction,
+			address: address_as_binary_num_arr,
+		};
+	} else {
+		return instruction;
+	}
+});
 
 /**
  * @param {Array} val
@@ -10,8 +29,8 @@ function floatingToPossibilites(vals) {
 	for (let val of vals) {
 		let x = val.indexOf('X');
 		if (x > -1) {
-			let a = val.slice(0, x) + '0' + val.slice(x + 1);
-			let b = val.slice(0, x) + '1' + val.slice(x + 1);
+			let a = `${val.slice(0, x)}0${val.slice(x + 1)}`;
+			let b = `${val.slice(0, x)}1${val.slice(x + 1)}`;
 			new_vals.push(a, b);
 			pushed = true;
 		}
@@ -24,15 +43,12 @@ function floatingToPossibilites(vals) {
 	}
 }
 
-function applyMaskOverMemoryAddress(_mask, _addr) {
-	let mask = _mask.split('');
-	let address = _addr.toString(2).padStart(36, '0').split('');
+function applyMaskOverMemoryAddress(mask, _address) {
+	let address = _address.slice(0);
 	for (let i = 0; i < mask.length; i++) {
 		let m = mask[i];
-		if (m === '1') {
-			address[i] = '1';
-		} else if (m === 'X') {
-			address[i] = 'X';
+		if (m === '1' || m === 'X') {
+			address[i] = m;
 		}
 	}
 
@@ -41,13 +57,11 @@ function applyMaskOverMemoryAddress(_mask, _addr) {
 
 function run(input) {
 	let memory = {};
-	// let current_addresses_to_write_to;
 	let current_mask;
 	for (line of input) {
 		const { type, address, value } = line;
 		if (type === 'mask') {
 			current_mask = value;
-			// current_addresses_to_write_to = floatingToPossibilites([value]).map(a => parseInt(a, 2));
 		} else {
 			let masked_address = applyMaskOverMemoryAddress(current_mask, address);
 			let current_addresses_to_write_to = floatingToPossibilites([masked_address]).map((a) =>
