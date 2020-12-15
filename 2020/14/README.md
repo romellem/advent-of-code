@@ -28,21 +28,21 @@ The program then attempts to write the value `11` to memory address `8`. By expa
 
 <pre><code>value:  000000000000000000000000000000001011  (decimal 11)
 mask:   XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X
-result: 00000000000000000000000000000<em>1</em>0010<em>0</em>1  (decimal 73)
+result: 00000000000000000000000000000<b>1</b>0010<b>0</b>1  (decimal 73)
 </code></pre>
 
 So, because of the mask, the value `73` is written to memory address `8` instead. Then, the program tries to write `101` to address `7`:
 
 <pre><code>value:  000000000000000000000000000001100101  (decimal 101)
 mask:   XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X
-result: 00000000000000000000000000000<em>1</em>1001<em>0</em>1  (decimal 101)
+result: 00000000000000000000000000000<b>1</b>1001<b>0</b>1  (decimal 101)
 </code></pre>
 
 This time, the mask has no effect, as the bits it overwrote were already the values the mask tried to set. Finally, the program tries to write `0` to address `8`:
 
 <pre><code>value:  000000000000000000000000000000000000  (decimal 0)
 mask:   XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X
-result: 00000000000000000000000000000<em>1</em>0000<em>0</em>0  (decimal 64)
+result: 00000000000000000000000000000<b>1</b>0000<b>0</b>0  (decimal 64)
 </code></pre>
 
 `64` is written to address `8` instead, overwriting the value that was there previously.
@@ -77,34 +77,34 @@ When this program goes to write to memory address `42`, it first applies the bit
 
 <pre><code>address: 000000000000000000000000000000101010  (decimal 42)
 mask:    000000000000000000000000000000X1001X
-result:  000000000000000000000000000000<em>X1</em>10<em>1X</em>
+result:  000000000000000000000000000000<b>X1</b>10<b>1X</b>
 </code></pre>
 
 After applying the mask, four bits are overwritten, three of which are different, and two of which are _floating_. Floating bits take on every possible combination of values; with two floating bits, four actual memory addresses are written:
 
-<pre><code>000000000000000000000000000000<em>0</em>1101<em>0</em>  (decimal 26)
-000000000000000000000000000000<em>0</em>1101<em>1</em>  (decimal 27)
-000000000000000000000000000000<em>1</em>1101<em>0</em>  (decimal 58)
-000000000000000000000000000000<em>1</em>1101<em>1</em>  (decimal 59)
+<pre><code>000000000000000000000000000000<b>0</b>1101<b>0</b>  (decimal 26)
+000000000000000000000000000000<b>0</b>1101<b>1</b>  (decimal 27)
+000000000000000000000000000000<b>1</b>1101<b>0</b>  (decimal 58)
+000000000000000000000000000000<b>1</b>1101<b>1</b>  (decimal 59)
 </code></pre>
 
 Next, the program is about to write to memory address `26` with a different bitmask:
 
 <pre><code>address: 000000000000000000000000000000011010  (decimal 26)
 mask:    00000000000000000000000000000000X0XX
-result:  00000000000000000000000000000001<em>X</em>0<em>XX</em>
+result:  00000000000000000000000000000001<b>X</b>0<b>XX</b>
 </code></pre>
 
 This results in an address with three floating bits, causing writes to _eight_ memory addresses:
 
-<pre><code>00000000000000000000000000000001<em>0</em>0<em>00</em>  (decimal 16)
-00000000000000000000000000000001<em>0</em>0<em>01</em>  (decimal 17)
-00000000000000000000000000000001<em>0</em>0<em>10</em>  (decimal 18)
-00000000000000000000000000000001<em>0</em>0<em>11</em>  (decimal 19)
-00000000000000000000000000000001<em>1</em>0<em>00</em>  (decimal 24)
-00000000000000000000000000000001<em>1</em>0<em>01</em>  (decimal 25)
-00000000000000000000000000000001<em>1</em>0<em>10</em>  (decimal 26)
-00000000000000000000000000000001<em>1</em>0<em>11</em>  (decimal 27)
+<pre><code>00000000000000000000000000000001<b>0</b>0<b>00</b>  (decimal 16)
+00000000000000000000000000000001<b>0</b>0<b>01</b>  (decimal 17)
+00000000000000000000000000000001<b>0</b>0<b>10</b>  (decimal 18)
+00000000000000000000000000000001<b>0</b>0<b>11</b>  (decimal 19)
+00000000000000000000000000000001<b>1</b>0<b>00</b>  (decimal 24)
+00000000000000000000000000000001<b>1</b>0<b>01</b>  (decimal 25)
+00000000000000000000000000000001<b>1</b>0<b>10</b>  (decimal 26)
+00000000000000000000000000000001<b>1</b>0<b>11</b>  (decimal 27)
 </code></pre>
 
 The entire 36-bit address space still begins initialized to the value 0 at every address, and you still need the sum of all values left in memory at the end of the program. In this example, the sum is _`208`_.
