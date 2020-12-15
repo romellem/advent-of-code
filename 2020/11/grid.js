@@ -27,14 +27,15 @@ class Grid {
 	}
 
 	getVisualNeighbors(x, y) {
+		// prettier-ignore
 		return [
-			this.getFirstInDir([OCCUPIED, EMPTY], x, y, [0, -1]), // top
-			this.getFirstInDir([OCCUPIED, EMPTY], x, y, [1, -1]), // top right
-			this.getFirstInDir([OCCUPIED, EMPTY], x, y, [1, 0]), // right
-			this.getFirstInDir([OCCUPIED, EMPTY], x, y, [1, 1]), // bottom right
-			this.getFirstInDir([OCCUPIED, EMPTY], x, y, [0, 1]), // bottom
-			this.getFirstInDir([OCCUPIED, EMPTY], x, y, [-1, 1]), // bottom left
-			this.getFirstInDir([OCCUPIED, EMPTY], x, y, [-1, 0]), // left
+			this.getFirstInDir([OCCUPIED, EMPTY], x, y, [0, -1]),  // top
+			this.getFirstInDir([OCCUPIED, EMPTY], x, y, [1, -1]),  // top right
+			this.getFirstInDir([OCCUPIED, EMPTY], x, y, [1, 0]),   // right
+			this.getFirstInDir([OCCUPIED, EMPTY], x, y, [1, 1]),   // bottom right
+			this.getFirstInDir([OCCUPIED, EMPTY], x, y, [0, 1]),   // bottom
+			this.getFirstInDir([OCCUPIED, EMPTY], x, y, [-1, 1]),  // bottom left
+			this.getFirstInDir([OCCUPIED, EMPTY], x, y, [-1, 0]),  // left
 			this.getFirstInDir([OCCUPIED, EMPTY], x, y, [-1, -1]), // top left
 		]
 			.filter((v) => v)
@@ -45,15 +46,15 @@ class Grid {
 	getNeighbors(x, y) {
 		// prettier-ignore
 		let neighbors = [
-            [x, y - 1],     // top
-            [x + 1, y - 1], // top right
-            [x + 1, y],     // right
-            [x + 1, y + 1], // bottom right
-            [x, y + 1],     // bottom
-            [x - 1, y + 1], // bottom left
-            [x - 1, y],     // left
-            [x - 1, y - 1], // top left
-        ].filter(([_x, _y]) => typeof (this.grid[_y] && this.grid[_y][_x]) !== 'undefined');
+			[x, y - 1],     // top
+			[x + 1, y - 1], // top right
+			[x + 1, y],     // right
+			[x + 1, y + 1], // bottom right
+			[x, y + 1],     // bottom
+			[x - 1, y + 1], // bottom left
+			[x - 1, y],     // left
+			[x - 1, y - 1], // top left
+		].filter(([_x, _y]) => typeof (this.grid[_y] && this.grid[_y][_x]) !== 'undefined');
 
 		return neighbors.map(([_x, _y]) => this.grid[_y][_x]);
 	}
