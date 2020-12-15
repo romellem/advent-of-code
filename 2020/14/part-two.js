@@ -32,7 +32,7 @@ function applyMaskOverMemoryAddress(_mask, _addr) {
 		if (m === '1') {
 			address[i] = '1';
 		} else if (m === 'X') {
-			address[i] = '1';
+			address[i] = 'X';
 		}
 	}
 
