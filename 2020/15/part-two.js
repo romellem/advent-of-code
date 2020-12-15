@@ -1,4 +1,5 @@
 const { input } = require('./input');
+// const input = [1,2,3]
 
 const said = {};
 let c = 0;
