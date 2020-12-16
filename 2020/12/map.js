@@ -29,17 +29,71 @@ const ROTATION_TO_DIRECTION = {
 	270: WEST,
 };
 
-const rotateInPlace = (a, direction) => {
+/**
+ * "Rotates" an array 90º clockwise (right) or counter-clockwise (left).
+ *
+ * Image the following graph:
+ *
+ *             -y
+ *              ^
+ *     (-2, -1) | a (1, -2)
+ *         d    |
+ *     -x <-----+-----> +x
+ *              |    b
+ *            c |  (2, 1)
+ *      (-1, 2) v
+ *             +y
+ *
+ * Where a, b, c, and d are the following points
+ * (Note that -y is up, and +y is down):
+ *
+ * - a: (1, -2)
+ * - b: (2, 1)
+ * - c: (-1, 2)
+ * - d: (-2, -1)
+ *
+ * You can see that to rotate clockwise, you can reflect
+ * a point over the line of `y = x`, which means you
+ * swap the x and y coords and negate both terms) and
+ * then reflect that new point over the x-axis, meaning you
+ * negate the y term.
+ *
+ * Written out, you get
+ *
+ * 0. (x, y)        // Initial point
+ * 1. (-y, -x)      // Reflect over `y = x` line
+ * 2. (-y, -1 * -x) // Reflect over x-axis
+ * 2. (-y, x)       // Cancel the double negative
+ *
+ * In the example above, rotating `a` clockwise to `b`:
+ *
+ * 0. (1, -2)
+ * 1. (2, -1)
+ * 2. (2, 1)
+ *
+ * In code, if you wanted to go from step 0 to step 2, you can
+ * swap the terms, and negate the _new_ `x` term.
+ *
+ * For rotating left, you do something similar, instead
+ * you reflect over the y-axis for the 2nd step.
+ *
+ * Again, in code, you swap the terms, and negate the _new_
+ * `x` term.
+ *
+ * @param {Array} arr - An array of 2 values
+ * @param {Enum} direction - Either `ROTATE_LEFT` or `ROTATE_RIGHT`
+ */
+const rotateInPlace = (arr, direction) => {
 	if (direction === ROTATE_LEFT) {
-		let t = a[1];
-		a[1] = -a[0];
-		a[0] = t;
+		let t = arr[1];
+		arr[1] = -arr[0];
+		arr[0] = t;
 	} else if (direction === ROTATE_RIGHT) {
-		let t = a[1];
-		a[1] = a[0];
-		a[0] = -t;
+		let t = arr[1];
+		arr[1] = arr[0];
+		arr[0] = -t;
 	}
-	return a;
+	return arr;
 };
 
 class Map {
