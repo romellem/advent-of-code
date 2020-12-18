@@ -30,6 +30,7 @@ function calculate(input, operator_precedence = []) {
 	while (tokens.includes(CLOSE_PAREN)) {
 		let close_paren = tokens.indexOf(CLOSE_PAREN);
 		let open_paren = indexOfFrom(OPEN_PAREN, tokens, close_paren);
+		// let open_paren = tokens.lastIndexOf(OPEN_PAREN, close_paren);
 
 		// Slices `['(', 4, '+', 5, ')']` to `[4, '+', 5]`
 		let slice = tokens.slice(open_paren + 1, close_paren);
@@ -53,35 +54,78 @@ function indexOfFrom(char, arr, from) {
 	return -1;
 }
 
-function reduce(_tokens, operator_precedence = []) {
+/**
+ * @example createIterablePrecedence({ '+': 1, '*': 1}) // returns [['+', '*']]
+ * @example createIterablePrecedence({ '+': 1, '*': 2}) // returns [['+'], ['*']]
+ * @example createIterablePrecedence({ '+': 1, '-': 1, '*': 2}) // returns [['+', '-'], ['*']]
+ * @param {Object} map
+ * @returns {Array<Array>}
+ */
+const createIterablePrecedence = (() => {
+	let cache = {};
+	return (map) => {
+		let map_str = JSON.stringify(map);
+		if (cache[map_str]) return cache[map_str];
+		let reverse_lookup = {};
+
+		let entries = Object.entries(map);
+		for (let [operator, precedence] of entries) {
+			if (!reverse_lookup[precedence]) {
+				reverse_lookup[precedence] = [];
+			}
+
+			reverse_lookup[precedence].push(operator);
+		}
+
+		let reverse_lookup_values = [];
+		for (let [index_raw, operators] of Object.entries(reverse_lookup)) {
+			let index = parseInt(index_raw, 10) - 1;
+			reverse_lookup_values[index] = operators;
+		}
+
+		cache[map_str] = reverse_lookup_values;
+
+		return reverse_lookup_values;
+	};
+})();
+
+function getMinIndexOf(arr, ...chars) {
+	let min_index;
+	for (let char of chars) {
+		let index = arr.indexOf(char);
+		if (min_index === undefined || index < min_index) {
+			min_index = index;
+		}
+	}
+
+	return min_index ?? -1;
+}
+
+function arrayIncludesOneOf(arr, items) {
+	for (let item of items) {
+		if (arr.includes(item)) return true;
+	}
+	return false;
+}
+
+function reduce(_tokens, operator_precedence = { [ADD]: 1, [MULTIPLY]: 1 }) {
+	let iterable_precedence = createIterablePrecedence(operator_precedence);
+
 	let tokens = _tokens.slice(0);
 
-	// If the operators have a specific precedence
-	if (operator_precedence.length) {
-		for (let current_operator of operator_precedence) {
-			while (tokens.includes(current_operator)) {
-				let operator_index = tokens.indexOf(current_operator);
-				let result = OPERATORS[current_operator](
-					tokens[operator_index - 1],
-					tokens[operator_index + 1]
-				);
-				tokens.splice(operator_index - 1, 3, result);
-			}
+	for (let operators of iterable_precedence) {
+		while (arrayIncludesOneOf(tokens, operators)) {
+			let operator_index = getMinIndexOf(tokens, ...operators);
+			let current_operator = tokens[operator_index];
+			let result = OPERATORS[current_operator](
+				tokens[operator_index - 1],
+				tokens[operator_index + 1]
+			);
+			tokens.splice(operator_index - 1, 3, result);
 		}
-
-		return tokens[0];
-	} else {
-		// Just accumulate the totals across
-		let acc = tokens[0];
-		for (let i = 1; i < tokens.length; i += 2) {
-			let operator = tokens[i];
-			let digit = tokens[i + 1];
-
-			acc = OPERATORS[operator](acc, digit);
-		}
-
-		return acc;
 	}
+
+	return tokens[0];
 }
 
 module.exports = {
