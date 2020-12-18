@@ -11,8 +11,23 @@ class InfiniteNDimensionalGrid {
 		 * If we have three dimensions, the keys would be `x,y,z`
 		 */
 		this.grid = this.parseArraysToGrid(JSON.parse(this.original_grid_str));
-
+		let [min, max] = this.getMinMaxFromGrid(this.grid);
+		this.min = min;
+		this.max = max;
 		this.neighbor_cache = {};
+	}
+
+	getMinMaxFromGrid(grid) {
+		let coords = Object.keys(grid).map(c => c.split(','));
+		let min = Array(this.dimensions).fill(Number.MAX_SAFE_INTEGER);
+		let max = Array(this.dimensions).fill(Number.MIN_SAFE_INTEGER);
+		for (let d = 0; d < this.dimensions; d++) {
+			for (let coord of coords) {
+				if (coord[d] < min[d]) min[d] = coord[d];
+				if (coord[d] > max[d]) max[d] = coord[d];
+			}
+		}
+		return [min, max]
 	}
 
 	parseArraysToGrid(arrays, depth = 1, coord = [], grid = {}) {
@@ -86,6 +101,17 @@ class InfiniteNDimensionalGrid {
 		}
 
 		return counts;
+	}
+
+	/**
+	 * @param {String} coord 
+	 */
+	set(coord, val) {
+		let coord_arr = coord.join(',').map(v => parseInt(v, 10));
+		this.grid[coord] = val;
+		for (let d = 0; d < coord_arr.length; d++) {
+			if (coord_arr[d] < this.min[d])
+		}
 	}
 
 	tick() {
