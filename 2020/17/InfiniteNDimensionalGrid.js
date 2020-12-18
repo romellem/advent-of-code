@@ -11,9 +11,6 @@ class InfiniteNDimensionalGrid {
 		 * If we have three dimensions, the keys would be `x,y,z`
 		 */
 		this.grid = this.parseArraysToGrid(JSON.parse(this.original_grid_str));
-		let [min, max] = this.getMinMaxFromGrid(this.grid);
-		this.min = min;
-		this.max = max;
 		this.neighbor_cache = {};
 	}
 
@@ -82,10 +79,10 @@ class InfiniteNDimensionalGrid {
 
 	/**
 	 * @param {String} coord
-	 * @param {Boolean} [removeUndefined=true]
+	 * @param {Boolean} [removeUndefined=false]
 	 * @returns {Array} - Returns an array of coordinates that can be looked up in `this.grid`
 	 */
-	getNeighbors(coord, removeUndefined = true) {
+	getNeighbors(coord, removeUndefined = false) {
 		let coord_arr = coord.split(',').map((v) => parseInt(v, 10));
 		let neighbors = this.getNeighbordCoords(coord_arr);
 		if (removeUndefined) {
@@ -97,28 +94,28 @@ class InfiniteNDimensionalGrid {
 	getValues(coords, totals = [ACTIVE, INACTIVE]) {
 		let counts = totals.reduce((obj, v) => ((obj[v] = 0), obj), {});
 		for (let coord of coords) {
-			counts[this.grid[coord]] += 1;
+			let type = this.grid[coord] || INACTIVE;
+			counts[type] += 1;
 		}
 
 		return counts;
 	}
 
-	/**
-	 * @param {String} coord 
-	 */
-	set(coord, val) {
-		let coord_arr = coord.join(',').map(v => parseInt(v, 10));
-		this.grid[coord] = val;
-		for (let d = 0; d < coord_arr.length; d++) {
-			if (coord_arr[d] < this.min[d])
+	saveUndefinedCoords(coords, map, defaultValue = INACTIVE) {
+		for (let coord of coords) {
+			if (this.grid[coord] === undefined) {
+				map[coord] = defaultValue;
+			}
 		}
 	}
 
 	tick() {
+		let extra_neighbors = {};
 		let new_grid = {};
 		let coords = Object.entries(this.grid);
 		for (let [coord, value] of coords) {
 			let neighbors = this.getNeighbors(coord);
+			this.saveUndefinedCoords(neighbors, extra_neighbors);
 			let neighbor_values = this.getValues(neighbors);
 			if (value === ACTIVE) {
 				// If a cube is active and exactly 2 or 3 of its neighbors are also active, the cube remains active.
@@ -130,12 +127,28 @@ class InfiniteNDimensionalGrid {
 				}
 			} else if (value === INACTIVE) {
 				// If a cube is inactive but exactly 3 of its neighbors are active, the cube becomes active.
-				if (neighbor_values[INACTIVE] === 3) {
+				if (neighbor_values[ACTIVE] === 3) {
 					new_grid[coord] = ACTIVE;
 				} else {
 					// Otherwise, the cube remains inactive.
 					new_grid[coord] = INACTIVE;
 				}
+			}
+		}
+
+		for (let [coord, value] of Object.entries(extra_neighbors)) {
+			let neighbors = this.getNeighbors(coord);
+			let neighbor_values = this.getValues(neighbors);
+			if (value === INACTIVE) {
+				// If a cube is inactive but exactly 3 of its neighbors are active, the cube becomes active.
+				if (neighbor_values[ACTIVE] === 3) {
+					new_grid[coord] = ACTIVE;
+				} else {
+					// Otherwise, the cube remains inactive.
+					// Don't write, to keep our grid size small
+				}
+			} else if (value === ACTIVE) {
+				throw 'Something went wrong!';
 			}
 		}
 

@@ -8,6 +8,15 @@ const input = fs
 	.split('\n')
 	.map((row) => row.split(''));
 
+const sampleInput = `.#.
+..#
+###`
+	.toString()
+	.trim()
+	.split('\n')
+	.map((row) => row.split(''));
+
 module.exports = {
 	input,
+	sampleInput,
 };
