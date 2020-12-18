@@ -2,10 +2,11 @@ const ACTIVE = '#';
 const INACTIVE = '.';
 
 class InfiniteNDimensionalGrid {
-	constructor({ intial_grid, dimensions, part }) {
+	constructor({ intial_grid, dimensions, part, default_value = INACTIVE }) {
 		this.original_grid_str = JSON.stringify(intial_grid);
 		this.dimensions = dimensions;
 		this.part = part;
+		this.default_value = default_value;
 
 		/**
 		 * If we have three dimensions, the keys would be `x,y,z`
@@ -94,7 +95,7 @@ class InfiniteNDimensionalGrid {
 	getValues(coords, totals = [ACTIVE, INACTIVE]) {
 		let counts = totals.reduce((obj, v) => ((obj[v] = 0), obj), {});
 		for (let coord of coords) {
-			let type = this.grid[coord] || INACTIVE;
+			let type = this.grid[coord] || this.default_value;
 			counts[type] += 1;
 		}
 
@@ -110,13 +111,31 @@ class InfiniteNDimensionalGrid {
 	}
 
 	tick() {
+		/**
+		 * One thing that is tricky is, besides looping through all _bespoke_
+		 * coords we have set, we want the _INACTIVE **edges**_ of the ACTIVE cells
+		 * because they could become ACTIVE.
+		 *
+		 * So, when looping over our cells, any neighbor that is undefined, save
+		 * that. Worst case, we have extra cells to check, but it guarantees
+		 * we get all the INACTIVE cells that should become ACTIVE since by
+		 * definition, an INACTIVE cell can only become ACTIVE if it has
+		 * ACTIVE neighbors.
+		 *
+		 * In fact, an optimization that can be done is to not copy over
+		 * INACTIVE cells rather than record them, and only iterate over our
+		 * INACTIVE cells that are neighbors to the ACTIVE ones.
+		 */
 		let extra_neighbors = {};
 		let new_grid = {};
 		let coords = Object.entries(this.grid);
 		for (let [coord, value] of coords) {
 			let neighbors = this.getNeighbors(coord);
-			this.saveUndefinedCoords(neighbors, extra_neighbors);
 			let neighbor_values = this.getValues(neighbors);
+
+			// Modifies `extra_neighbors` in place
+			this.saveUndefinedCoords(neighbors, extra_neighbors);
+
 			if (value === ACTIVE) {
 				// If a cube is active and exactly 2 or 3 of its neighbors are also active, the cube remains active.
 				if (neighbor_values[ACTIVE] === 2 || neighbor_values[ACTIVE] === 3) {
@@ -136,9 +155,11 @@ class InfiniteNDimensionalGrid {
 			}
 		}
 
+		// Not the most DRY, but not worth abstracting out
 		for (let [coord, value] of Object.entries(extra_neighbors)) {
 			let neighbors = this.getNeighbors(coord);
 			let neighbor_values = this.getValues(neighbors);
+
 			if (value === INACTIVE) {
 				// If a cube is inactive but exactly 3 of its neighbors are active, the cube becomes active.
 				if (neighbor_values[ACTIVE] === 3) {
