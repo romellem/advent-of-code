@@ -11,7 +11,7 @@ const OPERATORS = {
 // Poor man's "replaceAll"
 const replaceAll = (str, searchFor, replaceWith) => str.split(searchFor).join(replaceWith);
 
-function calculate(input) {
+function calculate(input, operator_precedence = []) {
 	input = input.trim();
 
 	/**
@@ -26,6 +26,7 @@ function calculate(input) {
 	// Parse numbers, leave all other tokens as strings
 	let tokens = input.split(' ').map((v) => (/\d+/.test(v) ? parseInt(v, 10) : v));
 
+	// Resolve all parens first
 	while (tokens.includes(CLOSE_PAREN)) {
 		let close_paren = tokens.indexOf(CLOSE_PAREN);
 		let open_paren = indexOfFrom(OPEN_PAREN, tokens, close_paren);
@@ -33,50 +34,14 @@ function calculate(input) {
 		// Slices `['(', 4, '+', 5, ')']` to `[4, '+', 5]`
 		let slice = tokens.slice(open_paren + 1, close_paren);
 		const slice_length = slice.length;
-		let total = reduce(slice);
+
+		let total = reduce(slice, operator_precedence);
 
 		// `+ 2` for the parens
 		tokens.splice(open_paren, slice_length + 2, total);
 	}
 
-	let total = reduce(tokens);
-	return total;
-}
-
-function calculate2(input) {
-	input = input.trim();
-	if (!input) {
-		return;
-	}
-
-	input = input.split('(').join('( ');
-	input = input.split(')').join(' )');
-
-	let tokens = input.split(' ').map((v) => (/\d+/.test(v) ? parseInt(v, 10) : v));
-
-	while (tokens.includes(')')) {
-		let close_paren = tokens.indexOf(')');
-		let open_paren = indexOfFrom('(', tokens, close_paren);
-		let slice = tokens.slice(open_paren + 1, close_paren);
-		const orig_length = slice.length;
-
-		while (slice.includes('+')) {
-			let plus = slice.indexOf('+');
-			let sum = slice[plus - 1] + slice[plus + 1];
-			slice.splice(plus - 1, 3, sum);
-		}
-
-		let total = reduce(slice);
-		tokens.splice(open_paren, orig_length + 2, total);
-	}
-
-	while (tokens.includes('+')) {
-		let plus = tokens.indexOf('+');
-		let sum = tokens[plus - 1] + tokens[plus + 1];
-		tokens.splice(plus - 1, 3, sum);
-	}
-
-	let total = reduce(tokens);
+	let total = reduce(tokens, operator_precedence);
 	return total;
 }
 
@@ -90,11 +55,16 @@ function indexOfFrom(char, arr, from) {
 
 function reduce(_tokens, operator_precedence = []) {
 	let tokens = _tokens.slice(0);
+
+	// If the operators have a specific precedence
 	if (operator_precedence.length) {
 		for (let current_operator of operator_precedence) {
 			while (tokens.includes(current_operator)) {
 				let operator_index = tokens.indexOf(current_operator);
-				let result = OPERATORS[current_operator](tokens[operator_index - 1], tokens[operator_index + 1]);
+				let result = OPERATORS[current_operator](
+					tokens[operator_index - 1],
+					tokens[operator_index + 1]
+				);
 				tokens.splice(operator_index - 1, 3, result);
 			}
 		}
@@ -116,5 +86,6 @@ function reduce(_tokens, operator_precedence = []) {
 
 module.exports = {
 	calculate,
-	calculate2,
+	ADD,
+	MULTIPLY,
 };
