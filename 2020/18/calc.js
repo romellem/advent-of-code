@@ -11,7 +11,7 @@ const OPERATORS = {
 // Poor man's "replaceAll"
 const replaceAll = (str, searchFor, replaceWith) => str.split(searchFor).join(replaceWith);
 
-function calculate(input, operator_precedence = []) {
+function calculate(input, operator_precedence = { [ADD]: 1, [MULTIPLY]: 1 }) {
 	input = input.trim();
 
 	/**
@@ -29,8 +29,7 @@ function calculate(input, operator_precedence = []) {
 	// Resolve all parens first
 	while (tokens.includes(CLOSE_PAREN)) {
 		let close_paren = tokens.indexOf(CLOSE_PAREN);
-		let open_paren = indexOfFrom(OPEN_PAREN, tokens, close_paren);
-		// let open_paren = tokens.lastIndexOf(OPEN_PAREN, close_paren);
+		let open_paren = tokens.lastIndexOf(OPEN_PAREN, close_paren);
 
 		// Slices `['(', 4, '+', 5, ')']` to `[4, '+', 5]`
 		let slice = tokens.slice(open_paren + 1, close_paren);
@@ -46,15 +45,9 @@ function calculate(input, operator_precedence = []) {
 	return total;
 }
 
-function indexOfFrom(char, arr, from) {
-	for (let i = from; i >= 0; i--) {
-		if (arr[i] === char) return i;
-	}
-
-	return -1;
-}
-
 /**
+ * @type {Function}
+ *
  * @example createIterablePrecedence({ '+': 1, '*': 1}) // returns [['+', '*']]
  * @example createIterablePrecedence({ '+': 1, '*': 2}) // returns [['+'], ['*']]
  * @example createIterablePrecedence({ '+': 1, '-': 1, '*': 2}) // returns [['+', '-'], ['*']]
@@ -93,12 +86,12 @@ function getMinIndexOf(arr, ...chars) {
 	let min_index;
 	for (let char of chars) {
 		let index = arr.indexOf(char);
-		if (min_index === undefined || index < min_index) {
+		if (index !== -1 && (min_index === undefined || index < min_index)) {
 			min_index = index;
 		}
 	}
 
-	return min_index ?? -1;
+	return min_index === undefined ? -1 : min_index;
 }
 
 function arrayIncludesOneOf(arr, items) {
@@ -108,7 +101,7 @@ function arrayIncludesOneOf(arr, items) {
 	return false;
 }
 
-function reduce(_tokens, operator_precedence = { [ADD]: 1, [MULTIPLY]: 1 }) {
+function reduce(_tokens, operator_precedence) {
 	let iterable_precedence = createIterablePrecedence(operator_precedence);
 
 	let tokens = _tokens.slice(0);
@@ -123,6 +116,10 @@ function reduce(_tokens, operator_precedence = { [ADD]: 1, [MULTIPLY]: 1 }) {
 			);
 			tokens.splice(operator_index - 1, 3, result);
 		}
+	}
+
+	if (tokens.length > 1) {
+		throw new Error(`Tokens were not correctly reduced: ${tokens}`);
 	}
 
 	return tokens[0];
