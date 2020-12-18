@@ -37,7 +37,7 @@ function calculate(input, operator_precedence = { [ADD]: 1, [MULTIPLY]: 1 }) {
 
 		let total = reduce(slice, operator_precedence);
 
-		// `+ 2` for the parens
+		// The `+ 2` is for the parens we removed in the slice
 		tokens.splice(open_paren, slice_length + 2, total);
 	}
 
@@ -46,8 +46,12 @@ function calculate(input, operator_precedence = { [ADD]: 1, [MULTIPLY]: 1 }) {
 }
 
 /**
- * @type {Function}
+ * A helper function to make entering an operator precedence easier from a
+ * user perspective. Of course, with this puzzle, I could have forgone this
+ * completely, but found is easy enough to code through. Memoized as well
+ * to reduce computation time.
  *
+ * @type {Function}
  * @example createIterablePrecedence({ '+': 1, '*': 1}) // returns [['+', '*']]
  * @example createIterablePrecedence({ '+': 1, '*': 2}) // returns [['+'], ['*']]
  * @example createIterablePrecedence({ '+': 1, '-': 1, '*': 2}) // returns [['+', '-'], ['*']]
@@ -82,6 +86,13 @@ const createIterablePrecedence = (() => {
 	};
 })();
 
+/**
+ * @example getMinIndexOf([1, '+', 2, '*' , 3], ...['+', '*']) // returns 1
+ * @example getMinIndexOf([1, '*', 2, '+' , 3], ...['+', '*']) // returns 1
+ * @param {Array} arr 
+ * @param  {...Any} chars - Searches the Array for the smallest index of one of the chars passed
+ * @returns {Number} - Returns the index of the first char found, or -1 if none of the chars are present in the array.
+ */
 function getMinIndexOf(arr, ...chars) {
 	let min_index;
 	for (let char of chars) {
@@ -94,20 +105,31 @@ function getMinIndexOf(arr, ...chars) {
 	return min_index === undefined ? -1 : min_index;
 }
 
-function arrayIncludesOneOf(arr, items) {
+/**
+ * @example arrayIncludesOneOf([1, 2, 3], 2, 3) // returns true
+ * @example arrayIncludesOneOf([1, 2, 3], 3, 5) // returns true
+ * @example arrayIncludesOneOf([1, 2, 3], 4, 5) // returns false
+ * @param {Array} arr 
+ * @param  {...any} items
+ * @returns {Boolean}
+ */
+function arrayIncludesOneOf(arr, ...items) {
 	for (let item of items) {
 		if (arr.includes(item)) return true;
 	}
 	return false;
 }
 
+/**
+ * @returns {Number}
+ */
 function reduce(_tokens, operator_precedence) {
 	let iterable_precedence = createIterablePrecedence(operator_precedence);
 
 	let tokens = _tokens.slice(0);
 
 	for (let operators of iterable_precedence) {
-		while (arrayIncludesOneOf(tokens, operators)) {
+		while (arrayIncludesOneOf(tokens, ...operators)) {
 			let operator_index = getMinIndexOf(tokens, ...operators);
 			let current_operator = tokens[operator_index];
 			let result = OPERATORS[current_operator](
