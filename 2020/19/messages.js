@@ -1,5 +1,7 @@
-// 
-function getRegexForId(id, rules, MAX_DEPTH) {
+// Arbitrary value
+const DEFAULT_MAX_DEPTH = 60;
+
+function getRegexForId(id, rules, MAX_DEPTH = DEFAULT_MAX_DEPTH) {
 	let base_rules = Object.values(rules).filter(({ parts }) => typeof parts === 'string');
 	let computed_rules = {};
 	for (let { id, parts } of base_rules) {
@@ -54,7 +56,7 @@ function getRegexForId(id, rules, MAX_DEPTH) {
 	0: ['(', "a", ['(', ['(', "a", "a", '|', "b", "b", ')'], ['(', "a", "b", '|', "a", "b", ')'], '|', ['(', "a", "b", '|', "b", "a", ')'], ['(', "a", "a", '|', "b", "b", ')'], ')'], 5, ')']
 	0: ['(', "a", ['(', ['(', "a", "a", '|', "b", "b", ')'], ['(', "a", "b", '|', "a", "b", ')'], '|', ['(', "a", "b", '|', "b", "a", ')'], ['(', "a", "a", '|', "b", "b", ')'], ')'], "b", ')']
 */
-function buildUpIdFromRules(id, rules, computed_rules, MAX_DEPTH, depth = 0) {
+function buildUpIdFromRules(id, rules, computed_rules, MAX_DEPTH = DEFAULT_MAX_DEPTH, depth = 0) {
 	if (computed_rules[id]) {
 		return computed_rules[id];
 	}
@@ -62,7 +64,7 @@ function buildUpIdFromRules(id, rules, computed_rules, MAX_DEPTH, depth = 0) {
 	let { parts } = rules[id];
 	let expanded_parts = parts
 		.map((v) => {
-			if (MAX_DEPTH !== undefined && depth > MAX_DEPTH) {
+			if (depth > MAX_DEPTH) {
 				// Bail on an arbitrarily large depth
 				// This can probably be computed by the longest input code, but trial and error works well enough to determine the answer
 				return undefined;
@@ -80,4 +82,5 @@ function buildUpIdFromRules(id, rules, computed_rules, MAX_DEPTH, depth = 0) {
 
 module.exports = {
 	getRegexForId,
+	DEFAULT_MAX_DEPTH,
 };
