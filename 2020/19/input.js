@@ -2,14 +2,16 @@ const path = require('path');
 const fs = require('fs');
 
 function tokenizeRule(rule) {
-	// @example '53: 86 6 | 52 134'
-	// @example '0: 8 11'
+	// @example '53: 86 6 | 52 134' -> parts: [86, 6, '|', 52, 134]
+	// @example '0: 8 11' -> parts: [8, 1]
+	// @example '86: "a"' parts: ['a']
 	let [id, parts] = rule.split(': ');
 	id = parseInt(id, 10);
+
 	parts = parts
 		.trim()
 		.split(' ')
-		.map((v) => (/\d+/.test(v) ? parseInt(v, 10) : v));
+		.map((v) => (/\d+/.test(v) ? parseInt(v, 10) : v.includes('"') ? v[1] : v));
 
 	return {
 		id,
