@@ -12,7 +12,7 @@ function tokenizeRule(rule) {
 		// parts === '"b"'
 		parts = parts[1];
 	} else {
-		parts = ['(', ...parts.split(' ').map((v) => (/\d+/.test(v) ? parseInt(v, 10) : v)), ')'];
+		parts = ['(?:', ...parts.split(' ').map((v) => (/\d+/.test(v) ? parseInt(v, 10) : v)), ')'];
 	}
 
 	return {
