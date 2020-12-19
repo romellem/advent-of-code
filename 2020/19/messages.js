@@ -1,11 +1,12 @@
-function getRegexForId(id, rules) {
+// 
+function getRegexForId(id, rules, MAX_DEPTH) {
 	let base_rules = Object.values(rules).filter(({ parts }) => typeof parts === 'string');
 	let computed_rules = {};
 	for (let { id, parts } of base_rules) {
 		computed_rules[id] = parts;
 	}
 
-	let computed_rules_for_id = buildUpIdFromRules(id, rules, computed_rules);
+	let computed_rules_for_id = buildUpIdFromRules(id, rules, computed_rules, MAX_DEPTH);
 	let regex_str = computed_rules_for_id.flat(Infinity).join('');
 
 	return new RegExp(`^${regex_str}$`);
@@ -53,7 +54,7 @@ function getRegexForId(id, rules) {
 	0: ['(', "a", ['(', ['(', "a", "a", '|', "b", "b", ')'], ['(', "a", "b", '|', "a", "b", ')'], '|', ['(', "a", "b", '|', "b", "a", ')'], ['(', "a", "a", '|', "b", "b", ')'], ')'], 5, ')']
 	0: ['(', "a", ['(', ['(', "a", "a", '|', "b", "b", ')'], ['(', "a", "b", '|', "a", "b", ')'], '|', ['(', "a", "b", '|', "b", "a", ')'], ['(', "a", "a", '|', "b", "b", ')'], ')'], "b", ')']
 */
-function buildUpIdFromRules(id, rules, computed_rules, depth = 0) {
+function buildUpIdFromRules(id, rules, computed_rules, MAX_DEPTH, depth = 0) {
 	if (computed_rules[id]) {
 		return computed_rules[id];
 	}
@@ -61,14 +62,14 @@ function buildUpIdFromRules(id, rules, computed_rules, depth = 0) {
 	let { parts } = rules[id];
 	let expanded_parts = parts
 		.map((v) => {
-			if (depth > 50) {
+			if (MAX_DEPTH !== undefined && depth > MAX_DEPTH) {
 				// Bail on an arbitrarily large depth
 				// This can probably be computed by the longest input code, but trial and error works well enough to determine the answer
 				return undefined;
 			} else if (typeof v === 'string') {
 				return v;
 			} else {
-				return buildUpIdFromRules(v, rules, computed_rules, depth + 1);
+				return buildUpIdFromRules(v, rules, computed_rules, MAX_DEPTH, depth + 1);
 			}
 		})
 		.filter((v) => v);
