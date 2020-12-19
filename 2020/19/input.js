@@ -3,7 +3,7 @@ const fs = require('fs');
 
 function tokenizeRule(rule) {
 	// @example '53: 86 6 | 52 134' -> parts: [[86, 6], [52, 134]]
-	// @example '0: 8 11' -> parts: [8, 1]
+	// @example '0: 8 11' -> parts: [[8, 1]]
 	// @example '86: "a"' parts: 'a'
 	let [id, parts] = rule.split(': ');
 	id = parseInt(id, 10);
