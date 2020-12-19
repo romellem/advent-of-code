@@ -49,6 +49,7 @@ const [sample_rules_raw, sample_codes_raw] = splitUpChunks(`0: 4 1 5
 5: "b"`);
 
 module.exports = {
+	tokenizeRule,
 	input: { rules, codes },
 	sampleInput: {
 		rules: sample_rules_raw
