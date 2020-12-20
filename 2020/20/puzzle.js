@@ -266,10 +266,12 @@ class Puzzle {
 
 	orientPieces() {
 		/**
-		 * Here is a question: of my four corners, which one is the _top left?_
-		 * The answer: it doesn't matter! Because the final picture can _itself_
-		 * still be rotated or flipped, I just need to pick one and orient the pieces
-		 * _as if_ that corner was the top left.
+		 * Here is a question: of my four corners, which one is the top left?
+		 * Which one is the bottom right? The answer is: _it doesn't matter!_
+		 *
+		 * Because the overall picture _itself_ can be rotated and flipped, I
+		 * just need to pick a *valid* corner, fix one of its orientations, then
+		 * start building my picture recursively based on its connections.
 		 *
 		 * After I have all the pieces oriented, I can strip off the "border" of each
 		 * tile (shrinking each piece from 10 x 10 to 8 x 8) and join all 144 of them
