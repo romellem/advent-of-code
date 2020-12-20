@@ -176,10 +176,6 @@ class PuzzlePiece {
 		}
 	}
 
-	countConnections() {
-		return this.connections.size;
-	}
-
 	/**
 	 * @returns {String} - Returns string of _current_ piece orientation.
 	 */
@@ -197,10 +193,15 @@ class Puzzle {
 		for (let [piece_a, piece_b] of G.combination(this.pieces, 2)) {
 			piece_a.tryToFit(piece_b);
 		}
-
-		for (let piece of this.pieces) {
-			console.log(piece.countConnections());
 	}
+
+	/**
+	 * Assumes we don't have trickery where a piece can have multiple connections
+	 * but an _optimal_ orientation and grid alignment puts it in the right place.
+	 * Looks like our input _does indeed_ generate pieces with 2, 3, or 4 connections.
+	 */
+	getIdsOfPiecesWithNConnections(n) {
+		return this.pieces.filter(piece => piece.connections.size === n).map(p => p.id);
 	}
 }
 
