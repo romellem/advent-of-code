@@ -3,6 +3,8 @@ const G = require('generatorics');
 /**
  * Rotates a square 2d array 90 degrees clockwise in place
  * @link https://code.likeagirl.io/rotate-an-2d-matrix-90-degree-clockwise-without-create-another-array-49209ea8b6e6
+ * @param {Array<Array>} matrix
+ * @returns {Array<Array>}
  */
 function rotate(matrix) {
 	const n = matrix.length;
@@ -10,7 +12,7 @@ function rotate(matrix) {
 	const y = n - 1;
 	for (let i = 0; i < x; i++) {
 		for (let j = i; j < y - i; j++) {
-			k = matrix[i][j];
+			let k = matrix[i][j];
 			matrix[i][j] = matrix[y - j][i];
 			matrix[y - j][i] = matrix[y - i][y - j];
 			matrix[y - i][y - j] = matrix[j][y - i];
@@ -21,14 +23,21 @@ function rotate(matrix) {
 	return matrix;
 }
 
-function flipY(m) {
-	for (let i = 0; i < Math.floor(m.length / 2); i++) {
-		let t = m[i];
-		m[i] = m[m.length - (i + 1)];
-		m[m.length - (i + 1)] = t;
+/**
+ * Flips a matrix in the `y` direction in place.
+ * @param {Array<Array>} matrix
+ * @returns {Array<Array>}
+ */
+function flipY(matrix) {
+	const n = matrix.length;
+	const half = Math.floor(n / 2);
+	for (let i = 0; i < half; i++) {
+		let t = matrix[i];
+		matrix[i] = matrix[n - (i + 1)];
+		matrix[n - (i + 1)] = t;
 	}
 
-	return m;
+	return matrix;
 }
 
 function picture(squares) {}
