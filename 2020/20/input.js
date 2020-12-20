@@ -8,12 +8,13 @@ const input = fs
 	.split('\n\n')
 	.map((tile) => {
 		let lines = tile.split('\n');
-		let id_raw = tile.shift();
+		let id_raw = lines.shift();
 
 		// Tile 3457:
 		let [, id] = /Tile (\d+):/.exec(id_raw);
-		let square = lines.map((row) => row.split(''));
-		return { id, square };
+		id = parseInt(id, 10);
+		let piece = lines.join('\n');
+		return { id, piece };
 	});
 
 module.exports = {

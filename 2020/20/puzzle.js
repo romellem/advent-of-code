@@ -79,16 +79,24 @@ function flipX(matrix) {
 }
 
 class PuzzlePiece {
-	constructor(piece) {
-		this.piece_str = JSON.stringify(piece);
-		this.piece = JSON.parse(this.piece_str);
-		this.orientations = this.generateOrientations();
+	/**
+	 * 
+	 * @param {Object} opt
+	 * @param {Number} opt.id 
+	 * @param {String} opt.piece 
+	 */
+	constructor({ id, piece }) {
+		this.id = id;
+		this.piece_str = piece;
+		this.piece = piece.split('\n').map(row => row.split(''));
 		this.edge_length = this.piece.length;
 
-		this.top = new Set();
-		this.left = new Set();
-		this.right = new Set();
-		this.bottom = new Set();
+		this.orientations = this.generateOrientations();
+
+		this[TOP] = new Set();
+		this[LEFT] = new Set();
+		this[RIGHT] = new Set();
+		this[BOTTOM] = new Set();
 	}
 
 	/**
@@ -98,42 +106,53 @@ class PuzzlePiece {
 		let orientations = [];
 		for (let i = 0; i < 4; i++) {
 			rotate(this.piece);
-			orientations.push(this.piece.toString());
+			orientations.push(this.toString());
 			flipY(this.piece);
-			orientations.push(this.piece.toString());
+			orientations.push(this.toString());
 		}
 
 		return uniq(orientations);
 	}
 
-	getEdge(side) {
+	getEdge(side, square_str) {
 		switch (side) {
 			case TOP:
-				return this.row(0);
+				return this.row(0, square_str);
 			case BOTTOM:
-				return this.row(this.outer_index);
+				return this.row(this.edge_length - 1, square_str);
 			case LEFT:
-				return this.col(0);
+				return this.col(0, square_str);
 			case RIGHT:
-				return this.col(this.outer_index);
+				return this.col(this.edge_length - 1, square_str);
 		}
 	}
 
 	row(i, square_str) {
 		if (square_str) {
+			const n = this.edge_length;
+
+			// Add `i` to offset the '\n' chars
+			return square_str.slice(i * n + i, i * n + n + i);
 		} else {
 			return this.piece[i].join('');
 		}
 	}
+
 	col(i, square_str) {
+		let str = '';
 		if (square_str) {
+			for (let row = 0; row < this.edge_length; row++) {
+				// Add `row` to offset the '\n' chars
+				let y = row * this.edge_length + row + i;
+				str += square_str[y];
+			}
 		} else {
-			let str = '';
 			for (let y = 0; y < this.piece.length; y++) {
 				str += this.piece[y][i];
 			}
-			return str;
 		}
+
+		return str;
 	}
 
 	fit(other_piece, side) {
@@ -145,46 +164,20 @@ class PuzzlePiece {
 	tryToFit(other_piece) {
 		for (let side of SIDES) {
 			let other_side = SIDE_COMPLEMENT[side];
+			for (let [self, other] of G.cartesian(this.orientations, other_piece.orientations)) {
+				let self_edge = this.getEdge(side, self);
+				let other_edge = this.getEdge(other_side, other);
+				if (self_edge === other_edge) {
+					// e.g. Fit _this_ top edge to the other's bottom edge
+					this.fit(other_piece, side);
+					break;
+				}
+			}
 		}
 	}
 
-	canFit(other_piece) {
-		let can_fit = false;
-		for (let i = 0; i < 4; i++) {
-			rotate(this.piece);
-			for (let attempt of [
-				['top', 'row', 0, 9],
-				['bottom', 'row', 9, 0],
-				['left', 'col', 0, 9],
-				['right', 'col', 9, 0],
-			]) {
-				let [place, fn, this_n, that_n] = attempt;
-				let this_val = this[fn](this_n);
-				let other_val = other_piece[fn](that_n);
-				if (this_val === other_val && !this[place].includes(other_piece)) {
-					this[place].push(other_piece);
-					can_fit = true;
-				}
-			}
-
-			flipY(this.piece);
-			for (let attempt of [
-				['top', 'row', 0, 9],
-				['bottom', 'row', 9, 0],
-				['left', 'col', 0, 9],
-				['right', 'col', 9, 0],
-			]) {
-				let [place, fn, this_n, that_n] = attempt;
-				let this_val = this[fn](this_n);
-				let other_val = other_piece[fn](that_n);
-				if (this_val === other_val && !this[place].includes(other_piece)) {
-					this[place].push(other_piece);
-					can_fit = true;
-				}
-			}
-		}
-
-		return can_fit;
+	countConnections() {
+		return SIDES.reduce((sum, side) => sum + this[side].size, 0);
 	}
 
 	/**
@@ -200,30 +193,15 @@ class Puzzle {
 		this.pieces = pieces;
 	}
 
-	solve() {
-		for (let [a, b] of G.combination(this.pieces, 2)) {
-			a.canFit(b);
+	connectPieces() {
+		for (let [piece_a, piece_b] of G.combination(this.pieces)) {
+			piece_a.tryToFit(piece_b);
 		}
 
-		let tl = 0;
-		let tr = 0;
-		let bl = 0;
-		let br = 0;
 		for (let piece of this.pieces) {
-			if (piece.top.length === 0 && pieces.left.length === 0) {
-				console.log('tl', ++tl);
-			}
-			if (piece.top.length === 0 && pieces.right.length === 0) {
-				console.log('tr', ++tr);
-			}
-			if (piece.bottom.length === 0 && pieces.left.length === 0) {
-				console.log('bl', ++bl);
-			}
-			if (piece.bottom.length === 0 && pieces.right.length === 0) {
-				console.log('br', ++br);
-			}
+			console.log(piece.countConnections());
 		}
 	}
 }
 
-module.exports = { Puzzle, Piece };
+module.exports = { Puzzle, PuzzlePiece };
