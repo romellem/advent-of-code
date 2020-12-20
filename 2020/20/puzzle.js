@@ -187,9 +187,19 @@ class PuzzlePiece {
 		return (self_edge === other_edge);
 	}
 
-	tryToFit(other_piece) {
+	tryToFit(other_piece, orientation_index = 0) {
+		/**
+		 * Pick some random orientation for itself.
+		 * Building the connections, I don't care _how_
+		 * they connect together. So, I only need to take
+		 * _some_ orientation and then test that against all
+		 * the orientations of the other piece (in all possible
+		 * sides). This is faster than looking at all _pairs_
+		 * of both collections of orientations.
+		 */
+		let self = this.orientations[orientation_index];
 		for (let side of SIDES) {
-			for (let [self, other] of G.cartesian(this.orientations, other_piece.orientations)) {
+			for (let other of other_piece.orientations) {
 				let can_be_joined = this.canJoinOrientationWithOtherAlong(self, other, side);
 				if (can_be_joined) {
 					this.fit(other_piece);
