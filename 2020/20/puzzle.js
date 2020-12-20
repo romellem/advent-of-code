@@ -112,6 +112,10 @@ class PuzzlePiece {
 		return uniq(orientations);
 	}
 
+	getOrientationAsPieceArray(i) {
+		return this.orientations[i].split('\n').map(row => row.split(''));
+	}
+
 	getEdge(side, square_str) {
 		switch (side) {
 			case TOP:
@@ -196,7 +200,7 @@ class Puzzle {
 
 		for (let piece of this.pieces) {
 			console.log(piece.countConnections());
-		}
+	}
 	}
 }
 
