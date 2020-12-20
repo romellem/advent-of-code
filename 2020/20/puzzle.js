@@ -98,6 +98,7 @@ class PuzzlePiece {
 		this.piece_str = piece;
 		this.piece = piece.split('\n').map((row) => row.split(''));
 		this.edge_length = this.piece.length;
+		this.edge_cache = SIDES.reduce((obj, side) => (obj[side] = {}, obj), {});
 
 		this.orientations = this.generateOrientations();
 
@@ -130,16 +131,24 @@ class PuzzlePiece {
 	 * @param {String} square_str 
 	 */
 	getEdge(side, square_str) {
+		if (!this.edge_cache[side][square_str]) {
 		switch (side) {
 			case TOP:
-				return this.row(0, square_str);
+					this.edge_cache[side][square_str] = this.row(0, square_str);
+					break;
 			case BOTTOM:
-				return this.row(this.edge_length - 1, square_str);
+					this.edge_cache[side][square_str] = this.row(this.edge_length - 1, square_str);
+					break;
 			case LEFT:
-				return this.col(0, square_str);
+					this.edge_cache[side][square_str] = this.col(0, square_str);
+					break;
 			case RIGHT:
-				return this.col(this.edge_length - 1, square_str);
+					this.edge_cache[side][square_str] = this.col(this.edge_length - 1, square_str);
+					break;
 		}
+	}
+
+		return this.edge_cache[side][square_str];
 	}
 
 	row(i, square_str) {
@@ -193,7 +202,7 @@ class PuzzlePiece {
 				let can_be_joined = this.canJoinOrientationWithOtherAlong(self, other, side);
 				if (can_be_joined) {
 					this.fit(other_piece);
-					break;
+					return;
 				}
 			}
 		}
@@ -222,6 +231,7 @@ class Puzzle {
 
 	connectPieces() {
 		for (let [piece_a, piece_b] of G.combination(this.pieces, 2)) {
+			if (piece_a.connections.size < 4 && piece_b.connections.size < 4)
 			piece_a.tryToFit(piece_b);
 		}
 
