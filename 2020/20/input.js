@@ -19,10 +19,11 @@ const toPiecesInput = (filename) =>
 		});
 
 const input = toPiecesInput('input.txt');
-
+const sampleInput1 = toPiecesInput('sample-input-1.txt');
 const sampleInput2 = toPiecesInput('sample-input-2.txt');
 
 module.exports = {
 	input,
+	sampleInput1,
 	sampleInput2,
 };
