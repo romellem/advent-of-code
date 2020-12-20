@@ -96,7 +96,7 @@ class PuzzlePiece {
 	constructor({ id, piece }) {
 		this.id = id;
 		this.piece_str = piece;
-		this.piece = piece.split('\n').map(row => row.split(''));
+		this.piece = piece.split('\n').map((row) => row.split(''));
 		this.edge_length = this.piece.length;
 
 		this.orientations = this.generateOrientations();
@@ -121,7 +121,7 @@ class PuzzlePiece {
 	}
 
 	getOrientationAsPieceArray(i) {
-		return this.orientations[i].split('\n').map(row => row.split(''));
+		return this.orientations[i].split('\n').map((row) => row.split(''));
 	}
 
 	/**
@@ -231,7 +231,7 @@ class Puzzle {
 	 * of them allows for all tiles to be arranged in its 12 x 12 grid.
 	 */
 	getIdsOfPiecesWithNConnections(n) {
-		return this.pieces.filter(piece => piece.connections.size === n).map(p => p.id);
+		return this.pieces.filter((piece) => piece.connections.size === n).map((p) => p.id);
 	}
 }
 
