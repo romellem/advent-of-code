@@ -162,13 +162,19 @@ class PuzzlePiece {
 		other_piece.connections.add(this);
 	}
 
+	canJoinOrientationWithOtherAlong(self_orientation, other_orientation, self_side) {
+		let other_side = SIDE_COMPLEMENT[self_side];
+		let self_edge = this.getEdge(self_side, self_orientation);
+		let other_edge = this.getEdge(other_side, other_orientation);
+
+		return (self_edge === other_edge);
+	}
+
 	tryToFit(other_piece) {
 		for (let side of SIDES) {
-			let other_side = SIDE_COMPLEMENT[side];
 			for (let [self, other] of G.cartesian(this.orientations, other_piece.orientations)) {
-				let self_edge = this.getEdge(side, self);
-				let other_edge = this.getEdge(other_side, other);
-				if (self_edge === other_edge) {
+				let can_be_joined = this.canJoinOrientationWithOtherAlong(self, other, side);
+				if (can_be_joined) {
 					this.fit(other_piece);
 					break;
 				}
