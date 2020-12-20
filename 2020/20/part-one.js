@@ -1,3 +1,4 @@
+const { strictEqual } = require('assert');
 const { input } = require('./input');
 const { PuzzlePiece, Puzzle } = require('./puzzle');
 
@@ -7,3 +8,5 @@ puzzle.connectPieces();
 let corners = puzzle.getIdsOfPiecesWithNConnections(2);
 let product = corners.reduce((a, b) => a * b, 1);
 console.log(product);
+
+strictEqual(17250897231301, product);
