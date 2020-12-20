@@ -93,10 +93,7 @@ class PuzzlePiece {
 
 		this.orientations = this.generateOrientations();
 
-		this[TOP] = new Set();
-		this[LEFT] = new Set();
-		this[RIGHT] = new Set();
-		this[BOTTOM] = new Set();
+		this.connections = new Set();
 	}
 
 	/**
@@ -155,10 +152,9 @@ class PuzzlePiece {
 		return str;
 	}
 
-	fit(other_piece, side) {
-		const other_side = SIDE_COMPLEMENT[side];
-		this[side].add(other_piece);
-		other_piece[other_side].add(this);
+	fit(other_piece) {
+		this.connections.add(other_piece);
+		other_piece.connections.add(this);
 	}
 
 	tryToFit(other_piece) {
@@ -168,8 +164,7 @@ class PuzzlePiece {
 				let self_edge = this.getEdge(side, self);
 				let other_edge = this.getEdge(other_side, other);
 				if (self_edge === other_edge) {
-					// e.g. Fit _this_ top edge to the other's bottom edge
-					this.fit(other_piece, side);
+					this.fit(other_piece);
 					break;
 				}
 			}
@@ -177,7 +172,7 @@ class PuzzlePiece {
 	}
 
 	countConnections() {
-		return SIDES.reduce((sum, side) => sum + this[side].size, 0);
+		return this.connections.size;
 	}
 
 	/**
