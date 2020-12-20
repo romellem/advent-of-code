@@ -222,8 +222,10 @@ class Puzzle {
 
 	connectPieces() {
 		for (let [piece_a, piece_b] of G.combination(this.pieces, 2)) {
-			if (piece_a.connections.size < 4 && piece_b.connections.size < 4)
+			// If a piece has 4 connections, we know it won't get anymore, so no need to test
+			if (piece_a.connections.size < 4 && piece_b.connections.size < 4) {
 			piece_a.tryToFit(piece_b);
+		}
 		}
 
 		for (let piece of this.pieces) {
