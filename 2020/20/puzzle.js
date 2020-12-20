@@ -5,6 +5,14 @@ const TOP = 'top';
 const LEFT = 'left';
 const RIGHT = 'right';
 const BOTTOM = 'bottom';
+
+/**
+ * @typedef {String} Side
+ */
+
+/**
+ * @enum {Side}
+ */
 const SIDE_COMPLEMENT = {
 	[TOP]: BOTTOM,
 	[LEFT]: RIGHT,
@@ -116,6 +124,10 @@ class PuzzlePiece {
 		return this.orientations[i].split('\n').map(row => row.split(''));
 	}
 
+	/**
+	 * @param {Side} side
+	 * @param {String} square_str 
+	 */
 	getEdge(side, square_str) {
 		switch (side) {
 			case TOP:
