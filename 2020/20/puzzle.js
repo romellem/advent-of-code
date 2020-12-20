@@ -102,6 +102,7 @@ class PuzzlePiece {
 		this.orientations = this.generateOrientations();
 
 		this.connections = new Set();
+		this.connections_array = undefined;
 	}
 
 	/**
@@ -169,6 +170,10 @@ class PuzzlePiece {
 		return str;
 	}
 
+	convertConnectionsToArray() {
+		this.connections_array = [...this.connections];
+	}
+
 	fit(other_piece) {
 		this.connections.add(other_piece);
 		other_piece.connections.add(this);
@@ -210,6 +215,10 @@ class Puzzle {
 	connectPieces() {
 		for (let [piece_a, piece_b] of G.combination(this.pieces, 2)) {
 			piece_a.tryToFit(piece_b);
+		}
+
+		for (let piece of this.pieces) {
+			piece.convertConnectionsToArray();
 		}
 	}
 
