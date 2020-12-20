@@ -98,7 +98,6 @@ class PuzzlePiece {
 		this.piece_str = piece;
 		this.piece = piece.split('\n').map((row) => row.split(''));
 		this.edge_length = this.piece.length;
-		this.edge_cache = SIDES.reduce((obj, side) => (obj[side] = {}, obj), {});
 
 		this.orientations = this.generateOrientations();
 
@@ -131,24 +130,16 @@ class PuzzlePiece {
 	 * @param {String} square_str 
 	 */
 	getEdge(side, square_str) {
-		if (!this.edge_cache[side][square_str]) {
 		switch (side) {
 			case TOP:
-					this.edge_cache[side][square_str] = this.row(0, square_str);
-					break;
+				return this.row(0, square_str);
 			case BOTTOM:
-					this.edge_cache[side][square_str] = this.row(this.edge_length - 1, square_str);
-					break;
+				return this.row(this.edge_length - 1, square_str);
 			case LEFT:
-					this.edge_cache[side][square_str] = this.col(0, square_str);
-					break;
+				return this.col(0, square_str);
 			case RIGHT:
-					this.edge_cache[side][square_str] = this.col(this.edge_length - 1, square_str);
-					break;
+				return this.col(this.edge_length - 1, square_str);
 		}
-	}
-
-		return this.edge_cache[side][square_str];
 	}
 
 	row(i, square_str) {
