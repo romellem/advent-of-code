@@ -242,6 +242,20 @@ class Puzzle {
 	getIdsOfPiecesWithNConnections(n) {
 		return this.pieces.filter((piece) => piece.connections.size === n).map((p) => p.id);
 	}
+
+	orientPieces() {
+		/**
+		 * Here is a question: of my four corners, which one is the _top left?_
+		 * The answer: it doesn't matter! Because the final picture can _itself_
+		 * still be rotated or flipped, I just need to pick one and orient the pieces
+		 * _as if_ that corner was the top left.
+		 *
+		 * After I have all the pieces oriented, I can strip off the "border" of each
+		 * tile (shrinking each piece from 10 x 10 to 8 x 8) and join all 144 of them
+		 * together into a 12 x 12 picture, making one large 96 x 96 grid (8 * 12 = 96).
+		 */
+		let [top_left] = this.getIdsOfPiecesWithNConnections(2);
+	}
 }
 
 module.exports = { Puzzle, PuzzlePiece };
