@@ -199,6 +199,18 @@ class Puzzle {
 	 * Assumes we don't have trickery where a piece can have multiple connections
 	 * but an _optimal_ orientation and grid alignment puts it in the right place.
 	 * Looks like our input _does indeed_ generate pieces with 2, 3, or 4 connections.
+	 *
+	 * @note Ah, and maybe this _is_ a safe assumption due to the instructions:
+	 *
+	 * > Each tile's image data includes a border that should line up exactly with its
+	 * > adjacent tiles. All tiles have this border, and the border lines up exactly
+	 * > when the tiles are both oriented correctly. Tiles at the edge of the image also
+	 * > have this border, **but the outermost edges won't line up with any other tiles.**
+	 *
+	 * Emphasis added at the end. So we know that we don't have an adversarial input
+	 * where the edges and corners line up with other tiles. However, it isn't clear
+	 * if some inner tile could have more than 4 possible connections, but only one
+	 * of them allows for all tiles to be arranged in its 12 x 12 grid.
 	 */
 	getIdsOfPiecesWithNConnections(n) {
 		return this.pieces.filter(piece => piece.connections.size === n).map(p => p.id);
