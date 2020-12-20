@@ -102,10 +102,11 @@ class PuzzlePiece {
 	generateOrientations() {
 		let orientations = [];
 		for (let i = 0; i < 4; i++) {
-			rotate(this.piece);
 			orientations.push(this.toString());
 			flipY(this.piece);
 			orientations.push(this.toString());
+			flipY(this.piece);
+			rotate(this.piece);
 		}
 
 		return uniq(orientations);
