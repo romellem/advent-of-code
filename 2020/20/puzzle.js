@@ -190,7 +190,7 @@ class Puzzle {
 	}
 
 	connectPieces() {
-		for (let [piece_a, piece_b] of G.combination(this.pieces)) {
+		for (let [piece_a, piece_b] of G.combination(this.pieces, 2)) {
 			piece_a.tryToFit(piece_b);
 		}
 
