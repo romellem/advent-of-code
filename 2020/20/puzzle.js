@@ -88,10 +88,10 @@ function flipX(matrix) {
 
 class PuzzlePiece {
 	/**
-	 * 
+	 *
 	 * @param {Object} opt
-	 * @param {Number} opt.id 
-	 * @param {String} opt.piece 
+	 * @param {Number} opt.id
+	 * @param {String} opt.piece
 	 */
 	constructor({ id, piece }) {
 		this.id = id;
@@ -196,6 +196,14 @@ class PuzzlePiece {
 					break;
 				}
 			}
+		}
+	}
+
+	orientToConnections(...joins) {
+		if (joins.length !== this.connections.length) {
+			throw new Error(
+				`Must provide joins equal to the number of connections. Provided ${joins.length} but there are ${this.connections.length}`
+			);
 		}
 	}
 
