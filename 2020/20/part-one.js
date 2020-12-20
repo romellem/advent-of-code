@@ -1,4 +1,4 @@
-const { input } = require('./input');
+const { input, sampleInput1 } = require('./input');
 const { PuzzlePiece, Puzzle } = require('./puzzle');
 
 let pieces = input.map(piece => new PuzzlePiece(piece));
