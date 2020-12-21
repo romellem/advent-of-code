@@ -1,5 +1,6 @@
 const { uniq } = require('lodash');
 const G = require('generatorics');
+const C = require('colors');
 
 const TOP = 'top';
 const LEFT = 'left';
@@ -86,6 +87,46 @@ function flipX(matrix) {
 	return matrix;
 }
 
+function splitSquare(square) {
+	return square.split('\n').map((row) => row.split(''));
+}
+
+function highlight(square, side, color = 'yellow') {
+	const height = square.length;
+	const width = square[0].length;
+	switch (side) {
+		case TOP:
+			for (let x = 0; x < width; x++) {
+				square[0][x] = C[color](square[0][x]);
+			}
+			break;
+		case BOTTOM:
+			for (let x = 0; x < width; x++) {
+				square[height - 1][x] = C[color](square[height - 1][x]);
+			}
+			break;
+		case LEFT:
+			for (let y = 0; y < height; y++) {
+				square[y][0] = C[color](square[y][0]);
+			}
+			break;
+		case RIGHT:
+			for (let y = 0; y < height; y++) {
+				square[y][width - 1] = C[color](square[y][width - 1]);
+			}
+			break;
+	}
+	return square;
+}
+
+function joinMatrix(matrix_a, matrix_b) {
+	for (let y = 0; y < matrix_a.length; y++) {
+		matrix_a[y] = matrix_a[y].concat(matrix_b[y]);
+	}
+
+	return matrix_a;
+}
+
 class PuzzlePiece {
 	/**
 	 *
@@ -100,6 +141,10 @@ class PuzzlePiece {
 		this.edge_length = this.piece.length;
 
 		this.orientations = this.generateOrientations();
+
+		// When we build our overall picture, each piece will get a fixed orientation
+		this.choosen_orientation = undefined;
+		this.choosen_sides = SIDES.reduce((obj, side) => ((obj[side] = undefined), obj), {});
 
 		this.connections = new Set();
 		this.connections_array = undefined;
@@ -127,7 +172,7 @@ class PuzzlePiece {
 
 	/**
 	 * @param {Side} side
-	 * @param {String} square_str 
+	 * @param {String} square_str
 	 */
 	getEdge(side, square_str) {
 		switch (side) {
@@ -184,7 +229,7 @@ class PuzzlePiece {
 		let self_edge = this.getEdge(self_side, self_orientation);
 		let other_edge = this.getEdge(other_side, other_orientation);
 
-		return (self_edge === other_edge);
+		return self_edge === other_edge;
 	}
 
 	tryToFit(other_piece, orientation_index = 0) {
@@ -209,11 +254,33 @@ class PuzzlePiece {
 		}
 	}
 
-	orientToConnections(...joins) {
-		if (joins.length !== this.connections.length) {
+	orientToConnections() {
+		if (!this.choosen_orientation) {
 			throw new Error(
-				`Must provide joins equal to the number of connections. Provided ${joins.length} but there are ${this.connections.length}`
+				`A PuzzlePiece must have a choosen_orientation before it can orient its connections.`
 			);
+		}
+
+		for (let piece of this.connections) {
+			// Skip the piece if it already has a choosen orientation
+			if (piece.choosen_orientation) {
+				continue;
+			}
+
+			sides_loop: for (let side of SIDES) {
+				for (let adjacent_orientation of piece.orientations) {
+					let can_be_joined = this.canJoinOrientationWithOtherAlong(
+						this.choosen_orientation,
+						adjacent_orientation,
+						side
+					);
+					if (can_be_joined) {
+						piece.choosen_orientation = adjacent_orientation;
+						this.choosen_sides[side] = piece;
+						break sides_loop;
+					}
+				}
+			}
 		}
 	}
 
@@ -234,8 +301,8 @@ class Puzzle {
 		for (let [piece_a, piece_b] of G.combination(this.pieces, 2)) {
 			// If a piece has 4 connections, we know it won't get anymore, so no need to test
 			if (piece_a.connections.size < 4 && piece_b.connections.size < 4) {
-			piece_a.tryToFit(piece_b);
-		}
+				piece_a.tryToFit(piece_b);
+			}
 		}
 
 		for (let piece of this.pieces) {
@@ -260,8 +327,8 @@ class Puzzle {
 	 * if some inner tile could have more than 4 possible connections, but only one
 	 * of them allows for all tiles to be arranged in its 12 x 12 grid.
 	 */
-	getIdsOfPiecesWithNConnections(n) {
-		return this.pieces.filter((piece) => piece.connections.size === n).map((p) => p.id);
+	getPiecesWithNConnections(n) {
+		return this.pieces.filter((piece) => piece.connections.size === n);
 	}
 
 	orientPieces() {
@@ -277,7 +344,65 @@ class Puzzle {
 		 * tile (shrinking each piece from 10 x 10 to 8 x 8) and join all 144 of them
 		 * together into a 12 x 12 picture, making one large 96 x 96 grid (8 * 12 = 96).
 		 */
-		let [top_left] = this.getIdsOfPiecesWithNConnections(2);
+		let [corner] = this.getPiecesWithNConnections(2);
+		corner.choosen_orientation = corner.orientations[0];
+		this.orientPiecesFrom(corner);
+	}
+
+	orientPiecesFrom(piece) {
+		let pieces = [piece];
+		while (pieces.length) {
+			let current_piece = pieces.pop();
+			let adjacents_without_choosen_orientations = current_piece.connections_array.filter(
+				(p) => !p.choosen_orientation
+			);
+			pieces.push(...adjacents_without_choosen_orientations);
+
+			current_piece.orientToConnections();
+		}
+	}
+
+	printOrientedPieces() {
+		let [top_left] = this.getPiecesWithNConnections(2).filter(
+			(p) =>
+				p.choosen_sides[RIGHT] &&
+				p.choosen_sides[BOTTOM] &&
+				!p.choosen_sides[LEFT] &&
+				!p.choosen_sides[TOP]
+		);
+
+		let stripes = [splitSquare(top_left.choosen_orientation)];
+		highlight(stripes[0], RIGHT);
+		highlight(stripes[0], BOTTOM);
+
+		let far_left = top_left;
+		let self = top_left.choosen_sides[RIGHT];
+		for (let y = 0; y < 12; y++) {
+			for (let x = 0; x < 11; x++) {
+				let square = splitSquare(self.choosen_orientation);
+				highlight(square, LEFT);
+				if (x < 10) highlight(square, RIGHT);
+				if (y > 0) highlight(square, TOP);
+				if (y < 11) highlight(square, BOTTOM);
+				joinMatrix(stripes[y], square);
+
+				self = self.choosen_sides[RIGHT];
+			}
+			far_left = far_left.choosen_sides[BOTTOM];
+			if (far_left) {
+				let square = splitSquare(far_left.choosen_orientation);
+				highlight(square, RIGHT);
+				highlight(square, TOP);
+				if (y < 11) highlight(square, BOTTOM);
+				stripes.push(square);
+				self = far_left.choosen_sides[RIGHT];
+			}
+
+			
+		}
+
+		let str = stripes.map(row => row.join('')).join('\n');
+		console.log(str);
 	}
 }
 
