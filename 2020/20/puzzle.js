@@ -465,9 +465,35 @@ class Puzzle {
 	}
 }
 
+const MONSTER_PART = 'O';
+const WAVE = '#';
+const WATER = '.';
+
+const SEA_MONSTER_STR = `                  # 
+#    ##    ##    ###
+ #  #  #  #  #  #   `;
+const SEA_MONSTER = SEA_MONSTER_STR.split('\n').map((row) => row.split(''));
+
+// A flat array of `[x, y]` offsets of sea monster pieces to iterate over
+const SEA_MONSTER_OFFSETS = SEA_MONSTER.map((row, y) => {
+	return row
+		.map((cell, x) => {
+			return cell === WAVE ? [x, y] : undefined;
+		})
+		.filter((v) => v);
+}).flat();
+
+const SEA_MONSTER_HEIGHT = SEA_MONSTER.length;
+const SEA_MONSTER_WIDTH = SEA_MONSTER[0].length;
+
 class Picture {
 	constructor(grid) {
-		this.grid = JSON.parse(JSON.stringify(grid));
+		this.grid_str = JSON.stringify(grid);
+		this.reset();
+	}
+
+	reset() {
+		this.grid = JSON.parse(this.grid_str);
 	}
 
 	toString() {
@@ -476,6 +502,18 @@ class Picture {
 
 	print() {
 		console.log(this.toString());
+	}
+
+	count(cell) {
+		let total = 0;
+		for (let y = 0; y < this.grid.length; y++) {
+			for (let x = 0; x < this.grid.length; x++) {
+				if (this.grid[y][x] === cell) {
+					total++;
+				}
+			}
+		}
+		return total;
 	}
 }
 
