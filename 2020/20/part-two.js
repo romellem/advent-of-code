@@ -8,4 +8,6 @@ puzzle.connectPieces();
 puzzle.orientPieces();
 let picture = puzzle.getTrimmedPictureFromOrientedPieces();
 let total_waves = picture.markAllSeaMonsters();
+picture.print();
+console.log('==========')
 console.log(total_waves);

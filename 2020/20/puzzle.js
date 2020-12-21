@@ -497,7 +497,9 @@ class Picture {
 	}
 
 	toString() {
-		return this.grid.map((row) => row.join('')).join('\n');
+		return this.grid
+			.map((row) => row.map((cell) => (cell === MONSTER_PART ? C.red(cell) : cell)).join(''))
+			.join('\n');
 	}
 
 	print() {
