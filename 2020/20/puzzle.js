@@ -91,28 +91,28 @@ function splitSquare(square) {
 	return square.split('\n').map((row) => row.split(''));
 }
 
-function highlight(square, side, color = 'yellow') {
+function highlight(square, side, color) {
 	const height = square.length;
 	const width = square[0].length;
 	switch (side) {
 		case TOP:
 			for (let x = 0; x < width; x++) {
-				square[0][x] = C[color](square[0][x]);
+				square[0][x] = C[color || 'cyan'](square[0][x]);
 			}
 			break;
 		case BOTTOM:
 			for (let x = 0; x < width; x++) {
-				square[height - 1][x] = C[color](square[height - 1][x]);
+				square[height - 1][x] = C[color || 'cyan'](square[height - 1][x]);
 			}
 			break;
 		case LEFT:
 			for (let y = 0; y < height; y++) {
-				square[y][0] = C[color](square[y][0]);
+				square[y][0] = C[color || 'blue'](square[y][0]);
 			}
 			break;
 		case RIGHT:
 			for (let y = 0; y < height; y++) {
-				square[y][width - 1] = C[color](square[y][width - 1]);
+				square[y][width - 1] = C[color || 'blue'](square[y][width - 1]);
 			}
 			break;
 	}
@@ -368,7 +368,10 @@ class Puzzle {
 	}
 
 	printOrientedPieces() {
-		let [top_left] = this.getPiecesWithNConnections(2).filter(
+		const square_size = Math.sqrt(this.pieces.length);
+
+		let corners = this.getPiecesWithNConnections(2);
+		let [top_left] = corners.filter(
 			(p) =>
 				p.choosen_sides[RIGHT] &&
 				p.choosen_sides[BOTTOM] &&
@@ -382,13 +385,13 @@ class Puzzle {
 
 		let far_left = top_left;
 		let self = top_left.choosen_sides[RIGHT];
-		for (let y = 0; y < 12; y++) {
-			for (let x = 0; x < 11; x++) {
+		for (let y = 0; y < square_size; y++) {
+			for (let x = 0; x < square_size - 1; x++) {
 				let square = splitSquare(self.choosen_orientation);
 				highlight(square, LEFT);
-				if (x < 10) highlight(square, RIGHT);
+				if (x < square_size - 2) highlight(square, RIGHT);
 				if (y > 0) highlight(square, TOP);
-				if (y < 11) highlight(square, BOTTOM);
+				if (y < square_size - 1) highlight(square, BOTTOM);
 				joinMatrix(stripes[y], square);
 
 				self = self.choosen_sides[RIGHT];
@@ -398,15 +401,15 @@ class Puzzle {
 				let square = splitSquare(far_left.choosen_orientation);
 				highlight(square, RIGHT);
 				highlight(square, TOP);
-				if (y < 11) highlight(square, BOTTOM);
+				if (y < square_size - 2) highlight(square, BOTTOM);
 				stripes.push(square);
 				self = far_left.choosen_sides[RIGHT];
 			}
-
-			
 		}
 
-		let str = stripes.map(row => row.join('')).join('\n');
+		stripes = stripes.flat();
+		let str = stripes.map((row) => row.join('')).join('\n');
+
 		console.log(str);
 	}
 }
