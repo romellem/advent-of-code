@@ -143,8 +143,8 @@ class PuzzlePiece {
 		this.orientations = this.generateOrientations();
 
 		// When we build our overall picture, each piece will get a fixed orientation
-		this.choosen_orientation = undefined;
-		this.choosen_sides = SIDES.reduce((obj, side) => ((obj[side] = undefined), obj), {});
+		this.chosen_orientation = undefined;
+		this.chosen_sides = SIDES.reduce((obj, side) => ((obj[side] = undefined), obj), {});
 
 		this.connections = new Set();
 		this.connections_array = undefined;
@@ -255,22 +255,22 @@ class PuzzlePiece {
 	}
 
 	orientToConnections() {
-		if (!this.choosen_orientation) {
+		if (!this.chosen_orientation) {
 			throw new Error(
-				`A PuzzlePiece must have a choosen_orientation before it can orient its connections.`
+				`A PuzzlePiece must have a chosen_orientation before it can orient its connections.`
 			);
 		}
 
 		for (let piece of this.connections) {
 			sides_loop: for (let side of SIDES) {
-				// Skip the piece if it already has a choosen orientation at this side
-				if (this.choosen_sides[side]) {
+				// Skip the piece if it already has a chosen orientation at this side
+				if (this.chosen_sides[side]) {
 					continue;
 				}
 
 				for (let adjacent_orientation of piece.orientations) {
 					let can_be_joined = this.canJoinOrientationWithOtherAlong(
-						this.choosen_orientation,
+						this.chosen_orientation,
 						adjacent_orientation,
 						side
 					);
@@ -278,9 +278,9 @@ class PuzzlePiece {
 					if (can_be_joined) {
 						const other_side = SIDE_COMPLEMENT[side];
 
-						piece.choosen_orientation = adjacent_orientation;
-						piece.choosen_sides[other_side] = this;
-						this.choosen_sides[side] = piece;
+						piece.chosen_orientation = adjacent_orientation;
+						piece.chosen_sides[other_side] = this;
+						this.chosen_sides[side] = piece;
 
 						break sides_loop;
 					}
@@ -350,7 +350,7 @@ class Puzzle {
 		 * together into a 12 x 12 picture, making one large 96 x 96 grid (8 * 12 = 96).
 		 */
 		let [corner] = this.getPiecesWithNConnections(2);
-		corner.choosen_orientation = corner.orientations[0];
+		corner.chosen_orientation = corner.orientations[0];
 		this.orientPiecesFrom(corner);
 	}
 
@@ -358,10 +358,10 @@ class Puzzle {
 		let pieces = [piece];
 		while (pieces.length) {
 			let current_piece = pieces.pop();
-			let adjacents_without_choosen_orientations = current_piece.connections_array.filter(
-				(p) => !p.choosen_orientation
+			let adjacents_without_chosen_orientations = current_piece.connections_array.filter(
+				(p) => !p.chosen_orientation
 			);
-			pieces.push(...adjacents_without_choosen_orientations);
+			pieces.push(...adjacents_without_chosen_orientations);
 
 			current_piece.orientToConnections();
 		}
@@ -373,37 +373,37 @@ class Puzzle {
 		let corners = this.getPiecesWithNConnections(2);
 		let [top_left] = corners.filter(
 			(p) =>
-				p.choosen_sides[RIGHT] &&
-				p.choosen_sides[BOTTOM] &&
-				!p.choosen_sides[LEFT] &&
-				!p.choosen_sides[TOP]
+				p.chosen_sides[RIGHT] &&
+				p.chosen_sides[BOTTOM] &&
+				!p.chosen_sides[LEFT] &&
+				!p.chosen_sides[TOP]
 		);
 
-		let stripes = [splitSquare(top_left.choosen_orientation)];
+		let stripes = [splitSquare(top_left.chosen_orientation)];
 		highlight(stripes[0], RIGHT);
 		highlight(stripes[0], BOTTOM);
 
 		let far_left = top_left;
-		let self = top_left.choosen_sides[RIGHT];
+		let self = top_left.chosen_sides[RIGHT];
 		for (let y = 0; y < square_size; y++) {
 			for (let x = 0; x < square_size - 1; x++) {
-				let square = splitSquare(self.choosen_orientation);
+				let square = splitSquare(self.chosen_orientation);
 				highlight(square, LEFT);
 				if (x < square_size - 2) highlight(square, RIGHT);
 				if (y > 0) highlight(square, TOP);
 				if (y < square_size - 1) highlight(square, BOTTOM);
 				joinMatrix(stripes[y], square);
 
-				self = self.choosen_sides[RIGHT];
+				self = self.chosen_sides[RIGHT];
 			}
-			far_left = far_left.choosen_sides[BOTTOM];
+			far_left = far_left.chosen_sides[BOTTOM];
 			if (far_left) {
-				let square = splitSquare(far_left.choosen_orientation);
+				let square = splitSquare(far_left.chosen_orientation);
 				highlight(square, RIGHT);
 				highlight(square, TOP);
 				if (y < square_size - 2) highlight(square, BOTTOM);
 				stripes.push(square);
-				self = far_left.choosen_sides[RIGHT];
+				self = far_left.chosen_sides[RIGHT];
 			}
 		}
 
