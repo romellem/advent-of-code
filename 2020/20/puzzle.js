@@ -262,21 +262,26 @@ class PuzzlePiece {
 		}
 
 		for (let piece of this.connections) {
-			// Skip the piece if it already has a choosen orientation
-			if (piece.choosen_orientation) {
-				continue;
-			}
-
 			sides_loop: for (let side of SIDES) {
+				// Skip the piece if it already has a choosen orientation at this side
+				if (this.choosen_sides[side]) {
+					continue;
+				}
+
 				for (let adjacent_orientation of piece.orientations) {
 					let can_be_joined = this.canJoinOrientationWithOtherAlong(
 						this.choosen_orientation,
 						adjacent_orientation,
 						side
 					);
+
 					if (can_be_joined) {
+						const other_side = SIDE_COMPLEMENT[side];
+
 						piece.choosen_orientation = adjacent_orientation;
+						piece.choosen_sides[other_side] = this;
 						this.choosen_sides[side] = piece;
+
 						break sides_loop;
 					}
 				}
