@@ -127,6 +127,19 @@ function joinMatrix(matrix_a, matrix_b) {
 	return matrix_a;
 }
 
+/**
+ * Trims edges off matrix in place.
+ */
+function trimEdge(matrix) {
+	matrix.shift();
+	matrix.pop();
+	for (let row of matrix) {
+		row.shift();
+		row.pop();
+	}
+	return matrix;
+}
+
 class PuzzlePiece {
 	/**
 	 *
@@ -367,6 +380,44 @@ class Puzzle {
 		}
 	}
 
+	getTrimmedPictureFromOrientedPieces() {
+		const square_size = Math.sqrt(this.pieces.length);
+
+		let corners = this.getPiecesWithNConnections(2);
+		let [top_left] = corners.filter(
+			(p) =>
+				p.chosen_sides[RIGHT] &&
+				p.chosen_sides[BOTTOM] &&
+				!p.chosen_sides[LEFT] &&
+				!p.chosen_sides[TOP]
+		);
+		let trimmed_top_left = trimEdge(splitSquare(top_left.chosen_orientation));
+		let stripes = [trimmed_top_left];
+
+		let far_left = top_left;
+		let self = top_left.chosen_sides[RIGHT];
+		for (let y = 0; y < square_size; y++) {
+			for (let x = 0; x < square_size - 1; x++) {
+				let square = splitSquare(self.chosen_orientation);
+				trimEdge(square);
+				joinMatrix(stripes[y], square);
+
+				self = self.chosen_sides[RIGHT];
+			}
+			far_left = far_left.chosen_sides[BOTTOM];
+			if (far_left) {
+				let square = splitSquare(far_left.chosen_orientation);
+				trimEdge(square);
+				stripes.push(square);
+				self = far_left.chosen_sides[RIGHT];
+			}
+		}
+
+		let grid = stripes.flat();
+
+		return new Picture(grid);
+	}
+
 	printOrientedPieces() {
 		const square_size = Math.sqrt(this.pieces.length);
 
@@ -414,4 +465,18 @@ class Puzzle {
 	}
 }
 
-module.exports = { Puzzle, PuzzlePiece };
+class Picture {
+	constructor(grid) {
+		this.grid = JSON.parse(JSON.stringify(grid));
+	}
+
+	toString() {
+		return this.grid.map((row) => row.join('')).join('\n');
+	}
+
+	print() {
+		console.log(this.toString());
+	}
+}
+
+module.exports = { Puzzle, PuzzlePiece, Picture };
