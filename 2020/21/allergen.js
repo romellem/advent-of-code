@@ -1,5 +1,16 @@
 const { uniq, intersectionBy } = require('lodash');
 
+const getIngredientSingleton = (() => {
+	let cache = {};
+	return (name) => {
+		if (!cache[name]) {
+			cache[name] = new Ingredient(name);
+		}
+
+		return cache[name];
+	};
+})();
+
 class Ingredient {
 	constructor(name) {
 		this.name = name;
@@ -9,7 +20,7 @@ class Ingredient {
 
 class Food {
 	constructor({ ingredients, ingredients_lookup, allergens, allergens_lookup }) {
-		this.ingredients = ingredients.map((v) => new Ingredient(v));
+		this.ingredients = ingredients.map((v) => getIngredientSingleton(v));
 		// this.ingredients_lookup = ingredients_lookup;
 		this.allergens = allergens;
 		// this.allergens_lookup = allergens_lookup;
@@ -20,6 +31,7 @@ class AllFoods {
 	constructor(input) {
 		this.foods = input.map((food_input) => new Food(food_input));
 		this.listed_allergens = this.getUniqueAllergens();
+		this.unique_ingredients = this.getUniqueIngredients();
 		this.foods_by_allergens = this.generateFoodsByAllergen();
 
 		this.assigned_allergens = this.listed_allergens.reduce(
@@ -30,6 +42,10 @@ class AllFoods {
 
 	getUniqueAllergens() {
 		return uniq(this.foods.map((f) => f.allergens).flat());
+	}
+
+	getUniqueIngredients() {
+		return [...new Set(this.foods.map((f) => f.ingredients).flat())];
 	}
 
 	generateFoodsByAllergen() {
@@ -60,8 +76,7 @@ class AllFoods {
 	assignKnownAllergens() {
 		let unknown_allergens = [...this.listed_allergens];
 
-		let bail = 99999;
-		while (unknown_allergens.length > 0 && (bail--) > 0) {
+		while (unknown_allergens.length > 0) {
 			for (let i = 0; i < unknown_allergens.length; i++) {
 				let unknown_allergen = unknown_allergens[i];
 				let foods_with_allergen = this.foods_by_allergens[unknown_allergen];
@@ -85,8 +100,12 @@ class AllFoods {
 				}
 			}
 		}
+	}
 
-		console.log(this.assigned_allergens);
+	countUnassignedIngredients() {
+		return this.foods
+			.map((f) => f.ingredients.filter((i) => !i.allergen).length)
+			.reduce((a, b) => a + b, 0);
 	}
 }
 
