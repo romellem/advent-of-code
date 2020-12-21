@@ -504,6 +504,42 @@ class Picture {
 		console.log(this.toString());
 	}
 
+	markAllSeaMonsters() {
+		for (let i = 0; i < 4; i++) {
+			this.markAllSeaMonstersInCurrentOrientation();
+			if (this.count(MONSTER_PART) > 0) {
+				return this.count(WAVE);
+			}
+
+			flipY(this.grid);
+			this.markAllSeaMonstersInCurrentOrientation();
+			if (this.count(MONSTER_PART) > 0) {
+				return this.count(WAVE);
+			}
+
+			flipY(this.grid);
+			rotate(this.grid);
+		}
+	}
+
+	markAllSeaMonstersInCurrentOrientation() {
+		/**
+		 * This can be optimized by skipping rectangles that have already been
+		 * marked as containing a sea monster, but this is simpler to code.
+		 */
+		for (let y = 0; y < this.grid.length - SEA_MONSTER_HEIGHT; y++) {
+			for (let x = 0; x < this.grid.length - SEA_MONSTER_WIDTH; x++) {
+				let cells = SEA_MONSTER_OFFSETS.map(([dx, dy]) => this.grid[y + dy][x + dx]);
+				if (cells.every((cell) => cell === WAVE)) {
+					// We found a sea monster!
+					for (let [dx, dy] of SEA_MONSTER_OFFSETS) {
+						this.grid[y + dy][x + dx] = MONSTER_PART;
+					}
+				}
+			}
+		}
+	}
+
 	count(cell) {
 		let total = 0;
 		for (let y = 0; y < this.grid.length; y++) {
