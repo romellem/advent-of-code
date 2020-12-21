@@ -529,8 +529,8 @@ class Picture {
 		 * This can be optimized by skipping rectangles that have already been
 		 * marked as containing a sea monster, but this is simpler to code.
 		 */
-		for (let y = 0; y < this.grid.length - SEA_MONSTER_HEIGHT; y++) {
-			for (let x = 0; x < this.grid.length - SEA_MONSTER_WIDTH; x++) {
+		for (let y = 0; y < this.grid.length - SEA_MONSTER_HEIGHT + 1; y++) {
+			for (let x = 0; x < this.grid.length - SEA_MONSTER_WIDTH + 1; x++) {
 				let cells = SEA_MONSTER_OFFSETS.map(([dx, dy]) => this.grid[y + dy][x + dx]);
 				if (cells.every((cell) => cell === WAVE)) {
 					// We found a sea monster!
