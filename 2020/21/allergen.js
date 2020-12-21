@@ -107,6 +107,18 @@ class AllFoods {
 			.map((f) => f.ingredients.filter((i) => !i.allergen).length)
 			.reduce((a, b) => a + b, 0);
 	}
+
+	getAlergenicIngredientsByAllergenName() {
+		let allergenic_ingredients = this.unique_ingredients.filter(i => i.allergen);
+		allergenic_ingredients.sort((a, b) => {
+			if (a.allergen > b.allergen) return 1;
+			else if (a.allergen < b.allergen) return -1;
+			else return 0;
+		});
+		let sorted_allergenic_ingredients = allergenic_ingredients.map(i => i.name);
+
+		return sorted_allergenic_ingredients.join(',');
+	}
 }
 
 module.exports = { AllFoods };
