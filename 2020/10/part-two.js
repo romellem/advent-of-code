@@ -22,17 +22,7 @@ function splitInputOnGapsOfThree(input) {
 	}
 	runs.push(current_run);
 
-	/**
-	 * Convert our runs of _absolute_ values to _relative_ values.
-	 * That is, the first digit should be a 0, followed by whatever
-	 * increments separate the terms.
-	 */
-	const relative_runs = runs.map((run, i) => {
-		const [first_term] = run;
-		const relative_run = run.map((v) => v - first_term);
-		return relative_run;
-	});
-	return relative_runs;
+	return runs;
 }
 
 let total = splitInputOnGapsOfThree(adapters)
