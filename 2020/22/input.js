@@ -1,20 +1,21 @@
 const path = require('path');
 const fs = require('fs');
 
-const input = fs
-	.readFileSync(path.join(__dirname, 'input.txt'), 'utf8')
-	.toString()
-	.trim()
-	.split('\n\n')
-	.map((p) => {
-		let p1 = p.split('\n');
-		p1.shift();
+const inputToPlayers = (input_str) =>
+	input_str
+		.trim()
+		.split('\n\n')
+		.map((p) => {
+			let p1 = p.split('\n');
+			p1.shift();
 
-		let nums = p1.map((v) => +v);
-		return nums;
-	});
+			let nums = p1.map((v) => +v);
+			return nums;
+		});
 
-const sampleInput = `Player 1:
+const input = inputToPlayers(fs.readFileSync(path.join(__dirname, 'input.txt'), 'utf8').toString());
+
+const sampleInput = inputToPlayers(`Player 1:
 9
 2
 6
@@ -26,16 +27,7 @@ Player 2:
 8
 4
 7
-10`.toString()
-.trim()
-.split('\n\n')
-.map((p) => {
-	let p1 = p.split('\n');
-	p1.shift();
-
-	let nums = p1.map((v) => +v);
-	return nums;
-});
+10`);
 
 module.exports = {
 	input,
