@@ -10,13 +10,10 @@ function play(p1, p2) {
 		}
 	}
 
-	let p1_a = p1.toArray().reverse();
-	let p2_a = p2.toArray().reverse();
+	let winner = p1.isEmpty() ? p2.toArray().reverse() : p1.toArray().reverse();
+	let score = winner.map((v, i) => v * (i + 1)).reduce((a, b) => a + b, 0);
 
-	let a = p1_a.map((v, i) => v * (i + 1)).reduce((a, b) => a + b, 0);
-	let b = p2_a.map((v, i) => v * (i + 1)).reduce((a, b) => a + b, 0);
-
-	return a + b;
+	return score;
 }
 
 module.exports = { play };
