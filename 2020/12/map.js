@@ -72,15 +72,11 @@ const MOVEMENT_VECTORS = {
  * @param {Enum} direction - Either `ROTATE_LEFT` or `ROTATE_RIGHT`
  */
 const rotateInPlace = (arr, direction) => {
-	if (direction === ROTATE_LEFT) {
-		let t = arr[1];
-		arr[1] = -arr[0];
-		arr[0] = t;
-	} else if (direction === ROTATE_RIGHT) {
-		let t = arr[1];
-		arr[1] = arr[0];
-		arr[0] = -t;
-	}
+	const sign = direction === ROTATE_LEFT ? 1 : -1;
+	let t = arr[1];
+	arr[1] = -1 * sign * arr[0];
+	arr[0] = sign * t;
+
 	return arr;
 };
 
