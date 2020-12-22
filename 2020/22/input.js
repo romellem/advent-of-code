@@ -1,6 +1,5 @@
 const path = require('path');
 const fs = require('fs');
-const Deque= require('double-ended-queue');
 
 const input = fs
 	.readFileSync(path.join(__dirname, 'input.txt'), 'utf8')
@@ -12,7 +11,7 @@ const input = fs
 		p1.shift();
 
 		let nums = p1.map((v) => +v);
-		return new Deque(nums);
+		return nums;
 	});
 
 module.exports = {
