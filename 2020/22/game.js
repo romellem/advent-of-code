@@ -48,6 +48,7 @@ function recursivePlay(p1, p2, depth = 0) {
 			 * to the number on the card they drew to trigger the sub-game)
 			 */
 			let winner = recursivePlay(p1.slice(0, p1_top), p2.slice(0, p2_top), depth + 1);
+
 			if (winner === PLAYER_1) {
 				p1.push(p1_top, p2_top);
 			} else if (PLAYER_2) {
