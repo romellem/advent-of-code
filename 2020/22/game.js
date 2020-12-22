@@ -41,6 +41,12 @@ function recursivePlay(p1, p2, depth = 0) {
 		let p2_top = p2.shift();
 
 		if (p1_top <= p1.length && p2_top <= p2.length) {
+			/**
+			 * To play a sub-game of Recursive Combat, each player
+			 * creates a new deck by making a copy of the next cards
+			 * in their deck (the quantity of cards copied is equal
+			 * to the number on the card they drew to trigger the sub-game)
+			 */
 			let winner = recursivePlay(p1.slice(0, p1_top), p2.slice(0, p2_top), depth + 1);
 			if (winner === PLAYER_1) {
 				p1.push(p1_top, p2_top);
