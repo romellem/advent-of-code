@@ -12,7 +12,7 @@ class LoopedListItem {
 		// Set next and prev to itself
 		if (is_first) {
 			this.next_item = this;
-			this.prev = this;
+			this.prev_item = this;
 		}
 	}
 
@@ -157,6 +157,14 @@ class LoopedList {
 	}
 }
 var list = new LoopedList(newinput);
+
+let lookup = Array(1000001);
+for (let i = 0; i < 1000000; i++) {
+	lookup[list.head.value] = list.head;
+	list.move();
+}
+
+
 for (let i = 0; i < 10000000; i++) {
 	i %100 === 0 && process.stdout.write(i/10000000*100+ '%\r')
 	let current_cup = list.head.value;
@@ -166,46 +174,25 @@ for (let i = 0; i < 10000000; i++) {
 	let c = list.popHeadMoveNext().value;
 	list.move(-1);
 
-	let length = list.length();
-	let scale = 1;
-	let found = false;
-	do {
-		for (let j = 0; j < length *2; j++) {
-			list.move();
-			let newval = current_cup - scale;
-			if (newval < 1) newval = 1000000;
-			if (list.head.value === newval) {
-				found = true;
-				break;
-			}
-		}
 
-		if (!found) scale++;
-	} while (!found);
+	let newval = current_cup - 1;
+	if (newval < 1) newval = 1000000;
+	while (a === newval || b === newval || c === newval) {
+		newval--;
+	}
+
+	list.head = lookup[newval];
 
 	list.insertNext(a);
 	list.insertNext(b);
 	list.insertNext(c);
 	
 	
-	let l = list.length();
-	for (let j = 0; j < l; j++) {
-		if (list.head.value === current_cup) {
-			break;
-		}
-		list.move();
-	}
+	list.head = lookup[current_cup];
 	list.move();
 }
 
-let nl = list.length();
-	for (let j = 0; j < nl+1; j++) {
-		if (list.head.value === 1) {
-			break;
-		}
-		list.move();
-	}
-let z = list.head.value;
+list.head = lookup[1];
 list.move();
 
 let a = list.head.value;
