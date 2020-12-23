@@ -1,14 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 
-const input = fs
-	.readFileSync(path.join(__dirname, 'input.txt'), 'utf8')
-	.toString()
-	.trim()
-	.split('\n')
-	.map((v) => {
-		return v;
-	});
+const input = [3,6,4,2,8,9,7,1,5];
 
 module.exports = {
 	input,
