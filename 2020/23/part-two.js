@@ -169,15 +169,15 @@ for (let i = 0; i < 10000000; i++) {
 	i %100 === 0 && process.stdout.write(i/10000000*100+ '%\r')
 	let current_cup = list.head.value;
 	list.move();
-	let a = list.popHeadMoveNext().value;
-	let b = list.popHeadMoveNext().value;
-	let c = list.popHeadMoveNext().value;
+	let a = list.popHeadMoveNext();
+	let b = list.popHeadMoveNext();
+	let c = list.popHeadMoveNext();
 	list.move(-1);
 
 
 	let newval = current_cup - 1;
 	if (newval < 1) newval = 1000000;
-	while (a === newval || b === newval || c === newval) {
+	while (a.value === newval || b.value === newval || c.value === newval) {
 		newval--;
 	}
 
@@ -199,5 +199,6 @@ let a = list.head.value;
 list.move();
 let b= list.head.value;
 
-console.log(a, b)
+console.log('\n')
+console.log(a, '*', b)
 console.log(a* b)
