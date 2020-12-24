@@ -29,7 +29,7 @@ const D = Object.entries({
 	ne: new Hex(1, 1, -2),
 });
 
-function pruneZeroes(obj) {
+function pruneZeroes() {
 	let white = Object.entries(BLACK)
 		.filter(([c, v]) => v === 0)
 		.map(([c]) => c);
@@ -38,7 +38,7 @@ function pruneZeroes(obj) {
 	}
 }
 
-pruneZeroes(BLACK);
+// pruneZeroes(BLACK);
 
 function getNeighborsOfCoordStr(str) {
 	let h = new Hex(...str.split(',').map((v) => parseInt(v, 10)));
@@ -49,10 +49,10 @@ function getNeighborsOfCoordStr(str) {
 	return neighbors;
 }
 
-for (let i = 0; i < 100; i++) {
-	pruneZeroes(BLACK);
-	let tiles = Object.entries(BLACK);
-	let neighbors = tiles.map(([coord]) => {
+for (let zz = 0; zz < 100; zz++) {
+	pruneZeroes();
+	let tiles = Object.keys(BLACK);
+	let neighbors = tiles.map((coord) => {
 		let h = new Hex(...coord.split(',').map((v) => parseInt(v, 10)));
 		let neighbors = [];
 		for (let [dir, cell] of D) {
@@ -72,9 +72,28 @@ for (let i = 0; i < 100; i++) {
 			black_tiles_to_flip.push(tile.toString());
 		}
 	}
-	let unique_neighbors = uniq(neighbors.flat().map((n) => n.toString())).map(
-		(v) => new Hex(...coord.split(',').map((v) => parseInt(v, 10)))
-	);
+	let unique_neighbors = uniq(neighbors.flat().map((n) => n.toString()));
+	
 
-	// for (let i = 0; i <)
+    let white_tiles_to_flip = [];
+	for (let i = 0; i < unique_neighbors.length; i++) {
+        let un = unique_neighbors[i];
+        if (BLACK[un] === 1) continue;
+
+        let nn = getNeighborsOfCoordStr(un);
+        let black_tiles = nn.filter(n => BLACK[n.toString()] === 1);
+
+        if (black_tiles.length === 2) {
+            white_tiles_to_flip.push(un);
+        }
+    }
+
+    for (let b of black_tiles_to_flip) {
+        BLACK[b] = 0;
+    }
+    for (let b of white_tiles_to_flip) {
+        BLACK[b] = 1;
+    }
 }
+
+console.log(Object.values(BLACK).reduce((a, b)=>a+b, 0))
