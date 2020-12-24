@@ -8,9 +8,9 @@ const input = fs
 	.split('\n')
 	.map((line) => {
 		let a = line.split('se').join(',se,');
-		a = line.split('sw').join(',sw,');
-		a = line.split('nw').join(',nw,');
-		a = line.split('ne').join(',ne,');
+		a = a.split('sw').join(',sw,');
+		a = a.split('nw').join(',nw,');
+		a = a.split('ne').join(',ne,');
 		// console.log(a);
 		// process.exit()
 		let paths = a.split(',').filter(v=>v);
