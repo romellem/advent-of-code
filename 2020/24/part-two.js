@@ -1,3 +1,4 @@
+const { uniq } = require('lodash');
 const { input } = require('./input');
 
 const { Hex } = require('./hex-grid-red-blob');
@@ -20,12 +21,12 @@ for (let steps of input) {
 }
 
 const D = Object.entries({
-    e: new Hex(2, -1, -1),
-    se: new Hex(1, -2, 1),
-    sw: new Hex(-1, -1, 2),
-    w: new Hex(-2, 1, 1),
-    nw: new Hex(-1, 2, -1),
-    ne: new Hex(1, 1, -2),
+	e: new Hex(2, -1, -1),
+	se: new Hex(1, -2, 1),
+	sw: new Hex(-1, -1, 2),
+	w: new Hex(-2, 1, 1),
+	nw: new Hex(-1, 2, -1),
+	ne: new Hex(1, 1, -2),
 });
 
 function pruneZeroes(obj) {
@@ -39,31 +40,41 @@ function pruneZeroes(obj) {
 
 pruneZeroes(BLACK);
 
+function getNeighborsOfCoordStr(str) {
+	let h = new Hex(...str.split(',').map((v) => parseInt(v, 10)));
+	let neighbors = [];
+	for (let [dir, cell] of D) {
+		neighbors.push(h.add(Hex.diagonals[dir]));
+	}
+	return neighbors;
+}
+
 for (let i = 0; i < 100; i++) {
 	pruneZeroes(BLACK);
 	let tiles = Object.entries(BLACK);
-	let neighbors = tiles.map(
-		([coord]) => {
-            let h = new Hex(...coord.split(',').map((v) => parseInt(v, 10)));
-            let neighbors = [];
-            for (let [dir, cell] of D) {
-                neighbors.push(h.add(Hex.diagonals[dir]));
-            }
+	let neighbors = tiles.map(([coord]) => {
+		let h = new Hex(...coord.split(',').map((v) => parseInt(v, 10)));
+		let neighbors = [];
+		for (let [dir, cell] of D) {
+			neighbors.push(h.add(Hex.diagonals[dir]));
+		}
 
-            return neighbors;
-        }
-    );
+		return neighbors;
+	});
 
-    let black_tiles_to_flip = []
-    for (let i = 0; i < tiles.length; i++) {
-        let tile = tiles[i];
-        let tile_n = neighbors[i];
-        let black_neighbors = tile_n.filter(n => BLACK[n.toString()]===1);
+	let black_tiles_to_flip = [];
+	for (let i = 0; i < tiles.length; i++) {
+		let tile = tiles[i];
+		let tile_n = neighbors[i];
+		let black_neighbors = tile_n.filter((n) => BLACK[n.toString()] === 1);
 
-        if (black_neighbors.length === 0 || black_neighbors.length > 2) {
-            black_tiles_to_flip.push(tile.toString());
-        }
-    }
-    let white_neighbors = neighbors.filter(n => BLACK[n.toString()]!==1);
-    for (let )
+		if (black_neighbors.length === 0 || black_neighbors.length > 2) {
+			black_tiles_to_flip.push(tile.toString());
+		}
+	}
+	let unique_neighbors = uniq(neighbors.flat().map((n) => n.toString())).map(
+		(v) => new Hex(...coord.split(',').map((v) => parseInt(v, 10)))
+	);
+
+	// for (let i = 0; i <)
 }
