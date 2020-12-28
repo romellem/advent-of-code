@@ -2,12 +2,12 @@ const { strictEqual } = require("assert");
 const { input } = require("./input");
 const [card_public_key, door_public_key] = input;
 
-function determineLoopSize(
+function determineLoopSize({
 	public_key,
 	value = 1,
 	subject_number = 7,
 	divisor = 20201227
-) {
+} = {}) {
 	let loop = 0;
 	do {
 		value *= subject_number;
@@ -32,8 +32,8 @@ function runLoop({
 	return value;
 }
 
-let card_loop = determineLoopSize(card_public_key);
-let door_loop = determineLoopSize(door_public_key);
+let card_loop = determineLoopSize({ public_key: card_public_key });
+let door_loop = determineLoopSize({ public_key: door_public_key });
 
 const secret_key_from_door_public_key = runLoop({
 	subject_number: door_public_key,
