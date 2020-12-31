@@ -73,27 +73,26 @@ for (let zz = 0; zz < 100; zz++) {
 		}
 	}
 	let unique_neighbors = uniq(neighbors.flat().map((n) => n.toString()));
-	
 
-    let white_tiles_to_flip = [];
+	let white_tiles_to_flip = [];
 	for (let i = 0; i < unique_neighbors.length; i++) {
-        let un = unique_neighbors[i];
-        if (BLACK[un] === 1) continue;
+		let un = unique_neighbors[i];
+		if (BLACK[un] === 1) continue;
 
-        let nn = getNeighborsOfCoordStr(un);
-        let black_tiles = nn.filter(n => BLACK[n.toString()] === 1);
+		let nn = getNeighborsOfCoordStr(un);
+		let black_tiles = nn.filter((n) => BLACK[n.toString()] === 1);
 
-        if (black_tiles.length === 2) {
-            white_tiles_to_flip.push(un);
-        }
-    }
+		if (black_tiles.length === 2) {
+			white_tiles_to_flip.push(un);
+		}
+	}
 
-    for (let b of black_tiles_to_flip) {
-        BLACK[b] = 0;
-    }
-    for (let b of white_tiles_to_flip) {
-        BLACK[b] = 1;
-    }
+	for (let b of black_tiles_to_flip) {
+		BLACK[b] = 0;
+	}
+	for (let b of white_tiles_to_flip) {
+		BLACK[b] = 1;
+	}
 }
 
-console.log(Object.values(BLACK).reduce((a, b)=>a+b, 0))
+console.log(Object.values(BLACK).reduce((a, b) => a + b, 0));
