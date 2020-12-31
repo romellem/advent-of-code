@@ -28,12 +28,12 @@ for (let i = 0; i < 100; i++) {
 	let next_cup = current_cup - 1;
 	let next_cup_item = list.find(next_cup);
 
-	if (!next_cup_item) {
-		next_cup = MAX_VALUE;
-		while (!next_cup_item) {
-			next_cup_item = list.find(next_cup);
-			next_cup--;
+	while (!next_cup_item) {
+		next_cup--;
+		if (next_cup < 1) {
+			next_cup = MAX_VALUE;
 		}
+		next_cup_item = list.find(next_cup);
 	}
 
 	list.setHead(next_cup_item);
