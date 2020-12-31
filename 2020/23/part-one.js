@@ -43,7 +43,8 @@ for (let i = 0; i < 100; i++) {
 
 	list.setHead(current_cup_item);
 	list.move(1);
-	console.log([...list.values()]);
 }
 
-console.log([...list.values()]);
+list.setHead(list.find(1));
+list.popHeadMoveNext();
+console.log(parseInt([...list.values()].join(''), 10));
