@@ -23,7 +23,6 @@ for (let i = 0; i < 100; i++) {
 	let a = list.popHeadMoveNext().value;
 	let b = list.popHeadMoveNext().value;
 	let c = list.popHeadMoveNext().value;
-	list.move(-1);
 
 	let next_cup = current_cup - 1;
 	let next_cup_item = list.find(next_cup);
