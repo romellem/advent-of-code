@@ -80,7 +80,7 @@ class Hex {
 
     toString() {
         let { q, r, s } = this;
-        return [q, r, s].join(',');
+        return `${q},${r},${s}`;
     }
 }
 Hex.directions = {
