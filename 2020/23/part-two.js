@@ -1,51 +1,40 @@
-const { input } = require('./input');
+const { inputPartTwo } = require('./input');
 const { LoopedList } = require('looped-list');
 
-const newinput = input.concat(Array(1000000 - 9).fill().map((v, i) => i + 10));
+const list = new LoopedList(inputPartTwo);
 
-var list = new LoopedList(newinput);
+const LIST_LENGTH = inputPartTwo.length;
+const MOVES = 10000000;
 
-let lookup = Array(1000001);
-for (let i = 0; i < 1000000; i++) {
-	lookup[list.head.value] = list.head;
-	list.move();
+let lookup = Array(LIST_LENGTH + 1);
+for (let item of list.items()) {
+	lookup[item.value] = item;
 }
 
-
-for (let i = 0; i < 10000000; i++) {
-	i %100 === 0 && process.stdout.write(i/10000000*100+ '%\r')
+for (let i = 0; i < MOVES; i++) {
 	let current_cup = list.head.value;
 	list.move();
 	let a = list.popHeadMoveNext();
 	let b = list.popHeadMoveNext();
 	let c = list.popHeadMoveNext();
-	list.move(-1);
 
-
-	let newval = current_cup - 1;
-	if (newval < 1) newval = 1000000;
-	while (a.value === newval || b.value === newval || c.value === newval) {
-		newval--;
+	let next_cup = current_cup - 1;
+	if (next_cup < 1) next_cup = LIST_LENGTH;
+	while (a.value === next_cup || b.value === next_cup || c.value === next_cup) {
+		next_cup--;
 	}
 
-	list.head = lookup[newval];
+	list.setHead(lookup[next_cup]);
 
 	list.insertNext(a);
 	list.insertNext(b);
 	list.insertNext(c);
-	
-	
-	list.head = lookup[current_cup];
+
+	list.setHead(lookup[current_cup]);
 	list.move();
 }
 
-list.head = lookup[1];
-list.move();
+let a = lookup[1].next(1).value;
+let b = lookup[1].next(2).value;
 
-let a = list.head.value;
-list.move();
-let b= list.head.value;
-
-console.log('\n')
-console.log(a, '*', b)
-console.log(a* b)
+console.log(`${a} * ${b}`, '=', a * b);

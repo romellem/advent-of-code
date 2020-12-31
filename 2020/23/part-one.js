@@ -12,7 +12,7 @@ const findMax = (arr) => {
 	return max;
 };
 
-const list = new LoopedList(input.slice(0));
+const list = new LoopedList(input);
 const MAX_VALUE = findMax(input);
 
 for (let i = 0; i < 100; i++) {
