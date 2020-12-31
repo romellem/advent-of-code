@@ -743,10 +743,10 @@ lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.20:
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
   integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
 
-looped-list@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/looped-list/-/looped-list-0.4.0.tgz#9b03c237f26904ec8ff0008b721b9d8582e5782d"
-  integrity sha512-WUUq3amwnEEQ/9qOVeXG+FoxbvQYaJekrCZuxqI7rWVpjwBzCE6fk6mDi7eQsDyLTlpF+JS+vf1yrp6EnMK6gg==
+looped-list@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/looped-list/-/looped-list-0.5.0.tgz#ca77132c39473ba9ae2fb404ede6ef93e38e3bce"
+  integrity sha512-HAOhUOcI3i828BZ7SXtRnUBvJBKRIrOVzamjbRj4fCw60SVccc+cy9o8PScEQEykNp/eWYxdR7BA2ElfoOGkxg==
 
 loose-envify@^1.4.0:
   version "1.4.0"
