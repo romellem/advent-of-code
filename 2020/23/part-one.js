@@ -1,45 +1,50 @@
 const { input } = require('./input');
 const { LoopedList } = require('looped-list');
 
-var list = new LoopedList(input.slice(0));
+// `Math.max(...arr)` throws a RangeError when too many arguments are passed.
+const findMax = (arr) => {
+	let max = Number.MIN_SAFE_INTEGER;
+	for (let v of arr) {
+		if (v > max) {
+			max = v;
+		}
+	}
+	return max;
+};
+
+const list = new LoopedList(input.slice(0));
+const MAX_VALUE = findMax(input);
+
 for (let i = 0; i < 100; i++) {
+	let current_cup_item = list.head;
 	let current_cup = list.head.value;
-	list.move();
+
+	list.move(1);
 	let a = list.popHeadMoveNext().value;
 	let b = list.popHeadMoveNext().value;
 	let c = list.popHeadMoveNext().value;
 	list.move(-1);
 
-	let length = list.length();
-	let scale = 1;
-	let found = false;
-	do {
-		for (let j = 0; j < length *2; j++) {
-			list.move();
-			let newval = current_cup - scale;
-			if (newval < 1) newval = 9;
-			if (list.head.value === newval) {
-				found = true;
-				break;
-			}
-		}
+	let next_cup = current_cup - 1;
+	let next_cup_item = list.find(next_cup);
 
-		if (!found) scale++;
-	} while (!found);
+	if (!next_cup_item) {
+		next_cup = MAX_VALUE;
+		while (!next_cup_item) {
+			next_cup_item = list.find(next_cup);
+			next_cup--;
+		}
+	}
+
+	list.setHead(next_cup_item);
 
 	list.insertNext(a);
 	list.insertNext(b);
 	list.insertNext(c);
-	
-	
-	let l = list.length();
-	for (let j = 0; j < l; j++) {
-		if (list.head.value === current_cup) {
-			break;
-		}
-		list.move();
-	}
-	list.move();
+
+	list.setHead(current_cup_item);
+	list.move(1);
+	console.log([...list.values()]);
 }
 
-console.log([...list]);
+console.log([...list.values()]);
