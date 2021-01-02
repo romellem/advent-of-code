@@ -16,17 +16,19 @@ const input = fs
 	.trim()
 	.split('\n')
 	.map((line) => {
-		let a = line.split('se').join(',se,');
-		a = a.split('sw').join(',sw,');
-		a = a.split('nw').join(',nw,');
-		a = a.split('ne').join(',ne,');
+		// This is an easy way to parse out the "ne" and "se" from the "e", and similar for "w"
+		let route_str = line
+			.replace(/se/g, ',se,')
+			.replace(/sw/g, ',sw,')
+			.replace(/nw/g, ',nw,')
+			.replace(/ne/g, ',ne,');
 
-		let paths = a.split(',').filter((v) => v);
-
-		paths = paths
+		let route = route_str
+			.split(',')
+			.filter((v) => v)
 			.map((p) => {
 				if (!dirs[p]) {
-					// Has to be `ee`+ or `ww`+
+					// Has to be `/ee+/` or `/ww+/`
 					return p.split('');
 				} else {
 					return p;
@@ -34,7 +36,7 @@ const input = fs
 			})
 			.flat();
 
-		return paths;
+		return route;
 	});
 
 module.exports = {
