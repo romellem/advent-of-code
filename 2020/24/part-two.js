@@ -1,97 +1,127 @@
+const assert = require('assert');
 const { uniq } = require('lodash');
 const { input } = require('./input');
-
 const { Hex } = require('./hex-grid-red-blob');
+
+assert.strictEqual(+!undefined, 1);
+assert.strictEqual(+!0, 1);
+assert.strictEqual(+!1, 0);
 
 const BLACK = {};
 for (let steps of input) {
 	let route = new Hex(0, 0, 0);
-	// console.log(route.toString())
-	for (let d of steps) {
-		route = route.add(Hex.diagonals[d]);
+	for (let direction of steps) {
+		route = route.add(Hex.diagonals[direction]);
 	}
 
-	if (BLACK[route.toString()] === undefined) {
-		BLACK[route.toString()] = 1;
-	} else if (BLACK[route.toString()] === 1) {
-		BLACK[route.toString()] = 0;
-	} else if (BLACK[route.toString()] === 0) {
-		BLACK[route.toString()] = 1;
-	}
+	const route_str = route.toString();
+
+	// undefined -> 1
+	// 0 -> 1
+	// 1 -> 0
+	BLACK[route_str] = +!BLACK[route_str];
 }
 
-const D = Object.entries({
-	e: new Hex(2, -1, -1),
-	se: new Hex(1, -2, 1),
-	sw: new Hex(-1, -1, 2),
-	w: new Hex(-2, 1, 1),
-	nw: new Hex(-1, 2, -1),
-	ne: new Hex(1, 1, -2),
-});
+const DIAGONALS = Object.keys(Hex.diagonals);
 
 function pruneZeroes() {
-	let white = Object.entries(BLACK)
-		.filter(([c, v]) => v === 0)
-		.map(([c]) => c);
-	for (let c of white) {
+	let white = Object.entries(BLACK).filter(([c, v]) => v === 0);
+	for (let [c] of white) {
 		delete BLACK[c];
 	}
 }
 
-// pruneZeroes(BLACK);
+// Memoized
+const parseCoordStr = (() => {
+	let cache = {};
+	return (str) => {
+		if (!cache[str]) {
+			cache[str] = str.split(',').map((v) => parseInt(v, 10));
+		}
+		return cache[str];
+	};
+})();
 
-function getNeighborsOfCoordStr(str) {
-	let h = new Hex(...str.split(',').map((v) => parseInt(v, 10)));
+const getHexFromCoordStr = (() => {
+	const cache = {};
+	return (coord) => {
+		if (!cache[coord]) {
+			cache[coord] = new Hex(...parseCoordStr(coord));
+		}
+		return cache[coord];
+	};
+})();
+
+function getNeighborsOfCoordStr(coord, color) {
+	let cell = getHexFromCoordStr(coord);
 	let neighbors = [];
-	for (let [dir, cell] of D) {
-		neighbors.push(h.add(Hex.diagonals[dir]));
+	for (let dir of DIAGONALS) {
+		let neighbor = cell.add(Hex.diagonals[dir]);
+		let neighbor_str = neighbor.toString();
+		if (color !== undefined) {
+			let neighbor_color = +Boolean(BLACK[neighbor_str]);
+			if (neighbor_color !== color) {
+				continue;
+			}
+		}
+		neighbors.push(neighbor_str);
 	}
 	return neighbors;
 }
 
-for (let zz = 0; zz < 100; zz++) {
+function getUniqueNeighborsOfCoordsStr(coords, color) {
+	let neighbors = {};
+
+	for (let coord of coords) {
+		let cell = getHexFromCoordStr(coord);
+		for (let dir of DIAGONALS) {
+			let neighbor = cell.add(Hex.diagonals[dir]);
+			let neighbor_str = neighbor.toString();
+			if (color !== undefined) {
+				let neighbor_color = +Boolean(BLACK[neighbor_str]);
+				if (neighbor_color !== color) {
+					continue;
+				}
+			}
+			neighbors[neighbor_str] = color;
+		}
+	}
+
+	return Object.keys(neighbors);
+}
+
+for (let iterations = 0; iterations < 100; iterations++) {
 	pruneZeroes();
 	let tiles = Object.keys(BLACK);
-	let neighbors = tiles.map((coord) => {
-		let h = new Hex(...coord.split(',').map((v) => parseInt(v, 10)));
-		let neighbors = [];
-		for (let [dir, cell] of D) {
-			neighbors.push(h.add(Hex.diagonals[dir]));
-		}
-
-		return neighbors;
-	});
 
 	let black_tiles_to_flip = [];
-	for (let i = 0; i < tiles.length; i++) {
-		let tile = tiles[i];
-		let tile_n = neighbors[i];
-		let black_neighbors = tile_n.filter((n) => BLACK[n.toString()] === 1);
+	for (let tile of tiles) {
+		let black_neighbors = getNeighborsOfCoordStr(tile, 1);
 
 		if (black_neighbors.length === 0 || black_neighbors.length > 2) {
-			black_tiles_to_flip.push(tile.toString());
+			black_tiles_to_flip.push(tile);
 		}
 	}
-	let unique_neighbors = uniq(neighbors.flat().map((n) => n.toString()));
+
+	let white_neighbors = getUniqueNeighborsOfCoordsStr(tiles, 0);
 
 	let white_tiles_to_flip = [];
-	for (let i = 0; i < unique_neighbors.length; i++) {
-		let un = unique_neighbors[i];
-		if (BLACK[un] === 1) continue;
+	for (let white_neighbor of white_neighbors) {
+		let black_tiles_count = getNeighborsOfCoordStr(white_neighbor, 0).reduce(
+			(sum, coord) => sum + (BLACK[coord] === 1 ? 1 : 0),
+			0
+		);
 
-		let nn = getNeighborsOfCoordStr(un);
-		let black_tiles = nn.filter((n) => BLACK[n.toString()] === 1);
-
-		if (black_tiles.length === 2) {
-			white_tiles_to_flip.push(un);
+		if (black_tiles_count === 2) {
+			white_tiles_to_flip.push(white_neighbor);
 		}
 	}
 
-	for (let b of black_tiles_to_flip) {
-		BLACK[b] = 0;
+	for (let tile of black_tiles_to_flip) {
+		BLACK[tile] = 0;
 	}
-	for (let b of white_tiles_to_flip) {
-		BLACK[b] = 1;
+	for (let tile of white_tiles_to_flip) {
+		BLACK[tile] = 1;
 	}
 }
 
