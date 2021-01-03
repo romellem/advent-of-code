@@ -19,7 +19,7 @@ of manual tinkering.
 
 ## 2020 Puzzles List
 
-Completed: **25/ 25** (100% ⭐️)
+Completed: **25 / 25** (100% ⭐️)
 
 *  [✅ Day 1](2020/1/)
 *  [✅ Day 2](2020/2/)
