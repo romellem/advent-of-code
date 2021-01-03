@@ -1,3 +1,5 @@
+const { lcm } = require('./math-util');
+
 function findEarliestBus(earliest_departure, bus_schedule) {
 	let buses_in_service = bus_schedule.filter((bus) => bus !== 'x');
 	let departure_time = earliest_departure;
@@ -16,81 +18,45 @@ function findEarliestBus(earliest_departure, bus_schedule) {
 	}
 }
 
-// @link https://rosettacode.org/wiki/Greatest_common_divisor#JavaScript
-function gcd2(a, b) {
-	a = Math.abs(a);
-	b = Math.abs(b);
+function findWhenBusesAlign(bus_schedule) {
+	// Remove `x` buses from input but keep the index stored with the buses with set IDs.
+	let filtered_bus_schedule = bus_schedule
+		.map((id, i) => ({ id, i }))
+		.filter((obj) => obj.id !== 'x');
 
-	if (b > a) {
-		var temp = a;
-		a = b;
-		b = temp;
-	}
+	// Set the first valid timestamp as one period after time zero.
+	let first_bus = filtered_bus_schedule.shift();
+	let timestamp = first_bus.id;
 
-	while (true) {
-		a %= b;
-		if (a === 0) {
-			return b;
+	// Also initialize the first period to this same ID value, that is, the first bus's period.
+	let period = first_bus.id;
+
+	// Loop through the remaining buses
+	for (let { id, i } of filtered_bus_schedule) {
+		/**
+		 * While the current timestamp plus its offset does not evenly divide the current ID,
+		 * increment the timestamp by our period, because we _have_ to keep the alignment
+		 * of whatever we have locked in so far.
+		 */
+		while ((timestamp + i) % id !== 0) {
+			timestamp += period;
 		}
-		b %= a;
-		if (b === 0) {
-			return a;
-		}
-	}
-}
 
-function gcd(...nums) {
-	let b = nums[0];
-
-	for (let i = 1; i < nums.length; i++) {
-		b = gcd2(nums[i], b);
-
-		if (b === 1) {
-			return 1;
-		}
-	}
-	return b;
-}
-// @link https://github.com/nickleefly/node-lcm/blob/5d44997/index.js
-const _lcm = (a, b) => {
-	if (b === 0) return 0;
-	return (a * b) / gcd2(a, b);
-};
-
-// @link https://stackoverflow.com/a/147523/864233
-const lcm = (...args) => args.reduce((a, b) => _lcm(a, b));
-
-/**
- * @returns {Object} - Return `{ gcd, x, y }` where `gcd` is the greater common divisor of params `a` and `b`, and `x` and `y` such that `x * a + y * b = gcd`
- */
-function extgcd(a, b) {
-	if (a < b) {
-		let tmp = extgcd(b, a);
-		return {
-			gcd: tmp.gcd,
-			x: tmp.y,
-			y: tmp.x,
-		};
+		/**
+		 * As soon as we have an timestamp where things are aligned, set the period
+		 * equal to the least common multiple between the current period
+		 * and the current ID so that our previous work stays aligned with each iteration.
+		 *
+		 * @note Looking at our input, all the numbers are prime, so the LCM will
+		 *       always be `period * id`, but this makes it a bit more general.
+		 */
+		period = lcm(period, id);
 	}
 
-	if (b === 0) {
-		return {
-			gcd: a,
-			x: 1,
-			y: 0,
-		};
-	}
-
-	let r = a % b;
-	let tmp = extgcd(b, r);
-
-	return {
-		gcd: tmp.gcd,
-		x: tmp.y,
-		y: tmp.x - Math.floor(a / b) * tmp.y,
-	};
+	return timestamp;
 }
 
 module.exports = {
 	findEarliestBus,
+	findWhenBusesAlign,
 };
