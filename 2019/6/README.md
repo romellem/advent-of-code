@@ -90,14 +90,14 @@ For example, suppose you have the following map:
 
 Visually, the above map of orbits looks like this:
 
-                              YOU
-                             /
-            G - H       J - K - L
-           /           /
-    COM - B - C - D - E - F
-                   \
-                    I - SAN
-    
+<pre><code>                          <b>YOU</b>
+                         <b>/</b>
+        G - H       <b>J - K</b> - L
+       /           <b>/</b>
+COM - B - C - <b>D - E</b> - F
+               <b>\</b>
+                <b>I - SAN</b>
+</code></pre>
 
 In this example, `YOU` are in orbit around `K`, and `SAN` is in orbit around `I`. To move from `K` to `I`, a minimum of `4` orbital transfers are required:
 
@@ -108,13 +108,13 @@ In this example, `YOU` are in orbit around `K`, and `SAN` is in orbit around `I`
 
 Afterward, the map of orbits looks like this:
 
-            G - H       J - K - L
-           /           /
-    COM - B - C - D - E - F
-                   \
-                    I - SAN
-                     \
-                      YOU
-    
+<pre><code>        G - H       J - K - L
+       /           /
+COM - B - C - D - E - F
+               \
+                I - SAN
+                 <b>\</b>
+                  <b>YOU</b>
+</code></pre>
 
 _What is the minimum number of orbital transfers required_ to move from the object `YOU` are orbiting to the object `SAN` is orbiting? (Between the objects they are orbiting - _not_ between `YOU` and `SAN`.)

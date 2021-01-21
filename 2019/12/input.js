@@ -1,10 +1,22 @@
-const input = [
-	// [x,  y,   z ]
-	[ -16, -1, -12 ],
-	[   0, -4, -17 ],
-	[ -11, 11,   0 ],
-	[   2,  2,  -6 ],
-];
+const path = require('path');
+const fs = require('fs');
+
+const strsToInts = (...nums) => nums.map((n) => parseInt(n, 10));
+
+/**
+ * @example [[1, 2, 3], [-1, -2, -3], ...]
+ */
+const input = fs
+	.readFileSync(path.join(__dirname, 'input.txt'), 'utf8')
+	.toString()
+	.trim()
+	.split('\n')
+	.map((line) => {
+		// @example <x=-16, y=-1, z=-12>
+		let [, x, y, z] = /^\<x=(-?\d+), y=(-?\d+), z=(-?\d+)\>$/.exec(line);
+		[x, y, z] = strsToInts(x, y, z);
+		return [x, y, z];
+	});
 
 module.exports = {
 	sampleInput: {

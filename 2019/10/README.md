@@ -16,12 +16,12 @@ Your job is to figure out which asteroid would be the best place to build a _new
 
 For example, consider the following map:
 
-    .#..#
-    .....
-    #####
-    ....#
-    ...##
-    
+<pre><code>.#..#
+.....
+#####
+....#
+...<b>#</b>#
+</code></pre>
 
 The best location for a new monitoring station on this map is the highlighted asteroid at `3,4` because it can detect `8` asteroids, more than any other location. (The only asteroid it cannot detect is the one at `1,0`; its view of this asteroid is blocked by the asteroid at `2,2`.) All other asteroids are worse locations; they can detect `7` or fewer other asteroids. Here is the number of other asteroids a monitoring station on each asteroid could detect:
 
@@ -50,69 +50,69 @@ Here are some larger examples:
 
 *   Best is `5,8` with `33` other asteroids detected:
     
-        ......#.#.
-        #..#.#....
-        ..#######.
-        .#.#.###..
-        .#..#.....
-        ..#....#.#
-        #..#....#.
-        .##.#..###
-        ##...#..#.
-        .#....####
-        
+    <pre><code>......#.#.
+#..#.#....
+..#######.
+.#.#.###..
+.#..#.....
+..#....#.#
+#..#....#.
+.##.#..###
+##...<b>#</b>..#.
+.#....####
+</code></pre>
     
 *   Best is `1,2` with `35` other asteroids detected:
     
-        #.#...#.#.
-        .###....#.
-        .#....#...
-        ##.#.#.#.#
-        ....#.#.#.
-        .##..###.#
-        ..#...##..
-        ..##....##
-        ......#...
-        .####.###.
-        
+    <pre><code>#.#...#.#.
+.###....#.
+.<b>#</b>....#...
+##.#.#.#.#
+....#.#.#.
+.##..###.#
+..#...##..
+..##....##
+......#...
+.####.###.
+</code></pre>
     
 *   Best is `6,3` with `41` other asteroids detected:
     
-        .#..#..###
-        ####.###.#
-        ....###.#.
-        ..###.##.#
-        ##.##.#.#.
-        ....###..#
-        ..#.#..#.#
-        #..#.#.###
-        .##...##.#
-        .....#.#..
-        
+    <pre><code>.#..#..###
+####.###.#
+....###.#.
+..###.<b>#</b>#.#
+##.##.#.#.
+....###..#
+..#.#..#.#
+#..#.#.###
+.##...##.#
+.....#.#..
+</code></pre>
     
 *   Best is `11,13` with `210` other asteroids detected:
     
-        .#..##.###...#######
-        ##.############..##.
-        .#.######.########.#
-        .###.#######.####.#.
-        #####.##.#.##.###.##
-        ..#####..#.#########
-        ####################
-        #.####....###.#.#.##
-        ##.#################
-        #####.##.###..####..
-        ..######..##.#######
-        ####.##.####...##..#
-        .#####..#.######.###
-        ##...#.##########...
-        #.##########.#######
-        .####.#.###.###.#.##
-        ....##.##.###..#####
-        .#.#.###########.###
-        #.#.#.#####.####.###
-        ###.##.####.##.#..##
-        
+    <pre><code>.#..##.###...#######
+##.############..##.
+.#.######.########.#
+.###.#######.####.#.
+#####.##.#.##.###.##
+..#####..#.#########
+####################
+#.####....###.#.#.##
+##.#################
+#####.##.###..####..
+..######..##.#######
+####.##.####...##..#
+.#####..#.######.###
+##...#.####<b>#</b>#####...
+#.##########.#######
+.####.#.###.###.#.##
+....##.##.###..#####
+.#.#.###########.###
+#.#.#.#####.####.###
+###.##.####.##.#..##
+</code></pre>
     
 
 Find the best location for a new monitoring station. _How many other asteroids can be detected from that location?_
@@ -140,39 +140,39 @@ For example, consider the following map, where the asteroid with the new monitor
 
 The first nine asteroids to get vaporized, in order, would be:
 
-    .#....###24...#..
-    ##...##.13#67..9#
-    ##...#...5.8####.
-    ..#.....X...###..
-    ..#.#.....#....##
-    
+<pre><code>.#....###<b>2</b><b>4</b>...#..
+##...##.<b>1</b><b>3</b>#<b>6</b><b>7</b>..<b>9</b>#
+##...#...<b>5</b>.<b>8</b>####.
+..#.....X...###..
+..#.#.....#....##
+</code></pre>
 
 Note that some asteroids (the ones behind the asteroids marked `1`, `5`, and `7`) won't have a chance to be vaporized until the next full rotation. The laser continues rotating; the next nine to be vaporized are:
 
-    .#....###.....#..
-    ##...##...#.....#
-    ##...#......1234.
-    ..#.....X...5##..
-    ..#.9.....8....76
-    
+<pre><code>.#....###.....#..
+##...##...#.....#
+##...#......<b>1</b><b>2</b><b>3</b><b>4</b>.
+..#.....X...<b>5</b>##..
+..#.<b>9</b>.....<b>8</b>....<b>7</b><b>6</b>
+</code></pre>
 
 The next nine to be vaporized are then:
 
-    .8....###.....#..
-    56...9#...#.....#
-    34...7...........
-    ..2.....X....##..
-    ..1..............
-    
+<pre><code>.<b>8</b>....###.....#..
+<b>5</b><b>6</b>...<b>9</b>#...#.....#
+<b>3</b><b>4</b>...<b>7</b>...........
+..<b>2</b>.....X....##..
+..<b>1</b>..............
+</code></pre>
 
 Finally, the laser completes its first full rotation (`1` through `3`), a second rotation (`4` through `8`), and vaporizes the last asteroid (`9`) partway through its third rotation:
 
-    ......234.....6..
-    ......1...5.....7
-    .................
-    ........X....89..
-    .................
-    
+<pre><code>......<b>2</b><b>3</b><b>4</b>.....<b>6</b>..
+......<b>1</b>...<b>5</b>.....<b>7</b>
+.................
+........X....<b>8</b><b>9</b>..
+.................
+</code></pre>
 
 In the large example above (the one with the best monitoring station location at `11,13`):
 
