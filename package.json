@@ -24,7 +24,7 @@
     "get-divisors": "^1.0.0",
     "jimp": "^0.16.0",
     "jsnetworkx": "^0.3.4",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "looped-list": "^0.5.0",
     "manhattan": "^1.0.0",
     "pathfinding": "^0.4.18",
