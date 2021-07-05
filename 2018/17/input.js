@@ -99,7 +99,7 @@ const parseInput = (raw_input) => {
 };
 
 /**
- * @property {InputValues}
+ * @param {InputValues}
  */
 const trimInputGrid = ({ grid, min_x }) => {
 	return Array(grid.length)
@@ -108,18 +108,10 @@ const trimInputGrid = ({ grid, min_x }) => {
 };
 
 /**
- * Returns a trimmed string of our grid
+ * @param {InputValues}
+ * @returns {String} Returns a trimmed string of our grid
  */
-const gridToString = (grid) => {
-	let min_x = Number.MAX_SAFE_INTEGER;
-	for (let row of grid) {
-		for (let x of row) {
-			if (x < min_x) {
-				min_x = x;
-			}
-		}
-	}
-
+const gridToString = ({ grid, min_x }) => {
 	return grid
 		.map((row) =>
 			row
