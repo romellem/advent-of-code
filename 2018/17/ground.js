@@ -9,8 +9,24 @@ const Jimp = require('jimp');
  * @property {Number} max_y
  */
 
+/**
+ * @typedef {Object} SurroundingCoords
+ * @property {Number} N
+ * @property {Number} NW
+ * @property {Number} NE
+ * @property {Number} E
+ * @property {Number} W
+ * @property {Number} S
+ * @property {Number} SW
+ * @property {Number} SE
+ */
+
 class Grid {
 	constructor(raw_input) {
+		if (!raw_input) {
+			return this;
+		}
+
 		const { grid, min_x, max_x, min_y, max_y } = Grid.parseInput(raw_input);
 		this.grid = grid;
 		this.min_x = min_x;
@@ -116,6 +132,41 @@ class Grid {
 			.map((_, y) => this.grid[y].slice(this.min_x));
 	}
 
+	/**
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @returns {SurroundingCoords}
+	 */
+	getSurrounding(x, y) {
+		let N, NW, NE;
+		if (y > this.min_y) {
+			N = this.grid[y - 1][x];
+			NW = this.grid[y - 1][x - 1];
+			NE = this.grid[y - 1][x + 1];
+		}
+
+		let E = this.grid[y][x + 1];
+		let W = this.grid[y][x - 1];
+
+		let S, SW, SE;
+		if (y < this.max_y) {
+			S = this.grid[y + 1][x];
+			SW = this.grid[y + 1][x - 1];
+			SE = this.grid[y + 1][x + 1];
+		}
+
+		return { N, NW, NE, E, W, S, SW, SE };
+	}
+
+	clone() {
+		const new_grid = new Grid();
+		new_grid.min_x = this.min_x;
+		new_grid.max_x = this.max_x;
+		new_grid.min_y = this.min_y;
+		new_grid.max_y = this.max_y;
+		return new_grid;
+	}
+
 	toString(trimmed = true) {
 		return this.grid
 			.map((row) => {
@@ -147,6 +198,28 @@ class Ground {
 		this.spring_x = spring_x;
 		this.spring_y = spring_y;
 	}
+
+	createDrip(from_x, from_y) {
+		return () => this.drip(from_x, from_y);
+	}
+
+	drip(from_x, from_y) {
+		let surrounding_coords = this.grid.getSurrounding(from_x, from_y);
+
+		// C
+		if (surrounding_coords.S) {
+
+		}
+	}
+
+	fill() {
+		const grid = this.grid.clone();
+		// Init with single drip
+		const steps = [this.createDrip(this.spring_x, this.spring_y)];
+		return this._fill(grid, steps);
+	}
+
+	_fill(grid, steps) {}
 
 	/**
 	 * @returns {Promise<Buffer>} Returns a PNG buffer, which can then be written out to a file
