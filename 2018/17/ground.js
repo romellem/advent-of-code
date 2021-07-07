@@ -158,12 +158,45 @@ class Grid {
 		return { N, NW, NE, E, W, S, SW, SE };
 	}
 
+	/**
+	 * All "peeks" can be called with two params, x/y,
+	 * or an object `{ x, y }`
+	 */
+	peekNorth(x, y) {
+		if (typeof x === 'object') ({x, y}) = x;
+		return this.grid[y - 1]?.[x];
+	}
+	peekSouth(x, y) {
+		if (typeof x === 'object') ({x, y}) = x;
+		return this.grid[y + 1]?.[x];
+	}
+	peekEast(x, y) {
+		if (typeof x === 'object') ({x, y}) = x;
+		return this.grid[y]?.[x + 1];
+	}
+	peekWest(x, y) {
+		if (typeof x === 'object') ({x, y}) = x;
+		return this.grid[y]?.[x - 1];
+	}
+
+	mark({ x, y, fromX, toX, as }) {
+		if (fromX !== undefined && toX !== undefined && this.grid[y]) {
+			for (let px = fromX; px <= toX; px++) {
+				this.grid[y][px] = as;
+			}
+		} else if (this.grid[y]) {
+			this.grid[y][x] = as;
+		}
+	}
+
 	clone() {
 		const new_grid = new Grid();
+		new_grid.grid = JSON.parse(JSON.stringify(this.grid));
 		new_grid.min_x = this.min_x;
 		new_grid.max_x = this.max_x;
 		new_grid.min_y = this.min_y;
 		new_grid.max_y = this.max_y;
+
 		return new_grid;
 	}
 
@@ -180,18 +213,6 @@ class Grid {
 	}
 }
 
-const newImage = (width, height, initial_color = '#FFFFFF') => {
-	return new Promise((resolve, reject) => {
-		new Jimp(width, height, initial_color, (err, image) => {
-			if (err) {
-				reject(err);
-			} else {
-				resolve(image);
-			}
-		});
-	});
-};
-
 class Ground {
 	constructor({ grid, spring_x = 500, spring_y = 0 }) {
 		this.grid = grid;
@@ -199,27 +220,24 @@ class Ground {
 		this.spring_y = spring_y;
 	}
 
-	createDrip(from_x, from_y) {
-		return () => this.drip(from_x, from_y);
-	}
-
-	drip(from_x, from_y) {
-		let surrounding_coords = this.grid.getSurrounding(from_x, from_y);
-
-		// C
-		if (surrounding_coords.S) {
-
-		}
+	static createDrip(x, y) {
+		return { x, y };
 	}
 
 	fill() {
 		const grid = this.grid.clone();
 		// Init with single drip
-		const steps = [this.createDrip(this.spring_x, this.spring_y)];
-		return this._fill(grid, steps);
+		const drips = [Ground.createDrip(this.spring_x, this.spring_y)];
+		return this._fill(grid, drips);
 	}
 
-	_fill(grid, steps) {}
+	_fill(grid, drips) {
+		while (drips.length) {
+			for (let drip of drips) {
+
+			}
+		}
+	}
 
 	/**
 	 * @returns {Promise<Buffer>} Returns a PNG buffer, which can then be written out to a file
@@ -231,7 +249,16 @@ class Ground {
 		const grid_instance = this.grid;
 		const grid = trimmed ? grid_instance.trimmed : grid_instance.grid;
 
-		const image = await newImage(grid[0].length, grid.length, '#FFFFFF');
+		const image = await (new Promise((resolve, reject) => {
+			new Jimp(grid[0].length, grid.length, '#FFFFFF', (err, image) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(image);
+				}
+			});
+		}));
+
 		for (let y = 0; y < grid.length; y++) {
 			let row = grid[y];
 			for (let x = 0; x < row.length; x++) {
