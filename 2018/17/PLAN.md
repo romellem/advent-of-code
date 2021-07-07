@@ -1,79 +1,40 @@
 ```
-Let `drips` be a stack
+Let `drips` be an array of objects, tracking:
+ - x
+ - y
+init'd with a drip at 500,0
 
-While drips has length
-
-Peek top drip, store as current drip
+Loop through drips until we have no more, with each one:
 
 if cell below is greater than max,
-    bail
+    pop and bail
 
-if current drip is down
-    if cell below current drip is SAND,
-        push new down drip onto stack, mark map as FLOW
-    if cell below current drip is CLAY,
-        pop current drip
-        push new left/right drip onto stack, mark map as FLOW
-    if cell below current drip is REST,
-        pop current drip
-        push new left/right drip onto stack, mark map as FLOW
-if current drip is left/right
-    pop current drip
-    if CLAY on both left/right
-        Mark map as REST in x-axis
-    if CLAY on left but not right
-        Get clay x and sand cell with sand below x, mark map between as FLOW
-        push new down drip onto stack
-    if CLAY on right but not left
-        Get clay x and sand cell with sand below x, mark map between as FLOW
-        push new down drip onto stack
-    
+if cell below current drip is SAND,
+    mark map as FLOWING
+    move drip down 1
+if cell below current drip is CLAY or SETTLED,
+    Move left, checking floor below continually to stay CLAY or SETTLED
+        If we eventually meet CLAY or SETTLED to the left,
+            var barrier_left = {x,y} of barrier
+        else
+            var flow_left = {x,y} of where the drip would start
+    Move right, checking floor below continually to stay CLAY or SETTLED
+        If we eventually meet CLAY or SETTLED to the right,
+            var barrier_right = {x,y}
+        else
+            var flow_right = {x,y} of where the drip would start
+    If barrier_left AND barrier_right
+        Mark from barrier_left to barrier_right to be SETTLED
+        move drip up 1
+    else if barrier_left AND flow_right
+        mark from barrier_left to flow_right to be FLOWING
+        move drip to flow_right
+    else if barrier_right AND flow_left
+        mark from barrier_right to flow_left to be FLOWING
+        move drip to flow_left
+     else if flow_left AND flow_right
+        mark from flow_left to flow_right to be FLOWING
+        move drip to flow_left
+        push new drip to flow_right
 
-
-
-[
-    [500, 0, down]
-    [500, 1, down]
-    [500, 2, down]
-    [500, 3, down]
-    [500, 4, down]
-    [500, 5, down]
-    [500, 6, down]
-]
-
-pop [500, 6, down]
-psh [500, 6, left/right]
-
-[
-    [500, 0, down]
-    [500, 1, down]
-    [500, 2, down]
-    [500, 3, down]
-    [500, 4, down]
-    [500, 5, down]
-    [500, 6, left/right]
-]
-
-pop [500, 6, left/right]
-
-[
-    [500, 0, down]
-    [500, 1, down]
-    [500, 2, down]
-    [500, 3, down]
-    [500, 4, down]
-    [500, 5, down]
-]
-
-pop [500, 5, down]
-psh [500, 5, left/right]
-
-[
-    [500, 0, down]
-    [500, 1, down]
-    [500, 2, down]
-    [500, 3, down]
-    [500, 4, down]
-    [500, 5, down]
-]
 ```
