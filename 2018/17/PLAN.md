@@ -1,5 +1,5 @@
 ```
-Let `drips` be an array of objects, tracking:
+Let `drips` be a Set of Points, tracking:
  - x
  - y
 init'd with a drip at 500,0
@@ -7,10 +7,10 @@ init'd with a drip at 500,0
 Loop through drips until we have no more, with each one:
 
 if cell below is greater than max,
-    pop and bail
+    delete drip and bail
 
 if cell below current drip is SAND,
-    mark map as FLOWING
+    mark map below current as FLOWING
     move drip down 1
 if cell below current drip is CLAY or SETTLED,
     Move left, checking floor below continually to stay CLAY or SETTLED

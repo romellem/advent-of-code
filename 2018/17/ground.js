@@ -21,6 +21,60 @@ const Jimp = require('jimp');
  * @property {Number} SE
  */
 
+const SAND = 0;
+const CLAY = 1;
+const FLOWING = 2;
+const SETTLED = 3;
+
+const ASCII_LOOKUP = {
+	[SAND]: '.',
+	[CLAY]: '#',
+	[FLOWING]: '|',
+	[SETTLED]: '~',
+};
+
+class Point {
+	constructor(x, y) {
+		this.x = x;
+		this.y = y;
+	}
+	moveNorth() {
+		this.y -= 1;
+		return this;
+	}
+	north() {
+		return new Point(this.x, this.y - 1);
+	}
+
+	moveSouth() {
+		this.y += 1;
+		return this;
+	}
+	south() {
+		return new Point(this.x, this.y + 1);
+	}
+
+	moveEast() {
+		this.x += 1;
+		return this;
+	}
+	east() {
+		return new Point(this.x + 1, this.y);
+	}
+
+	moveWest() {
+		this.x -= 1;
+		return this;
+	}
+	west() {
+		return new Point(this.x - 1, this.y);
+	}
+
+	getGrid(grid) {
+		return grid[this.y]?.[this.x];
+	}
+}
+
 class Grid {
 	constructor(raw_input) {
 		if (!raw_input) {
@@ -65,7 +119,7 @@ class Grid {
 	 * @returns {InputValues}
 	 */
 	static parseInput(raw_input) {
-		const grid_map = {};
+		const grid_set = new Set();
 		const lines = raw_input.split('\n');
 		for (let raw_line of lines) {
 			let [, axis_a, range_a, axis_b, range_b] =
@@ -80,12 +134,12 @@ class Grid {
 					 * order doesn't matter: I always will get an `x,y` string.
 					 */
 					let key = Grid.toCoordString({ [axis_a]: a, [axis_b]: b });
-					grid_map[key] = 1;
+					grid_set.add(key);
 				}
 			}
 		}
 
-		const coords = Object.keys(grid_map).map((coord_str) =>
+		const coords = [...grid_set].map((coord_str) =>
 			coord_str.split(',').map((v) => parseInt(v))
 		);
 		let min_x = Number.MAX_SAFE_INTEGER;
@@ -112,9 +166,9 @@ class Grid {
 		 */
 		const grid = Array(max_y + 1)
 			.fill()
-			.map((_) => Array(max_x + 1).fill(0));
+			.map((_) => Array(max_x + 1).fill(SAND));
 		for (let [x, y] of coords) {
-			grid[y][x] = 1;
+			grid[y][x] = CLAY;
 		}
 
 		return {
@@ -179,13 +233,13 @@ class Grid {
 		return this.grid[y]?.[x - 1];
 	}
 
-	mark({ x, y, fromX, toX, as }) {
+	mark({ x, y, fromX, toX, as: obj_as }, alt_as) {
 		if (fromX !== undefined && toX !== undefined && this.grid[y]) {
 			for (let px = fromX; px <= toX; px++) {
-				this.grid[y][px] = as;
+				this.grid[y][px] = obj_as ?? alt_as;
 			}
 		} else if (this.grid[y]) {
-			this.grid[y][x] = as;
+			this.grid[y][x] = obj_as ?? alt_as;
 		}
 	}
 
@@ -203,7 +257,7 @@ class Grid {
 	toString(trimmed = true) {
 		return this.grid
 			.map((row) => {
-				let line = row.map((v) => (v === 1 ? '#' : '.')).join('');
+				let line = row.map((v) => ASCII_LOOKUP[v]).join('');
 				if (trimmed) {
 					line = line.slice(Math.max(this.min_x - 1, 0));
 				}
@@ -221,20 +275,23 @@ class Ground {
 	}
 
 	static createDrip(x, y) {
-		return { x, y };
+		return new Point(x, y);
 	}
 
 	fill() {
 		const grid = this.grid.clone();
 		// Init with single drip
-		const drips = [Ground.createDrip(this.spring_x, this.spring_y)];
-		return this._fill(grid, drips);
-	}
-
-	_fill(grid, drips) {
-		while (drips.length) {
+		const drips = new Set([Ground.createDrip(this.spring_x, this.spring_y)]);
+		while (drips.size > 0) {
 			for (let drip of drips) {
+				if (drip.y > this.grid.max_y) {
+					drips.delete(drip);
+					continue;
+				}
 
+				if (grid.peekSouth(drip) === SAND) {
+					this.grid.mark(drip.moveSouth(), FLOWING);
+				}
 			}
 		}
 	}
