@@ -13,7 +13,7 @@ if cell below current drip is SAND,
     mark map below current as FLOWING
     move drip down 1
 if cell below current drip is CLAY or SETTLED,
-    Move left, checking floor below continually to stay CLAY or SETTLED
+    Move left, checking floor below continually to remain CLAY or SETTLED
         If we eventually meet CLAY or SETTLED to the left,
             var barrier_left = {x,y} of barrier
         else
@@ -30,7 +30,7 @@ if cell below current drip is CLAY or SETTLED,
         mark from barrier_left to flow_right to be FLOWING
         move drip to flow_right
     else if barrier_right AND flow_left
-        mark from barrier_right to flow_left to be FLOWING
+        mark from flow_left to barrier_right to be FLOWING
         move drip to flow_left
      else if flow_left AND flow_right
         mark from flow_left to flow_right to be FLOWING

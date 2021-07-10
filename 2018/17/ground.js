@@ -38,6 +38,13 @@ class Point {
 		this.x = x;
 		this.y = y;
 	}
+
+	moveTo(x, y) {
+		if (typeof x === 'object') ({ x, y } = x);
+		this.x = x;
+		this.y = y;
+	}
+
 	moveNorth() {
 		this.y -= 1;
 		return this;
@@ -113,6 +120,10 @@ class Grid {
 	}
 
 	static toCoordString = ({ x, y }) => `${x},${y}`;
+
+	static isClayOrSettled(cell) {
+		return cell === CLAY || cell === SETTLED;
+	}
 
 	/**
 	 * @param {String} raw_input Your raw input, with whitespace trimmed
@@ -217,29 +228,37 @@ class Grid {
 	 * or an object `{ x, y }`
 	 */
 	peekNorth(x, y) {
-		if (typeof x === 'object') ({x, y}) = x;
+		if (typeof x === 'object') ({ x, y } = x);
 		return this.grid[y - 1]?.[x];
 	}
 	peekSouth(x, y) {
-		if (typeof x === 'object') ({x, y}) = x;
+		if (typeof x === 'object') ({ x, y } = x);
 		return this.grid[y + 1]?.[x];
 	}
 	peekEast(x, y) {
-		if (typeof x === 'object') ({x, y}) = x;
+		if (typeof x === 'object') ({ x, y } = x);
 		return this.grid[y]?.[x + 1];
 	}
 	peekWest(x, y) {
-		if (typeof x === 'object') ({x, y}) = x;
+		if (typeof x === 'object') ({ x, y } = x);
 		return this.grid[y]?.[x - 1];
 	}
 
+	peek(x, y) {
+		if (typeof x === 'object') ({ x, y } = x);
+		return this.grid[y]?.[x];
+	}
+
 	mark({ x, y, fromX, toX, as: obj_as }, alt_as) {
-		if (fromX !== undefined && toX !== undefined && this.grid[y]) {
-			for (let px = fromX; px <= toX; px++) {
-				this.grid[y][px] = obj_as ?? alt_as;
+		if (this.grid[y] !== undefined) {
+			if (fromX !== undefined && toX !== undefined) {
+				let increment = fromX < toX ? 1 : -1;
+				for (let px = fromX; px <= toX; px += increment) {
+					this.grid[y][px] = obj_as ?? alt_as;
+				}
+			} else {
+				this.grid[y][x] = obj_as ?? alt_as;
 			}
-		} else if (this.grid[y]) {
-			this.grid[y][x] = obj_as ?? alt_as;
 		}
 	}
 
@@ -274,14 +293,10 @@ class Ground {
 		this.spring_y = spring_y;
 	}
 
-	static createDrip(x, y) {
-		return new Point(x, y);
-	}
-
 	fill() {
 		const grid = this.grid.clone();
 		// Init with single drip
-		const drips = new Set([Ground.createDrip(this.spring_x, this.spring_y)]);
+		const drips = new Set([new Point(this.spring_x, this.spring_y)]);
 		while (drips.size > 0) {
 			for (let drip of drips) {
 				if (drip.y > this.grid.max_y) {
@@ -289,11 +304,90 @@ class Ground {
 					continue;
 				}
 
-				if (grid.peekSouth(drip) === SAND) {
-					this.grid.mark(drip.moveSouth(), FLOWING);
+				let below_drip = grid.peekSouth(drip);
+				if (below_drip === SAND) {
+					grid.mark(drip.moveSouth(), FLOWING);
+				} else if (Grid.isClayOrSettled(below_drip)) {
+					// Flow left
+					let left_drip = drip;
+					let barrier_left, flow_left;
+					while (!barrier_left && !flow_left) {
+						left_drip = left_drip.west();
+						let below_left_drip = grid.peekSouth(left_drip);
+						if (!Grid.isClayOrSettled(below_left_drip)) {
+							// Will flow downwards
+							flow_left = left_drip;
+						} else if (Grid.isClayOrSettled(grid.peekWest(left_drip))) {
+							// Technically is space just to right of barrier
+							barrier_left = left_drip;
+						}
+					}
+
+					// Flow right
+					let right_drip = drip;
+					let barrier_right, flow_right;
+					while (!barrier_right && !flow_right) {
+						right_drip = right_drip.east();
+						let below_right_drip = grid.peekSouth(right_drip);
+						if (!Grid.isClayOrSettled(below_right_drip)) {
+							// Will flow downwards
+							flow_right = right_drip;
+						} else if (Grid.isClayOrSettled(grid.peekEast(right_drip))) {
+							// Technically is space just to left of barrier
+							barrier_right = right_drip;
+						}
+					}
+
+					if (barrier_left && barrier_right) {
+						grid.mark({
+							y: barrier_left.y,
+							fromX: barrier_left.x,
+							toX: barrier_right.x,
+							as: SETTLED,
+						});
+						drip.moveNorth();
+					} else if (barrier_left && flow_right) {
+						grid.mark({
+							y: barrier_left.y,
+							fromX: barrier_left.x,
+							toX: flow_right.x,
+							as: FLOWING,
+						});
+						drip.moveTo(flow_right);
+					} else if (barrier_right && flow_left) {
+						grid.mark({
+							y: barrier_right.y,
+							fromX: flow_left.x,
+							toX: barrier_right.x,
+							as: FLOWING,
+						});
+						drip.moveTo(flow_right);
+					} else if (flow_left && flow_right) {
+						grid.mark({
+							y: flow_left.y,
+							fromX: flow_left.x,
+							toX: flow_right.x,
+							as: FLOWING,
+						});
+						drip.moveTo(flow_left);
+						drips.add(flow_right);
+					} else {
+						throw new Error('Should not happen');
+					}
+				} else {
+					console.log('Flowing beneath drip?');
+					console.log({
+						x: drip.x,
+						y: drip.y,
+						below_drip,
+						ascii: ASCII_LOOKUP[below_drip],
+					});
+					drips.delete(drip);
 				}
 			}
 		}
+
+		console.log('done');
 	}
 
 	/**
@@ -306,7 +400,7 @@ class Ground {
 		const grid_instance = this.grid;
 		const grid = trimmed ? grid_instance.trimmed : grid_instance.grid;
 
-		const image = await (new Promise((resolve, reject) => {
+		const image = await new Promise((resolve, reject) => {
 			new Jimp(grid[0].length, grid.length, '#FFFFFF', (err, image) => {
 				if (err) {
 					reject(err);
@@ -314,7 +408,7 @@ class Ground {
 					resolve(image);
 				}
 			});
-		}));
+		});
 
 		for (let y = 0; y < grid.length; y++) {
 			let row = grid[y];
@@ -326,9 +420,7 @@ class Ground {
 			}
 		}
 
-		let spring_x = trimmed
-			? this.spring_x - this.grid.min_x
-			: this.spring_x;
+		let spring_x = trimmed ? this.spring_x - this.grid.min_x : this.spring_x;
 		image.setPixelColor(BLUE, spring_x, this.spring_y);
 
 		const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
@@ -337,16 +429,10 @@ class Ground {
 
 	toString(trimmed = true) {
 		let grid_str = this.grid.toString(trimmed);
-		let spring_x = trimmed
-			? this.spring_x - this.grid.min_x
-			: this.spring_x;
+		let spring_x = trimmed ? this.spring_x - this.grid.min_x : this.spring_x;
 
 		// Spring is a '+' char in the first row
-		return (
-			grid_str.substring(0, spring_x) +
-			'+' +
-			grid_str.substring(spring_x + 1)
-		);
+		return grid_str.substring(0, spring_x) + '+' + grid_str.substring(spring_x + 1);
 	}
 }
 
