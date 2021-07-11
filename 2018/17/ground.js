@@ -1,4 +1,5 @@
 const Jimp = require('jimp');
+const fs = require('fs');
 
 /**
  * @typedef {Object} InputValues
@@ -284,6 +285,21 @@ class Grid {
 			})
 			.join('\n');
 	}
+
+	sum() {
+		const sums = {
+			[SAND]: 0,
+			[CLAY]: 0,
+			[FLOWING]: 0,
+			[SETTLED]: 0,
+		};
+		for (let row of this.grid) {
+			for (let col of row) {
+				sums[col]++;
+			}
+		}
+		return sums;
+	}
 }
 
 class Ground {
@@ -293,13 +309,19 @@ class Ground {
 		this.spring_y = spring_y;
 	}
 
-	fill() {
+	async fill() {
 		const grid = this.grid.clone();
 		// Init with single drip
 		const drips = new Set([new Point(this.spring_x, this.spring_y)]);
+
+		let buffers = [];
+		let iter = 0;
 		while (drips.size > 0) {
+			let image_buffer = await this.toImage(true, grid);
+			buffers.push(image_buffer);
+			console.log((++iter / 2903 * 100) + '%');
 			for (let drip of drips) {
-				if (drip.y > this.grid.max_y) {
+				if (drip.y >= this.grid.max_y) {
 					drips.delete(drip);
 					continue;
 				}
@@ -361,7 +383,7 @@ class Ground {
 							toX: barrier_right.x,
 							as: FLOWING,
 						});
-						drip.moveTo(flow_right);
+						drip.moveTo(flow_left);
 					} else if (flow_left && flow_right) {
 						grid.mark({
 							y: flow_left.y,
@@ -387,17 +409,25 @@ class Ground {
 			}
 		}
 
-		console.log('done');
+		console.log('writing files')
+		let frames_length = String(buffers.length).length;
+		for (let i = 0; i < buffers.length; i++) {
+			let file = `frames/frame_${i.toString().padStart(frames_length, '0')}.png`;
+			fs.writeFileSync(file, buffers[i]);
+		}
+		return grid.sum();
 	}
 
 	/**
 	 * @returns {Promise<Buffer>} Returns a PNG buffer, which can then be written out to a file
 	 */
-	async toImage(trimmed = true) {
+	async toImage(trimmed = true, _grid) {
 		const BLACK = Jimp.cssColorToHex('#000000');
+		const GREEN = Jimp.cssColorToHex('#00FF00');
+		const CYAN = Jimp.cssColorToHex('#00FFFF');
 		const BLUE = Jimp.cssColorToHex('#0000FF');
 
-		const grid_instance = this.grid;
+		const grid_instance = _grid || this.grid;
 		const grid = trimmed ? grid_instance.trimmed : grid_instance.grid;
 
 		const image = await new Promise((resolve, reject) => {
@@ -414,14 +444,24 @@ class Ground {
 			let row = grid[y];
 			for (let x = 0; x < row.length; x++) {
 				let cell = row[x];
-				if (cell) {
-					image.setPixelColor(BLACK, x, y);
+				switch (cell) {
+					case CLAY:
+						image.setPixelColor(BLACK, x, y);
+						break;
+					case FLOWING:
+						image.setPixelColor(CYAN, x, y);
+						break;
+					case SETTLED:
+						image.setPixelColor(BLUE, x, y);
+						break;
+					default:
+						break;
 				}
 			}
 		}
 
 		let spring_x = trimmed ? this.spring_x - this.grid.min_x : this.spring_x;
-		image.setPixelColor(BLUE, spring_x, this.spring_y);
+		image.setPixelColor(GREEN, spring_x, this.spring_y);
 
 		const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
 		return buffer;
