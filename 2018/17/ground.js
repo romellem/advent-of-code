@@ -82,6 +82,43 @@ class Point {
 	getGrid(grid) {
 		return grid[this.y]?.[this.x];
 	}
+
+	toString() {
+		return `${this.x},${this.y}`;
+	}
+}
+
+class Drips {
+	constructor(drips_iter = []) {
+		/**
+		 * Use a map with drips keyed off their stringified version.
+		 * This is useful because it effectively "de-dups" my drips.
+		 * When I have two flows rising up to eventually split left and
+		 * right again, I don't want to have duplicate drips on either side.
+		 * This class is just an abstractiong on top of Map, to make it
+		 * seem like I'm still just operating on a Set.
+		 */
+		this.drips_map = new Map();
+		for (let drip of drips_iter) {
+			this.drips_map.set(drip.toString(), drip);
+		}
+	}
+
+	get size() {
+		return this.drips_map.size;
+	}
+
+	add(drip) {
+		return this.drips_map.set(drip.toString(), drip);
+	}
+
+	delete(drip) {
+		return this.drips_map.delete(drip.toString());
+	}
+
+	[Symbol.iterator]() {
+		return this.drips_map.values();
+	}
 }
 
 class Grid {
@@ -291,26 +328,20 @@ class Ground {
 		this.spring_y = spring_y;
 	}
 
-	async fill() {
+	async fill(output_frames = false) {
 		const grid = this.grid.clone();
 		// Init with single drip
-		const drips = new Set([new Point(this.spring_x, this.spring_y)]);
+		const drips = new Drips([new Point(this.spring_x, this.spring_y)]);
 
 		let buffers = [];
 		let iter = 0;
 		while (drips.size > 0) {
-			// let image_buffer = await this.toImageSlice(drips, grid);
-			// buffers.push(image_buffer);
-			// console.log((++iter / 2903) * 100 + '%');
-			// console.log(++iter);
-			if (iter === 202) {
-				debugger;
+			console.log(drips.size, ' ', ++iter);
+			if (output_frames) {
+				let image_buffer = await this.toImageSlice(drips, grid);
+				buffers.push(image_buffer);
 			}
 
-			// if (iter > 120) {
-			// 	drips.clear();
-			// 	break;
-			// }
 			let new_drips = [];
 			for (let drip of drips) {
 				if (drip.y >= this.grid.max_y) {
@@ -319,6 +350,7 @@ class Ground {
 				}
 
 				if (grid.peek(drip) === SETTLED) {
+					// Happen when two drips meet clay: the first one settles, 2nd one should skip
 					drip.moveNorth();
 					continue;
 				}
@@ -413,6 +445,7 @@ class Ground {
 			for (let new_drip of new_drips) {
 				drips.add(new_drip);
 			}
+
 		}
 
 		// console.log('writing files');
