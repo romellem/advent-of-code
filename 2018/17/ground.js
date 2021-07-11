@@ -312,16 +312,34 @@ class Ground {
 	static SETTLED = SETTLED;
 
 	async fill(output_frames = false) {
+		// Only used if `output_frames` is true
+		let max_height = 0;
+		let max_width = 0;
+
 		const grid = this.grid.clone();
 		// Init with single drip
 		let drips = new Set([new Point(this.spring_x, this.spring_y)]);
 
-		let buffers = [];
+		const images = [];
+		// let iter = 0;
 		while (drips.size > 0) {
 			if (output_frames) {
-				let image_buffer = await this.toImageSlice(drips, grid);
-				buffers.push(image_buffer);
+				let image_buffer = await this.toImageSlice({
+					drips,
+					grid_instance: grid,
+					callback: async ({ image, drips, grid_instance }) => {
+						// Track max image slice so we can pad all images at the end
+						max_height = Math.max(max_height, image.bitmap.height);
+						max_width = Math.max(max_width, image.bitmap.width);
+						return image;
+					},
+				});
+				// images.push(image_buffer);
 			}
+
+			// if (++iter > 250) {
+			// 	break;
+			// }
 
 			let new_drips = [];
 			for (let drip of drips) {
@@ -343,8 +361,7 @@ class Ground {
 					// Flow left
 					let left_drip = drip;
 					let barrier_left, flow_left;
-					let left_bail = 0;
-					while (!barrier_left && !flow_left && ++left_bail < 9999) {
+					while (!barrier_left && !flow_left) {
 						let below_left_drip = grid.peekSouth(left_drip);
 						if (!Grid.isClayOrSettled(below_left_drip)) {
 							// Will flow downwards
@@ -360,8 +377,7 @@ class Ground {
 					// Flow right
 					let right_drip = drip;
 					let barrier_right, flow_right;
-					let right_bail = 0;
-					while (!barrier_right && !flow_right && ++right_bail < 9999) {
+					while (!barrier_right && !flow_right) {
 						let below_right_drip = grid.peekSouth(right_drip);
 						if (!Grid.isClayOrSettled(below_right_drip)) {
 							// Will flow downwards
@@ -372,11 +388,6 @@ class Ground {
 						} else {
 							right_drip = right_drip.east();
 						}
-					}
-
-					if (left_bail > 9999 || right_bail > 9999) {
-						debugger;
-						break;
 					}
 
 					if (barrier_left && barrier_right) {
@@ -421,11 +432,12 @@ class Ground {
 				}
 			}
 
+			// Add all new drips after we finished our iterations (don't iterate over new drips in middle of loop)
 			for (let new_drip of new_drips) {
 				drips.add(new_drip);
 			}
 
-			// de-dup drips based on unique coordinates
+			// De-dup drips based on unique coordinates
 			let deduped_drip_coords = new Set([...drips].map((v) => v.toString()));
 			if (deduped_drip_coords.size < drips.size) {
 				let deduped_drips = new Set();
@@ -439,26 +451,49 @@ class Ground {
 		if (output_frames) {
 			// Creates frames folder if it doesn't exist
 			fsExtra.emptyDirSync('frames');
-			let frames_length = String(buffers.length).length;
-			for (let i = 0; i < buffers.length; i++) {
+			const frames_length = String(images.length).length;
+
+			// Loop through images and cover to max height
+			const padded_images = await Promise.all(
+				images.map((image) => {
+					image = image.contain(
+						max_width,
+						max_height,
+						Jimp.HORIZONTAL_ALIGN_LEFT | Jimp.VERTICAL_ALIGN_TOP
+					);
+					const buffer = image.getBufferAsync(Jimp.MIME_PNG);
+					return buffer;
+				})
+			);
+			for (let i = 0; i < padded_images.length; i++) {
 				let file = `frames/frame_${i
 					.toString()
 					.padStart(frames_length, '0')}.png`;
-				fs.writeFileSync(file, buffers[i]);
+				fs.writeFileSync(file, padded_images[i]);
 			}
 		}
 
-		let image_buffer = await this.toImage(true, grid);
+		let image_buffer = await this.toImage({
+			trimmed: true,
+			grid_instance: grid,
+			callback: async ({ image, grid_instance }) => {
+				const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
+				return buffer;
+			},
+		});
 		fs.writeFileSync('filled-grid.png', image_buffer);
 
 		return grid.sum();
 	}
 
 	/**
-	 * @returns {Promise<Buffer>} Returns a PNG buffer, which can then be written out to a file
+	 * @param {Object} options
+	 * @param {Boolean} [options.trimmed]
+	 * @param {Grid} [options.grid_instance]
+	 * @param {Function} [options.callback] - Called with `({ image, grid_instance })`.
+	 * @returns {Promise<Jimp|unknown>} Returns a Jimp instance, or the await'd return of `callback`
 	 */
-	async toImage(trimmed = true, _grid) {
-		const grid_instance = _grid || this.grid;
+	async toImage({ trimmed = true, grid_instance = this.grid, callback }) {
 		const grid = trimmed ? grid_instance.trimmed : grid_instance.grid;
 
 		const image = await new Promise((resolve, reject) => {
@@ -491,17 +526,25 @@ class Ground {
 			}
 		}
 
-		let spring_x = trimmed ? this.spring_x - this.grid.min_x : this.spring_x;
+		let spring_x = trimmed ? this.spring_x - grid_instance.min_x : this.spring_x;
 		image.setPixelColor(RED, spring_x, this.spring_y);
 
-		const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
-		return buffer;
+		let return_value = image;
+		if (typeof callback === 'function') {
+			return_value = await callback({ image, grid_instance });
+		}
+
+		return return_value;
 	}
 
 	/**
+	 * @param {Object} options
+	 * @param {Set} [options.drips] - A Set of `Point` instances.
+	 * @param {Grid} [options.grid_instance]
+	 * @param {Function} [options.callback] - Called with `({ image, drips, grid_instance })`.
 	 * @returns {Promise<Buffer>} Returns a PNG buffer, which can then be written out to a file
 	 */
-	async toImageSlice(drips, grid_instance) {
+	async toImageSlice({ drips, grid_instance, callback }) {
 		const grid = grid_instance.trimmed;
 
 		let min_y;
@@ -518,6 +561,12 @@ class Ground {
 		max_y += 40;
 		min_y = Math.max(min_y, 0);
 		max_y = Math.min(max_y, grid_instance.max_y);
+
+		// This was determined from running through everything once
+		const MAX_FRAME_HEIGHT = 175;
+		if ((max_y - min_y + 1) < MAX_FRAME_HEIGHT) {
+			max_y += MAX_FRAME_HEIGHT - (max_y - min_y + 1);
+		}
 
 		const image = await new Promise((resolve, reject) => {
 			new Jimp(grid[0].length, max_y - min_y + 1, '#FFFFFF', (err, image) => {
@@ -552,8 +601,12 @@ class Ground {
 		let spring_x = this.spring_x - grid_instance.min_x;
 		image.setPixelColor(RED, spring_x, this.spring_y - min_y);
 
-		const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
-		return buffer;
+		let return_value = image;
+		if (typeof callback === 'function') {
+			return_value = await callback({ image, drips, grid_instance });
+		}
+
+		return return_value;
 	}
 
 	toString(trimmed = true) {
