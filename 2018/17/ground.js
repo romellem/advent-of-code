@@ -301,6 +301,11 @@ class Ground {
 		this.spring_y = spring_y;
 	}
 
+	static SAND = SAND;
+	static CLAY = CLAY;
+	static FLOWING = FLOWING;
+	static SETTLED = SETTLED;
+
 	async fill(output_frames = false) {
 		const grid = this.grid.clone();
 		// Init with single drip
@@ -345,7 +350,6 @@ class Ground {
 						} else {
 							left_drip = left_drip.west();
 						}
-
 					}
 
 					// Flow right
@@ -363,7 +367,6 @@ class Ground {
 						} else {
 							right_drip = right_drip.east();
 						}
-						
 					}
 
 					if (left_bail > 9999 || right_bail > 9999) {
@@ -418,7 +421,7 @@ class Ground {
 			}
 
 			// de-dup drips based on unique coordinates
-			let deduped_drip_coords = new Set([...drips].map(v => v.toString()));
+			let deduped_drip_coords = new Set([...drips].map((v) => v.toString()));
 			if (deduped_drip_coords.size < drips.size) {
 				let deduped_drips = new Set();
 				for (let drip_coord of deduped_drip_coords) {
@@ -426,19 +429,21 @@ class Ground {
 				}
 				drips = deduped_drips;
 			}
-
 		}
 
-		// console.log('writing files');
+		if (output_frames) {
+			// Creates frames folder if it doesn't exist
+			fsExtra.emptyDirSync('frames');
+			let frames_length = String(buffers.length).length;
+			for (let i = 0; i < buffers.length; i++) {
+				let file = `frames/frame_${i
+					.toString()
+					.padStart(frames_length, '0')}.png`;
+				fs.writeFileSync(file, buffers[i]);
+			}
+		}
 
-		// // Creates frames if it doesn't exist
-		// fsExtra.emptyDirSync('frames');
-		// let frames_length = String(buffers.length).length;
-		// for (let i = 0; i < buffers.length; i++) {
-		// 	let file = `frames/frame_${i.toString().padStart(frames_length, '0')}.png`;
-		// 	fs.writeFileSync(file, buffers[i]);
-		// }
-		let image_buffer = await this.toImage(false, grid);
+		let image_buffer = await this.toImage(true, grid);
 		fs.writeFileSync('filled-grid.png', image_buffer);
 
 		return grid.sum();
