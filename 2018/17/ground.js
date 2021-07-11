@@ -157,6 +157,7 @@ class Grid {
 		);
 		let min_x = Number.MAX_SAFE_INTEGER;
 		let max_x = 0;
+		let min_y = Number.MAX_SAFE_INTEGER;
 		let max_y = 0;
 		for (let [x, y] of coords) {
 			if (x < min_x) {
@@ -164,6 +165,10 @@ class Grid {
 			}
 			if (x > max_x) {
 				max_x = x;
+			}
+
+			if (y < min_y) {
+				min_y = y;
 			}
 			if (y > max_y) {
 				max_y = y;
@@ -188,7 +193,7 @@ class Grid {
 			grid,
 			min_x,
 			max_x,
-			min_y: 0,
+			min_y,
 			max_y,
 		};
 	}
@@ -228,7 +233,7 @@ class Grid {
 	mark({ x, y, fromX, toX, as: obj_as }, alt_as) {
 		if (this.grid[y] !== undefined) {
 			if (fromX !== undefined && toX !== undefined) {
-				let increment = fromX < toX ? 1 : -1;
+				let increment = fromX <= toX ? 1 : -1;
 				for (let px = fromX; px <= toX; px += increment) {
 					this.grid[y][px] = obj_as ?? alt_as;
 				}
@@ -268,7 +273,9 @@ class Grid {
 			[FLOWING]: 0,
 			[SETTLED]: 0,
 		};
-		for (let row of this.grid) {
+
+		for (let y = this.min_y; y <= this.max_y; y++) {
+			let row = this.grid[y];
 			for (let col of row) {
 				sums[col]++;
 			}
@@ -292,21 +299,27 @@ class Ground {
 		let buffers = [];
 		let iter = 0;
 		while (drips.size > 0) {
-			let image_buffer = await this.toImageSlice(drips, grid);
-			buffers.push(image_buffer);
+			// let image_buffer = await this.toImageSlice(drips, grid);
+			// buffers.push(image_buffer);
 			// console.log((++iter / 2903) * 100 + '%');
-			console.log(++iter);
+			// console.log(++iter);
 			if (iter === 202) {
-				break;
+				debugger;
 			}
 
 			// if (iter > 120) {
 			// 	drips.clear();
 			// 	break;
 			// }
+			let new_drips = [];
 			for (let drip of drips) {
 				if (drip.y >= this.grid.max_y) {
 					drips.delete(drip);
+					continue;
+				}
+
+				if (grid.peek(drip) === SETTLED) {
+					drip.moveNorth();
 					continue;
 				}
 
@@ -326,8 +339,10 @@ class Ground {
 						} else if (Grid.isClayOrSettled(grid.peekWest(left_drip))) {
 							// Technically is space just to right of barrier
 							barrier_left = left_drip;
+						} else {
+							left_drip = left_drip.west();
 						}
-						left_drip = left_drip.west();
+
 					}
 
 					// Flow right
@@ -342,8 +357,10 @@ class Ground {
 						} else if (Grid.isClayOrSettled(grid.peekEast(right_drip))) {
 							// Technically is space just to left of barrier
 							barrier_right = right_drip;
+						} else {
+							right_drip = right_drip.east();
 						}
-						right_drip = right_drip.east();
+						
 					}
 
 					if (left_bail > 9999 || right_bail > 9999) {
@@ -383,32 +400,33 @@ class Ground {
 							as: FLOWING,
 						});
 						drip.moveTo(flow_left);
-						drips.add(flow_right);
+						new_drips.push(flow_right);
 					} else {
 						throw new Error('Should not happen');
 					}
 				} else {
-					console.log('Flowing beneath drip?');
-					console.log({
-						x: drip.x,
-						y: drip.y,
-						below_drip,
-						ascii: ASCII_LOOKUP[below_drip],
-					});
+					// Already flowing, delete this drip
 					drips.delete(drip);
 				}
 			}
+
+			for (let new_drip of new_drips) {
+				drips.add(new_drip);
+			}
 		}
 
-		console.log('writing files');
+		// console.log('writing files');
 
-		// Creates frames if it doesn't exist
-		fsExtra.emptyDirSync('frames');
-		let frames_length = String(buffers.length).length;
-		for (let i = 0; i < buffers.length; i++) {
-			let file = `frames/frame_${i.toString().padStart(frames_length, '0')}.png`;
-			fs.writeFileSync(file, buffers[i]);
-		}
+		// // Creates frames if it doesn't exist
+		// fsExtra.emptyDirSync('frames');
+		// let frames_length = String(buffers.length).length;
+		// for (let i = 0; i < buffers.length; i++) {
+		// 	let file = `frames/frame_${i.toString().padStart(frames_length, '0')}.png`;
+		// 	fs.writeFileSync(file, buffers[i]);
+		// }
+		let image_buffer = await this.toImage(false, grid);
+		fs.writeFileSync('filled-grid.png', image_buffer);
+
 		return grid.sum();
 	}
 
