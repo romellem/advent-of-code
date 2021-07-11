@@ -35,6 +35,11 @@ const ASCII_LOOKUP = {
 	[SETTLED]: '~',
 };
 
+const BLACK = Jimp.cssColorToHex('#000000');
+const RED = Jimp.cssColorToHex('#FF0000');
+const CYAN = Jimp.cssColorToHex('#00FFFF');
+const BLUE = Jimp.cssColorToHex('#0000FF');
+
 class Point {
 	constructor(x, y) {
 		if (typeof x === 'string') {
@@ -453,11 +458,6 @@ class Ground {
 	 * @returns {Promise<Buffer>} Returns a PNG buffer, which can then be written out to a file
 	 */
 	async toImage(trimmed = true, _grid) {
-		const BLACK = Jimp.cssColorToHex('#000000');
-		const GREEN = Jimp.cssColorToHex('#00FF00');
-		const CYAN = Jimp.cssColorToHex('#00FFFF');
-		const BLUE = Jimp.cssColorToHex('#0000FF');
-
 		const grid_instance = _grid || this.grid;
 		const grid = trimmed ? grid_instance.trimmed : grid_instance.grid;
 
@@ -492,7 +492,7 @@ class Ground {
 		}
 
 		let spring_x = trimmed ? this.spring_x - this.grid.min_x : this.spring_x;
-		image.setPixelColor(GREEN, spring_x, this.spring_y);
+		image.setPixelColor(RED, spring_x, this.spring_y);
 
 		const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
 		return buffer;
@@ -502,11 +502,6 @@ class Ground {
 	 * @returns {Promise<Buffer>} Returns a PNG buffer, which can then be written out to a file
 	 */
 	async toImageSlice(drips, grid_instance) {
-		const BLACK = Jimp.cssColorToHex('#000000');
-		const GREEN = Jimp.cssColorToHex('#00FF00');
-		const CYAN = Jimp.cssColorToHex('#00FFFF');
-		const BLUE = Jimp.cssColorToHex('#0000FF');
-
 		const grid = grid_instance.trimmed;
 
 		let min_y;
@@ -555,7 +550,7 @@ class Ground {
 		}
 
 		let spring_x = this.spring_x - grid_instance.min_x;
-		image.setPixelColor(GREEN, spring_x, this.spring_y - min_y);
+		image.setPixelColor(RED, spring_x, this.spring_y - min_y);
 
 		const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
 		return buffer;
