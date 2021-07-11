@@ -199,32 +199,6 @@ class Grid {
 	}
 
 	/**
-	 * @param {Number} x
-	 * @param {Number} y
-	 * @returns {SurroundingCoords}
-	 */
-	getSurrounding(x, y) {
-		let N, NW, NE;
-		if (y > this.min_y) {
-			N = this.grid[y - 1][x];
-			NW = this.grid[y - 1][x - 1];
-			NE = this.grid[y - 1][x + 1];
-		}
-
-		let E = this.grid[y][x + 1];
-		let W = this.grid[y][x - 1];
-
-		let S, SW, SE;
-		if (y < this.max_y) {
-			S = this.grid[y + 1][x];
-			SW = this.grid[y + 1][x - 1];
-			SE = this.grid[y + 1][x + 1];
-		}
-
-		return { N, NW, NE, E, W, S, SW, SE };
-	}
-
-	/**
 	 * All "peeks" can be called with two params, x/y,
 	 * or an object `{ x, y }`
 	 */
@@ -317,9 +291,14 @@ class Ground {
 		let buffers = [];
 		let iter = 0;
 		while (drips.size > 0) {
-			let image_buffer = await this.toImage(true, grid);
+			let image_buffer = await this.toImageSlice(drips, grid);
 			buffers.push(image_buffer);
 			console.log((++iter / 2903 * 100) + '%');
+
+			if (iter > 120) {
+				drips.clear();
+				break;
+			}
 			for (let drip of drips) {
 				if (drip.y >= this.grid.max_y) {
 					drips.delete(drip);
@@ -461,6 +440,69 @@ class Ground {
 		}
 
 		let spring_x = trimmed ? this.spring_x - this.grid.min_x : this.spring_x;
+		image.setPixelColor(GREEN, spring_x, this.spring_y);
+
+		const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
+		return buffer;
+	}
+
+	/**
+	 * @returns {Promise<Buffer>} Returns a PNG buffer, which can then be written out to a file
+	 */
+	 async toImageSlice(drips, grid_instance) {
+		const BLACK = Jimp.cssColorToHex('#000000');
+		const GREEN = Jimp.cssColorToHex('#00FF00');
+		const CYAN = Jimp.cssColorToHex('#00FFFF');
+		const BLUE = Jimp.cssColorToHex('#0000FF');
+
+		const grid = grid_instance.trimmed;
+
+		let min_y;
+		let max_y;
+		for (let drip of drips) {
+			if (max_y === undefined || drip.y > max_y) {
+				max_y = drip.y;
+			}
+			if (min_y === undefined || drip.y < min_y) {
+				min_y = drip.y;
+			}
+		}
+		min_y -= 40;
+		max_y += 40;
+		min_y = Math.max(min_y, 0);
+		max_y = Math.min(max_y, grid_instance.max_y);
+
+		const image = await new Promise((resolve, reject) => {
+			new Jimp(grid[0].length, max_y - min_y + 1, '#FFFFFF', (err, image) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(image);
+				}
+			});
+		});
+
+		for (let y = min_y; y <= max_y; y++) {
+			let row = grid[y];
+			for (let x = 0; x < row.length; x++) {
+				let cell = row[x];
+				switch (cell) {
+					case CLAY:
+						image.setPixelColor(BLACK, x, y);
+						break;
+					case FLOWING:
+						image.setPixelColor(CYAN, x, y);
+						break;
+					case SETTLED:
+						image.setPixelColor(BLUE, x, y);
+						break;
+					default:
+						break;
+				}
+			}
+		}
+
+		let spring_x = this.spring_x - grid_instance.min_x;
 		image.setPixelColor(GREEN, spring_x, this.spring_y);
 
 		const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
