@@ -1,6 +1,5 @@
 const Jimp = require('jimp');
-const fs = require('fs');
-const fsExtra = require('fs-extra');
+const fs = require('fs-extra');
 
 /**
  * @typedef {Object} InputValues
@@ -35,6 +34,7 @@ const ASCII_LOOKUP = {
 	[SETTLED]: '~',
 };
 
+const LIGHT_GRAY = Jimp.cssColorToHex('#EAEAEA');
 const BLACK = Jimp.cssColorToHex('#000000');
 const RED = Jimp.cssColorToHex('#FF0000');
 const CYAN = Jimp.cssColorToHex('#00FFFF');
@@ -299,9 +299,16 @@ class Grid {
 	}
 }
 
+let IMAGE_SLICE_CAMERA_Y = 0;
+
+// This value was determined from running through everything once and noting what the max
+// interval was between min and max y
+const MAX_FRAME_HEIGHT = 175;
+
 class Ground {
 	constructor({ grid, spring_x = 500, spring_y = 0 }) {
 		this.grid = grid;
+		this.original_grid = grid.clone();
 		this.spring_x = spring_x;
 		this.spring_y = spring_y;
 	}
@@ -312,38 +319,27 @@ class Ground {
 	static SETTLED = SETTLED;
 
 	async fill(output_frames = false) {
-		// Only used if `output_frames` is true
-		// THe values here were gather by running through everything once and recording the values
-		const MAX_IMAGE_HEIGHT = 175;
-		const MAX_IMAGE_WIDTH = 283;
+		// Reset camera y coord, only useful if `output_frames` is true
+		IMAGE_SLICE_CAMERA_Y = 0;
 
 		const grid = this.grid.clone();
 		// Init with single drip
 		let drips = new Set([new Point(this.spring_x, this.spring_y)]);
 
 		const images = [];
-		// let iter = 0;
 		while (drips.size > 0) {
 			if (output_frames) {
 				let image_buffer = await this.toImageSlice({
 					drips,
 					grid_instance: grid,
 					callback: async ({ image, drips, grid_instance }) => {
-						image = image.contain(
-							MAX_IMAGE_WIDTH,
-							MAX_IMAGE_HEIGHT,
-							Jimp.HORIZONTAL_ALIGN_LEFT | Jimp.VERTICAL_ALIGN_TOP
-						);
+						image = image.scale(2, Jimp.RESIZE_NEAREST_NEIGHBOR);
 						const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
 						return buffer;
 					},
 				});
 				images.push(image_buffer);
 			}
-
-			// if (++iter > 250) {
-			// 	break;
-			// }
 
 			let new_drips = [];
 			for (let drip of drips) {
@@ -454,7 +450,7 @@ class Ground {
 
 		if (output_frames) {
 			// Creates frames folder if it doesn't exist
-			fsExtra.emptyDirSync('frames');
+			fs.emptyDirSync('frames');
 			const frames_length = String(images.length).length;
 
 			for (let i = 0; i < images.length; i++) {
@@ -465,15 +461,7 @@ class Ground {
 			}
 		}
 
-		let image_buffer = await this.toImage({
-			trimmed: true,
-			grid_instance: grid,
-			callback: async ({ image, grid_instance }) => {
-				const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
-				return buffer;
-			},
-		});
-		fs.writeFileSync('filled-grid.png', image_buffer);
+		this.grid = grid;
 
 		return grid.sum();
 	}
@@ -485,7 +473,7 @@ class Ground {
 	 * @param {Function} [options.callback] - Called with `({ image, grid_instance })`.
 	 * @returns {Promise<Jimp|unknown>} Returns a Jimp instance, or the await'd return of `callback`
 	 */
-	async toImage({ trimmed = true, grid_instance = this.grid, callback }) {
+	async toImage({ trimmed = true, grid_instance = this.grid, callback } = {}) {
 		const grid = trimmed ? grid_instance.trimmed : grid_instance.grid;
 
 		const image = await new Promise((resolve, reject) => {
@@ -536,7 +524,7 @@ class Ground {
 	 * @param {Function} [options.callback] - Called with `({ image, drips, grid_instance })`.
 	 * @returns {Promise<Buffer>} Returns a PNG buffer, which can then be written out to a file
 	 */
-	async toImageSlice({ drips, grid_instance, callback }) {
+	async toImageSlice({ drips, grid_instance, callback } = {}) {
 		const grid = grid_instance.trimmed;
 
 		let min_y;
@@ -554,15 +542,12 @@ class Ground {
 		min_y = Math.max(min_y, 0);
 		max_y = Math.min(max_y, grid_instance.max_y);
 
-		// This was determined from running through everything once
-		const MAX_FRAME_HEIGHT = 175;
-		if (max_y - min_y + 1 < MAX_FRAME_HEIGHT) {
-			max_y += MAX_FRAME_HEIGHT - (max_y - min_y + 1);
+		if (max_y > IMAGE_SLICE_CAMERA_Y + MAX_FRAME_HEIGHT) {
+			IMAGE_SLICE_CAMERA_Y += max_y - (IMAGE_SLICE_CAMERA_Y + MAX_FRAME_HEIGHT);
 		}
-		// console.log(max_y - min_y + 1)
 
 		const image = await new Promise((resolve, reject) => {
-			new Jimp(grid[0].length, max_y - min_y + 1, '#FFFFFF', (err, image) => {
+			new Jimp(grid[0].length, MAX_FRAME_HEIGHT, '#FFFFFF', (err, image) => {
 				if (err) {
 					reject(err);
 				} else {
@@ -571,28 +556,38 @@ class Ground {
 			});
 		});
 
-		for (let y = min_y; y <= max_y; y++) {
+		for (
+			let y = IMAGE_SLICE_CAMERA_Y;
+			y <= IMAGE_SLICE_CAMERA_Y + MAX_FRAME_HEIGHT;
+			y++
+		) {
 			let row = grid[y];
-			if (!row) continue;
+			if (!row) {
+				console.log('no row');
+				row = Array(grid[0].length).fill();
+			}
 			for (let x = 0; x < row.length; x++) {
 				let cell = row[x];
 				switch (cell) {
+					case SAND:
+						break;
 					case CLAY:
-						image.setPixelColor(BLACK, x, y - min_y);
+						image.setPixelColor(BLACK, x, y - IMAGE_SLICE_CAMERA_Y);
 						break;
 					case FLOWING:
-						image.setPixelColor(CYAN, x, y - min_y);
+						image.setPixelColor(CYAN, x, y - IMAGE_SLICE_CAMERA_Y);
 						break;
 					case SETTLED:
-						image.setPixelColor(BLUE, x, y - min_y);
+						image.setPixelColor(BLUE, x, y - IMAGE_SLICE_CAMERA_Y);
 						break;
 					default:
+						image.setPixelColor(LIGHT_GRAY, x, y - IMAGE_SLICE_CAMERA_Y);
 						break;
 				}
 			}
 		}
 
-		if (min_y === 0) {
+		if (IMAGE_SLICE_CAMERA_Y === 0) {
 			let spring_x = this.spring_x - grid_instance.min_x;
 			image.setPixelColor(RED, spring_x, this.spring_y);
 		}
@@ -603,6 +598,10 @@ class Ground {
 		}
 
 		return return_value;
+	}
+
+	reset() {
+		this.grid = this.original_grid.clone();
 	}
 
 	toString(trimmed = true) {

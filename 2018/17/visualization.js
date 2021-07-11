@@ -75,7 +75,7 @@ fs.writeFileSync('grid.txt', ground.toString());
 			video_process.on('close', (code) => resolve(code));
 			video_process.on('error', (...args) => reject(args));
 		});
-		fsExtra.removeSync('frames');
+		fs.removeSync('frames');
 		console.log('Wrote to "animation.mp4"');
 	}
 })();
