@@ -1,5 +1,6 @@
 const Jimp = require('jimp');
 const fs = require('fs');
+const fsExtra = require('fs-extra');
 
 /**
  * @typedef {Object} InputValues
@@ -293,12 +294,16 @@ class Ground {
 		while (drips.size > 0) {
 			let image_buffer = await this.toImageSlice(drips, grid);
 			buffers.push(image_buffer);
-			console.log((++iter / 2903 * 100) + '%');
-
-			if (iter > 120) {
-				drips.clear();
+			// console.log((++iter / 2903) * 100 + '%');
+			console.log(++iter);
+			if (iter === 202) {
 				break;
 			}
+
+			// if (iter > 120) {
+			// 	drips.clear();
+			// 	break;
+			// }
 			for (let drip of drips) {
 				if (drip.y >= this.grid.max_y) {
 					drips.delete(drip);
@@ -312,8 +317,8 @@ class Ground {
 					// Flow left
 					let left_drip = drip;
 					let barrier_left, flow_left;
-					while (!barrier_left && !flow_left) {
-						left_drip = left_drip.west();
+					let left_bail = 0;
+					while (!barrier_left && !flow_left && ++left_bail < 9999) {
 						let below_left_drip = grid.peekSouth(left_drip);
 						if (!Grid.isClayOrSettled(below_left_drip)) {
 							// Will flow downwards
@@ -322,13 +327,14 @@ class Ground {
 							// Technically is space just to right of barrier
 							barrier_left = left_drip;
 						}
+						left_drip = left_drip.west();
 					}
 
 					// Flow right
 					let right_drip = drip;
 					let barrier_right, flow_right;
-					while (!barrier_right && !flow_right) {
-						right_drip = right_drip.east();
+					let right_bail = 0;
+					while (!barrier_right && !flow_right && ++right_bail < 9999) {
 						let below_right_drip = grid.peekSouth(right_drip);
 						if (!Grid.isClayOrSettled(below_right_drip)) {
 							// Will flow downwards
@@ -337,6 +343,12 @@ class Ground {
 							// Technically is space just to left of barrier
 							barrier_right = right_drip;
 						}
+						right_drip = right_drip.east();
+					}
+
+					if (left_bail > 9999 || right_bail > 9999) {
+						debugger;
+						break;
 					}
 
 					if (barrier_left && barrier_right) {
@@ -388,7 +400,10 @@ class Ground {
 			}
 		}
 
-		console.log('writing files')
+		console.log('writing files');
+
+		// Creates frames if it doesn't exist
+		fsExtra.emptyDirSync('frames');
 		let frames_length = String(buffers.length).length;
 		for (let i = 0; i < buffers.length; i++) {
 			let file = `frames/frame_${i.toString().padStart(frames_length, '0')}.png`;
@@ -449,7 +464,7 @@ class Ground {
 	/**
 	 * @returns {Promise<Buffer>} Returns a PNG buffer, which can then be written out to a file
 	 */
-	 async toImageSlice(drips, grid_instance) {
+	async toImageSlice(drips, grid_instance) {
 		const BLACK = Jimp.cssColorToHex('#000000');
 		const GREEN = Jimp.cssColorToHex('#00FF00');
 		const CYAN = Jimp.cssColorToHex('#00FFFF');
@@ -488,13 +503,13 @@ class Ground {
 				let cell = row[x];
 				switch (cell) {
 					case CLAY:
-						image.setPixelColor(BLACK, x, y);
+						image.setPixelColor(BLACK, x, y - min_y);
 						break;
 					case FLOWING:
-						image.setPixelColor(CYAN, x, y);
+						image.setPixelColor(CYAN, x, y - min_y);
 						break;
 					case SETTLED:
-						image.setPixelColor(BLUE, x, y);
+						image.setPixelColor(BLUE, x, y - min_y);
 						break;
 					default:
 						break;
@@ -503,7 +518,7 @@ class Ground {
 		}
 
 		let spring_x = this.spring_x - grid_instance.min_x;
-		image.setPixelColor(GREEN, spring_x, this.spring_y);
+		image.setPixelColor(GREEN, spring_x, this.spring_y - min_y);
 
 		const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
 		return buffer;
