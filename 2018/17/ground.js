@@ -37,6 +37,12 @@ const ASCII_LOOKUP = {
 
 class Point {
 	constructor(x, y) {
+		if (typeof x === 'string') {
+			// Treat string args as coordinates `x,y`
+			let [split_x, split_y] = x.split(',');
+			x = parseInt(split_x);
+			y = parseInt(split_y);
+		}
 		this.x = x;
 		this.y = y;
 	}
@@ -85,39 +91,6 @@ class Point {
 
 	toString() {
 		return `${this.x},${this.y}`;
-	}
-}
-
-class Drips {
-	constructor(drips_iter = []) {
-		/**
-		 * Use a map with drips keyed off their stringified version.
-		 * This is useful because it effectively "de-dups" my drips.
-		 * When I have two flows rising up to eventually split left and
-		 * right again, I don't want to have duplicate drips on either side.
-		 * This class is just an abstractiong on top of Map, to make it
-		 * seem like I'm still just operating on a Set.
-		 */
-		this.drips_map = new Map();
-		for (let drip of drips_iter) {
-			this.drips_map.set(drip.toString(), drip);
-		}
-	}
-
-	get size() {
-		return this.drips_map.size;
-	}
-
-	add(drip) {
-		return this.drips_map.set(drip.toString(), drip);
-	}
-
-	delete(drip) {
-		return this.drips_map.delete(drip.toString());
-	}
-
-	[Symbol.iterator]() {
-		return this.drips_map.values();
 	}
 }
 
@@ -331,12 +304,10 @@ class Ground {
 	async fill(output_frames = false) {
 		const grid = this.grid.clone();
 		// Init with single drip
-		const drips = new Drips([new Point(this.spring_x, this.spring_y)]);
+		let drips = new Set([new Point(this.spring_x, this.spring_y)]);
 
 		let buffers = [];
-		let iter = 0;
 		while (drips.size > 0) {
-			console.log(drips.size, ' ', ++iter);
 			if (output_frames) {
 				let image_buffer = await this.toImageSlice(drips, grid);
 				buffers.push(image_buffer);
@@ -444,6 +415,16 @@ class Ground {
 
 			for (let new_drip of new_drips) {
 				drips.add(new_drip);
+			}
+
+			// de-dup drips based on unique coordinates
+			let deduped_drip_coords = new Set([...drips].map(v => v.toString()));
+			if (deduped_drip_coords.size < drips.size) {
+				let deduped_drips = new Set();
+				for (let drip_coord of deduped_drip_coords) {
+					deduped_drips.add(new Point(drip_coord));
+				}
+				drips = deduped_drips;
 			}
 
 		}
