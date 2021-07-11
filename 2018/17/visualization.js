@@ -40,7 +40,6 @@ const hasBinary = (bin) => {
 const grid = new Grid(input);
 const ground = new Ground({ grid });
 
-fs.writeFileSync('grid.txt', ground.toString());
 (async () => {
 	let empty_grid_image_buffer = await ground.toImage({
 		callback: async ({ image }) => {
@@ -48,6 +47,7 @@ fs.writeFileSync('grid.txt', ground.toString());
 		},
 	});
 	fs.writeFileSync('grid.png', empty_grid_image_buffer);
+	fs.writeFileSync('grid.txt', ground.toString());
 
 	if (hasBinary('ffmpeg')) {
 		await ground.fill(true);
