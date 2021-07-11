@@ -313,8 +313,9 @@ class Ground {
 
 	async fill(output_frames = false) {
 		// Only used if `output_frames` is true
-		let max_height = 0;
-		let max_width = 0;
+		// THe values here were gather by running through everything once and recording the values
+		const MAX_IMAGE_HEIGHT = 175;
+		const MAX_IMAGE_WIDTH = 283;
 
 		const grid = this.grid.clone();
 		// Init with single drip
@@ -328,13 +329,16 @@ class Ground {
 					drips,
 					grid_instance: grid,
 					callback: async ({ image, drips, grid_instance }) => {
-						// Track max image slice so we can pad all images at the end
-						max_height = Math.max(max_height, image.bitmap.height);
-						max_width = Math.max(max_width, image.bitmap.width);
-						return image;
+						image = image.contain(
+							MAX_IMAGE_WIDTH,
+							MAX_IMAGE_HEIGHT,
+							Jimp.HORIZONTAL_ALIGN_LEFT | Jimp.VERTICAL_ALIGN_TOP
+						);
+						const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
+						return buffer;
 					},
 				});
-				// images.push(image_buffer);
+				images.push(image_buffer);
 			}
 
 			// if (++iter > 250) {
@@ -453,23 +457,11 @@ class Ground {
 			fsExtra.emptyDirSync('frames');
 			const frames_length = String(images.length).length;
 
-			// Loop through images and cover to max height
-			const padded_images = await Promise.all(
-				images.map((image) => {
-					image = image.contain(
-						max_width,
-						max_height,
-						Jimp.HORIZONTAL_ALIGN_LEFT | Jimp.VERTICAL_ALIGN_TOP
-					);
-					const buffer = image.getBufferAsync(Jimp.MIME_PNG);
-					return buffer;
-				})
-			);
-			for (let i = 0; i < padded_images.length; i++) {
+			for (let i = 0; i < images.length; i++) {
 				let file = `frames/frame_${i
 					.toString()
 					.padStart(frames_length, '0')}.png`;
-				fs.writeFileSync(file, padded_images[i]);
+				fs.writeFileSync(file, images[i]);
 			}
 		}
 
@@ -564,9 +556,10 @@ class Ground {
 
 		// This was determined from running through everything once
 		const MAX_FRAME_HEIGHT = 175;
-		if ((max_y - min_y + 1) < MAX_FRAME_HEIGHT) {
+		if (max_y - min_y + 1 < MAX_FRAME_HEIGHT) {
 			max_y += MAX_FRAME_HEIGHT - (max_y - min_y + 1);
 		}
+		// console.log(max_y - min_y + 1)
 
 		const image = await new Promise((resolve, reject) => {
 			new Jimp(grid[0].length, max_y - min_y + 1, '#FFFFFF', (err, image) => {
@@ -580,6 +573,7 @@ class Ground {
 
 		for (let y = min_y; y <= max_y; y++) {
 			let row = grid[y];
+			if (!row) continue;
 			for (let x = 0; x < row.length; x++) {
 				let cell = row[x];
 				switch (cell) {
@@ -598,8 +592,10 @@ class Ground {
 			}
 		}
 
-		let spring_x = this.spring_x - grid_instance.min_x;
-		image.setPixelColor(RED, spring_x, this.spring_y - min_y);
+		if (min_y === 0) {
+			let spring_x = this.spring_x - grid_instance.min_x;
+			image.setPixelColor(RED, spring_x, this.spring_y);
+		}
 
 		let return_value = image;
 		if (typeof callback === 'function') {
