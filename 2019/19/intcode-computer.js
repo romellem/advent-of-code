@@ -1,7 +1,3 @@
-const readline = require('readline');
-const { green, cyan } = require('colors');
-const {InfiniteGrid} = require('./infinite-grid');
-
 const ADD = '01'; // Add
 const MUL = '02'; // Multiply
 const INP = '03'; // Input
