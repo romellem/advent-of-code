@@ -1,5 +1,6 @@
 const { input } = require('./input');
-const { TractorBeam } = require('./intcode-computer');
+const { TractorBeam } = require('./tractor-beam');
 
 let tractor_beam = new TractorBeam(input);
-tractor_beam.partOne();
+console.log(tractor_beam.partOne());
+console.log(tractor_beam.grid.toString());
