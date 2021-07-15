@@ -71,39 +71,46 @@ class TractorBeam {
 		let top_edge = {...start};
 		let bottom_edge = {...start};
 		while (top_edge.x - bottom_edge.x <= square_size) {
-			// First, move down until we hit 0
-			let output;
-			do {
-				bottom_edge.y++;
-				let computer = new Computer({ memory: this.memory, inputs: [bottom_edge.x, bottom_edge.y] });
-				[output] = computer.run();
-				this.grid.set(bottom_edge.x, bottom_edge.y, output);
-			} while (output === 1);
-			
-			// Then, move inward until we hit a `1`
-			do {
-				bottom_edge.x++;
-				let computer = new Computer({ memory: this.memory, inputs:  [bottom_edge.x, bottom_edge.y] });
-				[output] = computer.run();
-				this.grid.set(bottom_edge.x, bottom_edge.y, output);
-			} while (output === 0);
-
-			// Now do top edge
-			do {
-				// Double loops in case bottom calc mo
-				top_edge.y++;
-				do {
-					// Move right until we hit a `0`
-					top_edge.x++;
-					let computer = new Computer({ memory: this.memory, inputs: [top_edge.x, top_edge.y] });
-					[output] = computer.run();
-					this.grid.set(top_edge.x, top_edge.y, output);
-				} while (output === 1);
-			} while (top_edge.y !== bottom_edge.y);
-
-			// The cell immediately to the left of that is the right edge.
-			top_edge.x--;
+			this.calculateNewEdges(bottom_edge, top_edge);
 		}
+	}
+
+	/**
+	 * Updates edges in place.
+	 */
+	calculateNewEdges(bottom_edge, top_edge) {
+		// First, move down until we hit 0
+		let output;
+		do {
+			bottom_edge.y++;
+			let computer = new Computer({ memory: this.memory, inputs: [bottom_edge.x, bottom_edge.y] });
+			[output] = computer.run();
+			this.grid.set(bottom_edge.x, bottom_edge.y, output);
+		} while (output === 1);
+		
+		// Then, move inward until we hit a `1`
+		do {
+			bottom_edge.x++;
+			let computer = new Computer({ memory: this.memory, inputs:  [bottom_edge.x, bottom_edge.y] });
+			[output] = computer.run();
+			this.grid.set(bottom_edge.x, bottom_edge.y, output);
+		} while (output === 0);
+
+		// Now do top edge
+		do {
+			// Double loops in case bottom calc mo
+			top_edge.y++;
+			do {
+				// Move right until we hit a `0`
+				top_edge.x++;
+				let computer = new Computer({ memory: this.memory, inputs: [top_edge.x, top_edge.y] });
+				[output] = computer.run();
+				this.grid.set(top_edge.x, top_edge.y, output);
+			} while (output === 1);
+		} while (top_edge.y !== bottom_edge.y);
+
+		// The cell immediately to the left of that is the right edge.
+		top_edge.x--;
 	}
 }
 
