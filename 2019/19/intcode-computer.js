@@ -227,7 +227,7 @@ class Computer {
 				 *
 				 * Now, if I were to re-map the pointer'd `@` symbols, I'd get
 				 *
-				 *     @3 = @1 + 2
+				 *     7 = 9 + 2
 				 *
 				 * But _that isn't what we want!_ Namely, it doesn't make sense
 				 * to set the _literal_ number 7 equal to some addition operation.
