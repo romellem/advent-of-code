@@ -93,8 +93,8 @@ class Network {
 					return { x: nat_packet[0], y: nat_packet[1] };
 				}
 
-				// @todo Reset NAT packet here?, e.g. `nat_packet = undefined`?
-				last_nat_sent = nat_packet;
+				// Clone the packet, otherwise, when NIC 0 consumes this packet it modifies this value
+				last_nat_sent = [...nat_packet];
 				idle = IDLE_REST;
 			}
 		}
