@@ -61,16 +61,17 @@ class Network {
 		let nat_packet;
 		let last_nat_sent = [];
 
-		const IDLE_REST = 200;
+		// Should be one more than 3, aka what our output size should be to consistute a packet
+		const IDLE_RESET = 4;
 
 		// Some arbitrary number of loops to test if "idle"
-		let idle = IDLE_REST;
+		let idle = IDLE_RESET;
 		while (true) {
 			idle--;
 			for (let nic of this.nics) {
 				let outputs = nic.run();
 				if (outputs.length === 3) {
-					idle = IDLE_REST;
+					idle = IDLE_RESET;
 					let address = outputs.shift();
 					let x = outputs.shift();
 					let y = outputs.shift();
@@ -95,7 +96,7 @@ class Network {
 
 				// Clone the packet, otherwise, when NIC 0 consumes this packet it modifies this value
 				last_nat_sent = [...nat_packet];
-				idle = IDLE_REST;
+				idle = IDLE_RESET;
 			}
 		}
 	}
