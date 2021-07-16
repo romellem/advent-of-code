@@ -14,14 +14,14 @@ const IMMEDIATE_MODE = '1';
 const RELATIVE_MODE = '2';
 
 class Computer {
-	constructor(
+	constructor({
 		memory,
-		inputs,
-		replenish_input,
+		inputs = [],
+		replenish_input = undefined,
 		pause_on_output = true,
 		id = 0,
-		clone_memory = false
-	) {
+		clone_memory = false,
+	}) {
 		// For debugging
 		this.id = String.fromCharCode('A'.charCodeAt(0) + id);
 
@@ -301,124 +301,6 @@ class Computer {
 	}
 }
 
-class Direction {
-	constructor(x, y) {
-		this.x = x;
-		this.y = y;
-		this.direction = [0, -1];
-	}
-
-	rotateLeft() {
-		const [x, y] = this.direction;
-		if (x === 0 && y === -1) {
-			this.direction = [-1, 0];
-		} else if (x === -1 && y === 0) {
-			this.direction = [0, 1];
-		} else if (x === 0 && y === 1) {
-			this.direction = [1, 0];
-		} else if (x === 1 && y === 0) {
-			this.direction = [0, -1];
-		}
-
-		this.move();
-	}
-
-	rotateRight() {
-		const [x, y] = this.direction;
-		if (x === 0 && y === -1) {
-			this.direction = [1, 0];
-		} else if (x === 1 && y === 0) {
-			this.direction = [0, 1];
-		} else if (x === 0 && y === 1) {
-			this.direction = [-1, 0];
-		} else if (x === -1 && y === 0) {
-			this.direction = [0, -1];
-		}
-
-		this.move();
-	}
-
-	move() {
-		const [x, y] = this.direction;
-		this.x += x;
-		this.y += y;
-	}
-
-	get coord() {
-		return `${this.x},${this.y}`;
-	}
-}
-
-class Ship {
-	constructor(memory, starting_color = 0) {
-		this.computer = new Computer(memory, [starting_color], starting_color);
-
-		this.ship = { '0,0': starting_color };
-		this.direction = new Direction(0, 0);
-	}
-
-	run() {
-		let computer = this.computer;
-		let output;
-
-		while (!computer.halted) {
-			output = computer.run();
-			if (computer.halted) {
-				break;
-			}
-
-			if (output.length > 1) {
-				// 0 is black, 1 is white
-				let color = output.shift();
-				// 0 is turn left, 1 is turn right
-				let direction = output.shift();
-
-				this.ship[this.direction.coord] = color;
-
-				if (direction === 0) {
-					this.direction.rotateLeft();
-				} else if (direction === 1) {
-					this.direction.rotateRight();
-				} else {
-					console.log('ERRROR', direction);
-				}
-
-				// Set input replenish after move
-				let new_color = this.ship[this.direction.coord] || 0;
-				computer.inputs = [new_color];
-				computer.replenish_input = new_color;
-			}
-		}
-
-		return Object.keys(this.ship).length;
-	}
-
-	printShip() {
-		let coords = Object.keys(this.ship).map(c => c.split(',').map(v => parseInt(v, 10)));
-		let xs = coords.map(c => c[0]);
-		let ys = coords.map(c => c[1]);
-
-		xs.sort((a, b) => a - b);
-		ys.sort((a, b) => a - b);
-
-		let min_x = xs[0];
-		let max_x = xs[xs.length - 1];
-		let min_y = ys[0];
-		let max_y = ys[ys.length - 1];
-
-		let str = '';
-		for (let y = min_y; y <= max_y; y++) {
-			for (let x = min_x; x <= max_x; x++) {
-				let cell = `${x},${y}`;
-				str += this.ship[cell] ? '#' : ' ';
-			}
-			str += '\n';
-		}
-		console.log(str);
-	}
-}
-
 module.exports = {
 	Computer,
-	Ship,
 };
