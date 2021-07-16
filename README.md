@@ -49,7 +49,7 @@ Completed: **25 / 25** (100% ⭐️)
 
 ## 2019 Puzzles List
 
-Completed: **14 / 25** (56%)
+Completed: **15 / 25** (60%)
 
 *  [✅ Day 1](2019/1/)
 *  [✅ Day 2](2019/2/)
@@ -69,7 +69,7 @@ Completed: **14 / 25** (56%)
 *  Day 16
 *  Day 17
 *  Day 18
-*  Day 19
+*  [✅ Day 19](2019/19/)
 *  Day 20
 *  Day 21
 *  Day 22
