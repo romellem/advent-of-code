@@ -127,51 +127,111 @@ class TractorBeam {
 		return found_square.x * 10000 + found_square.y;
 	}
 
+	// May not work in all cases (e.g. for slow slopes on top edge)
+	partTwoOptimized(square_size = 100) {
+		/**
+		 * First, we need to find when the tractor beam begins after the origin.
+		 * We do this by diagonalizing from 1,0 (or 0,1) until we hit 1 (being pulled).
+		 * Rather than just following a simple `y = x` line from the origin, we diagonalize
+		 * because the "slope" may be thin enough to not add pulled markers near the origin
+		 * (as I see with my puzzle input).
+		 */
+		this.grid.set(0, 0, 1);
+		let start;
+		let col = 1;
+		let x = 1;
+		let y = 0;
+		while (!start) {
+			let output = this.computeAt(x, y);
+
+			if (output === 1) {
+				this.grid.set(x, y, 1);
+				start = { x, y };
+				break;
+			}
+
+			if (x === 0) {
+				x = ++col;
+				y = 0;
+			} else {
+				x--;
+				y++;
+			}
+		}
+
+		/**
+		 * Walk the top line and check bottom left from each point.
+		 */
+		let top_edge = { ...start };
+		let found_top_left;
+		while (!found_top_left) {
+			let bottom_left_x = top_edge.x - square_size + 1;
+			let bottom_left_y = top_edge.y + square_size - 1;
+			let output = this.computeAt(bottom_left_x, bottom_left_y);
+			this.grid.set(x, y, output);
+			if (output) {
+				found_top_left = { x: bottom_left_x, y: top_edge.y };
+			} else {
+				this.calculateNewEdges(undefined, top_edge, false);
+			}
+		}
+
+		// What value do you get if you take that
+		// point's X coordinate, multiply it by 10000, then add the point's Y coordinate?
+		console.log(found_top_left);
+		return found_top_left.x * 10000 + found_top_left.y;
+	}
+
 	/**
 	 * Updates edges in place.
 	 */
-	calculateNewEdges(bottom_edge, top_edge) {
-		// First, move down until we hit 0
+	calculateNewEdges(bottom_edge, top_edge, allow_for_bottom_jumps = true) {
 		let output;
-		do {
-			bottom_edge.y++;
-			let computer = new Computer({
-				memory: this.memory,
-				inputs: [bottom_edge.x, bottom_edge.y],
-			});
-			[output] = computer.run();
-			this.grid.set(bottom_edge.x, bottom_edge.y, output);
-		} while (output === 1);
 
-		// Then, move inward until we hit a `1`
-		do {
-			bottom_edge.x++;
-			let computer = new Computer({
-				memory: this.memory,
-				inputs: [bottom_edge.x, bottom_edge.y],
-			});
-			[output] = computer.run();
-			this.grid.set(bottom_edge.x, bottom_edge.y, output);
-		} while (output === 0);
-
-		// Now do top edge
-		do {
-			// Double loops in case bottom calc mo
-			top_edge.y++;
+		if (bottom_edge) {
+			// First, move down until we hit 0
 			do {
-				// Move right until we hit a `0`
-				top_edge.x++;
+				bottom_edge.y++;
 				let computer = new Computer({
 					memory: this.memory,
-					inputs: [top_edge.x, top_edge.y],
+					inputs: [bottom_edge.x, bottom_edge.y],
 				});
 				[output] = computer.run();
-				this.grid.set(top_edge.x, top_edge.y, output);
+				this.grid.set(bottom_edge.x, bottom_edge.y, output);
 			} while (output === 1);
-		} while (top_edge.y !== bottom_edge.y);
 
-		// The cell immediately to the left of that is the right edge.
-		top_edge.x--;
+			// Then, move inward until we hit a `1`
+			do {
+				bottom_edge.x++;
+				let computer = new Computer({
+					memory: this.memory,
+					inputs: [bottom_edge.x, bottom_edge.y],
+				});
+				[output] = computer.run();
+				this.grid.set(bottom_edge.x, bottom_edge.y, output);
+			} while (output === 0);
+		}
+
+		if (top_edge) {
+			// Now do top edge
+			do {
+				// Double loops in case bottom calc mo
+				top_edge.y++;
+				do {
+					// Move right until we hit a `0`
+					top_edge.x++;
+					let computer = new Computer({
+						memory: this.memory,
+						inputs: [top_edge.x, top_edge.y],
+					});
+					[output] = computer.run();
+					this.grid.set(top_edge.x, top_edge.y, output);
+				} while (output === 1);
+			} while (allow_for_bottom_jumps && top_edge.y !== bottom_edge.y);
+
+			// The cell immediately to the left of that is the right edge.
+			top_edge.x--;
+		}
 	}
 
 	getWidth(bottom_edge, top_edge) {
