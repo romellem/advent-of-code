@@ -5,8 +5,6 @@ class TractorBeam {
 	constructor(memory, options = {}) {
 		this.memory = memory.slice(0);
 		this.grid = new InfiniteGrid({ string_map: { 1: '#', 0: '.' } });
-
-		this.parseOpTime = 0;
 	}
 
 	partOne() {
@@ -232,7 +230,6 @@ class TractorBeam {
 		// The computer halts after every output, so we create a new one each time
 		let computer = new Computer({ memory: this.memory, inputs: [x, y] });
 		let [output] = computer.run();
-		this.parseOpTime += computer.parseOpTime;
 
 		return output;
 	}
