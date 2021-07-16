@@ -35,6 +35,8 @@ class Computer {
 		this.replenish_input = replenish_input;
 		this.outputs = [];
 
+		this.parseOpTime = 0;
+
 		this.OPS = {
 			[ADD]: {
 				name: ADD,
@@ -163,6 +165,7 @@ class Computer {
 	}
 
 	parseOp() {
+		let start = new Date();
 		let temp_op = String(this.memory[this.pointer]).padStart(2, '0');
 
 		// "The opcode is a two-digit number based only on the ones and tens digit of the value, that is, the opcode is the rightmost two digits of the first value in an instruction"
@@ -177,10 +180,13 @@ class Computer {
 			modes.push(full_op[i]);
 		}
 
-		return {
+		let rtn_obj = {
 			...op,
 			modes,
 		};
+		let end = new Date();
+		this.parseOpTime += (end - start);
+		return rtn_obj;
 	}
 
 	runOp({ modes, fn, jumps, write }) {
@@ -298,6 +304,11 @@ class Computer {
 	// For debugging
 	get _() {
 		return this.memory.slice(Math.max(0, this.pointer - 1), this.pointer + 8);
+	}
+
+	logParseOpDuration() {
+		const million = BigInt(1e6);
+		console.log(`parseOp took ${parseOpTime / million} ms`);
 	}
 }
 

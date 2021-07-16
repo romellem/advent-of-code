@@ -5,6 +5,8 @@ class TractorBeam {
 	constructor(memory, options = {}) {
 		this.memory = memory.slice(0);
 		this.grid = new InfiniteGrid({ string_map: { 1: '#', 0: '.' } });
+
+		this.parseOpTime = 0;
 	}
 
 	partOne() {
@@ -192,22 +194,14 @@ class TractorBeam {
 			// First, move down until we hit 0
 			do {
 				bottom_edge.y++;
-				let computer = new Computer({
-					memory: this.memory,
-					inputs: [bottom_edge.x, bottom_edge.y],
-				});
-				[output] = computer.run();
+				output = this.computeAt(bottom_edge.x, bottom_edge.y);
 				this.grid.set(bottom_edge.x, bottom_edge.y, output);
 			} while (output === 1);
 
 			// Then, move inward until we hit a `1`
 			do {
 				bottom_edge.x++;
-				let computer = new Computer({
-					memory: this.memory,
-					inputs: [bottom_edge.x, bottom_edge.y],
-				});
-				[output] = computer.run();
+				output = this.computeAt(bottom_edge.x, bottom_edge.y);
 				this.grid.set(bottom_edge.x, bottom_edge.y, output);
 			} while (output === 0);
 		}
@@ -220,11 +214,7 @@ class TractorBeam {
 				do {
 					// Move right until we hit a `0`
 					top_edge.x++;
-					let computer = new Computer({
-						memory: this.memory,
-						inputs: [top_edge.x, top_edge.y],
-					});
-					[output] = computer.run();
+					output = this.computeAt(top_edge.x, top_edge.y);
 					this.grid.set(top_edge.x, top_edge.y, output);
 				} while (output === 1);
 			} while (allow_for_bottom_jumps && top_edge.y !== bottom_edge.y);
@@ -242,6 +232,8 @@ class TractorBeam {
 		// The computer halts after every output, so we create a new one each time
 		let computer = new Computer({ memory: this.memory, inputs: [x, y] });
 		let [output] = computer.run();
+		this.parseOpTime += computer.parseOpTime;
+
 		return output;
 	}
 }
