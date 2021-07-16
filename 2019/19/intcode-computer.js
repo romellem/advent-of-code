@@ -41,7 +41,7 @@ class Computer {
 			[ADD]: {
 				name: ADD,
 				realName: 'ADD',
-				params: 3,
+				params: Array(3).fill('0'),
 				fn: (a, b, c) => {
 					this.memory[c] = a + b;
 				},
@@ -51,7 +51,7 @@ class Computer {
 			[MUL]: {
 				name: MUL,
 				realName: 'MUL',
-				params: 3,
+				params: Array(3).fill('0'),
 				fn: (a, b, c) => {
 					this.memory[c] = a * b;
 				},
@@ -61,7 +61,7 @@ class Computer {
 			[INP]: {
 				name: INP,
 				realName: 'INP',
-				params: 1,
+				params: Array(1).fill('0'),
 				fn: a => {
 					this.memory[a] = this.inputs.shift();
 					if (this.replenish_input !== undefined) {
@@ -74,28 +74,28 @@ class Computer {
 			[OUT]: {
 				name: OUT,
 				realName: 'OUT',
-				params: 1,
+				params: Array(1).fill('0'),
 				fn: a => this.output(a),
 			},
 
 			[ARB]: {
 				name: ARB,
 				realName: 'ARB',
-				params: 1,
+				params: Array(1).fill('0'),
 				fn: a => (this.relative_base += a),
 			},
 
 			[STP]: {
 				name: STP,
 				realName: 'STP',
-				params: 0,
+				params: Array(0).fill('0'),
 				fn: () => (this.halted = true),
 			},
 
 			[JIT]: {
 				name: JIT,
 				realName: 'JIT',
-				params: 2,
+				params: Array(2).fill('0'),
 				fn: (a, b) => {
 					if (a) {
 						this.pointer = b;
@@ -109,7 +109,7 @@ class Computer {
 			[JIF]: {
 				name: JIF,
 				realName: 'JIF',
-				params: 2,
+				params: Array(2).fill('0'),
 				fn: (a, b) => {
 					if (!a) {
 						this.pointer = b;
@@ -123,7 +123,7 @@ class Computer {
 			[LTH]: {
 				name: LTH,
 				realName: 'LTH',
-				params: 3,
+				params: Array(3).fill('0'),
 				fn: (a, b, c) => {
 					this.memory[c] = a < b ? 1 : 0;
 				},
@@ -133,16 +133,13 @@ class Computer {
 			[EQU]: {
 				name: EQU,
 				realName: 'EQU',
-				params: 3,
+				params: Array(3).fill('0'),
 				fn: (a, b, c) => {
 					this.memory[c] = a === b ? 1 : 0;
 				},
 				write: true,
 			},
 		};
-
-		this.maxParams = Math.max(...Object.values(this.OPS).map(v => v.params));
-		this.sharedModes = Array(this.maxParams).fill('0');
 
 		this.halted = false;
 	}
@@ -174,16 +171,10 @@ class Computer {
 		// "The opcode is a two-digit number based only on the ones and tens digit of the value, that is, the opcode is the rightmost two digits of the first value in an instruction"
 		let op = this.OPS[temp_op.substr(-2, 2)];
 
-		if (!op) {
-			debugger;
-		}
-
 		let full_op = temp_op.padStart(op.params + 2, '0');
 
-		let modes = this.sharedModes;
-
 		// "Parameter modes are single digits, one per parameter, read **right-to-left** from the opcode"
-		for (let i = op.params - 1; i >= 0; i--) {
+		for (let i = op.params.length - 1; i >= 0; i--) {
 			// [0,1,2,3,4,5]
 			// ^ ops.params = 6
 			// 5 -> 0 # |(5 - 6 + 1)| = | 0| = 0
@@ -192,23 +183,19 @@ class Computer {
 			// 2 -> 3 # |(2 - 6 + 1)| = |-3| = 3
 			// 1 -> 4 # |(1 - 6 + 1)| = |-4| = 4
 			// 0 -> 5 # |(0 - 6 + 1)| = |-5| = 5
-			modes[Math.abs(i - op.params + 1)] = full_op[i];
+			op.params[Math.abs(i - op.params + 1)] = full_op[i];
 		}
 
-		let rtn_obj = {
-			...op,
-			modes,
-		};
 		let end = new Date();
 		this.parseOpTime += (end - start);
-		return rtn_obj;
+		return op;
 	}
 
-	runOp({ modes, params, fn, jumps, write }) {
+	runOp({ params, fn, jumps, write }) {
 		this.pointer++;
 		let values = [];
-		for (let i = 0; i < params; i++) {
-			let mode = modes[i];
+		for (let i = 0; i < params.length; i++) {
+			let mode = params[i];
 			let value = this.memory[this.pointer + i];
 
 			// Values can overflow existing memory. If so, value should be 0
@@ -277,7 +264,7 @@ class Computer {
 				 * - I am running an op that does _not_ write to memory
 				 * - Or if I am not at the last parameter in the op
 				 */
-				const can_switch_to_position = !write || i < params - 1;
+				const can_switch_to_position = !write || i < params.length - 1;
 
 				if (can_switch_to_position && mode === POSITION_MODE) {
 					value = this.memory[value];
@@ -308,7 +295,7 @@ class Computer {
 		let result = fn(...values);
 
 		if (!jumps || (jumps && !result)) {
-			this.pointer += modes.length;
+			this.pointer += params.length;
 		}
 	}
 
