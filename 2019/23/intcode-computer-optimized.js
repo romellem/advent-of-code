@@ -14,28 +14,46 @@ const IMMEDIATE_MODE = '1';
 const RELATIVE_MODE = '2';
 
 class Computer {
+	static ADD = ADD;
+	static MUL = MUL;
+	static INP = INP;
+	static OUT = OUT;
+	static JIT = JIT;
+	static JIF = JIF;
+	static LTH = LTH;
+	static EQU = EQU;
+	static ARB = ARB;
+	static STP = STP;
+
+	static POSITION_MODE = POSITION_MODE;
+	static IMMEDIATE_MODE = IMMEDIATE_MODE;
+	static RELATIVE_MODE = RELATIVE_MODE;
+
 	constructor({
 		memory,
 		inputs = [],
-		replenish_input = undefined,
-		pause_on_output = true,
-		id = 0,
+		// Called with computer as it's only arg
+		defaultInput,
+		pause_on = { [OUT]: true },
+		address,
 		clone_memory = false,
 	}) {
-		// For debugging
-		this.id = String.fromCharCode('A'.charCodeAt(0) + id);
+		// Must match initial input
+		this.address = address;
+		if (this.address !== inputs[0]) {
+			throw new Error(`Invalid address: ${address}, inputs: ${JSON.stringify(inputs)}`);
+		}
 
 		this.original_memory = clone_memory && memory.slice(0);
 		this.memory = memory.slice(0);
 		this.pointer = 0;
 		this.relative_base = 0;
-		this.pause_on_output = pause_on_output;
+		this.pause_on = pause_on;
 
 		this.inputs = Array.isArray(inputs) ? inputs.slice(0) : [inputs];
-		this.replenish_input = replenish_input;
 		this.outputs = [];
 
-		this.parseOpTime = 0;
+		this.defaultInput = defaultInput;
 
 		this.OPS = {
 			[ADD]: {
@@ -63,10 +81,11 @@ class Computer {
 				realName: 'INP',
 				params: 1,
 				fn: (a) => {
+					if (this.defaultInput && this.inputs.length === 0) {
+						let default_input_value = this.defaultInput(this);
+						this.inputs.push(default_input_value);
+					} 
 					this.memory[a] = this.inputs.shift();
-					if (this.replenish_input !== undefined) {
-						this.inputs.push(this.replenish_input);
-					}
 				},
 				write: true,
 			},
@@ -177,10 +196,10 @@ class Computer {
 			this.runOp(op);
 
 			/**
-			 * In circuits, computer execution should be paused on outout so that value can be passed to the next computer.
+			 * In circuits, computer execution should be paused on output so that value can be passed to the next computer.
 			 * Additionally, execution should immediately stopped if we have halted.
 			 */
-			if ((this.pause_on_output && op.name === OUT) || this.halted) {
+			if (this.pause_on[op.name] || this.halted) {
 				break;
 			}
 
