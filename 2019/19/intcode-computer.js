@@ -62,7 +62,7 @@ class Computer {
 				name: INP,
 				realName: 'INP',
 				params: 1,
-				fn: a => {
+				fn: (a) => {
 					this.memory[a] = this.inputs.shift();
 					if (this.replenish_input !== undefined) {
 						this.inputs.push(this.replenish_input);
@@ -75,14 +75,14 @@ class Computer {
 				name: OUT,
 				realName: 'OUT',
 				params: 1,
-				fn: a => this.output(a),
+				fn: (a) => this.output(a),
 			},
 
 			[ARB]: {
 				name: ARB,
 				realName: 'ARB',
 				params: 1,
-				fn: a => (this.relative_base += a),
+				fn: (a) => (this.relative_base += a),
 			},
 
 			[STP]: {
@@ -142,8 +142,26 @@ class Computer {
 		};
 
 		const ops_list = Object.values(this.OPS);
-		const max_params = Math.max(...ops_list.map(v => v.params));
+		const max_params = Math.max(...ops_list.map((v) => v.params));
 		const shared_modes = Array(max_params).fill('0');
+
+		/**
+		 * Use shared arrays for `modes` and `value`.
+		 *
+		 * We can share a single array for `modes` since we know
+		 * the number of params for an op, meaning if an op has
+		 * 2 params, we can determine the modes for the 1st and
+		 * 2nd values, and the 3rd value will just be "junk" data
+		 * we'll ignore.
+		 *
+		 * The `values` for the ops need to be unique though, since
+		 * we spread out the values into our function call. Also
+		 * good to note that another optimization is we have hard-coded
+		 * fn calls for the number of params. `fn(...[1, 2])` is
+		 * slower than `fn(1, 2)`, so we code for 0 - 3 params, with
+		 * a default case of a spread. Similar libraries like lodash
+		 * do this.
+		 */
 		for (let op of ops_list) {
 			op.modes = shared_modes;
 			op.values = Array(op.params).fill(0);
@@ -173,7 +191,6 @@ class Computer {
 	}
 
 	parseOp() {
-		let start = new Date();
 		let temp_op = String(this.memory[this.pointer]).padStart(2, '0');
 
 		// "The opcode is a two-digit number based only on the ones and tens digit of the value, that is, the opcode is the rightmost two digits of the first value in an instruction"
@@ -194,8 +211,6 @@ class Computer {
 			op.modes[Math.abs(i - op.params + 1)] = full_op[i];
 		}
 
-		let end = new Date();
-		this.parseOpTime += (end - start);
 		return op;
 	}
 
@@ -299,7 +314,33 @@ class Computer {
 		}
 
 		// If result is `true`, we moved the pointer
-		let result = fn(...values);
+		let result;
+
+		/**
+		 * Always spreading args is slow, so we can create a few base cases
+		 * (actually all our base cases) to speed up these function calls.
+		 * We still have a default case if for some reason we have an op
+		 * with more than 3 params (we don't), so this code is future proof,
+		 * but this change offers a ~2x speed improvement.
+		 */
+		switch (params) {
+			case 0:
+				result = fn();
+				break;
+			case 1:
+				result = fn(values[0]);
+				break;
+			case 2:
+				result = fn(values[0], values[1]);
+				break;
+			case 3:
+				result = fn(values[0], values[1], values[2]);
+				break;
+			default:
+				// Spreads are slow, so use direct branches for known number of params
+				result = fn(...values);
+				break;
+		}
 
 		if (!jumps || (jumps && !result)) {
 			this.pointer += params;
@@ -313,11 +354,6 @@ class Computer {
 	// For debugging
 	get _() {
 		return this.memory.slice(Math.max(0, this.pointer - 1), this.pointer + 8);
-	}
-
-	logParseOpDuration() {
-		const million = BigInt(1e6);
-		console.log(`parseOp took ${parseOpTime / million} ms`);
 	}
 }
 
