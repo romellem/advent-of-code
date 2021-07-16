@@ -141,6 +141,9 @@ class Computer {
 			},
 		};
 
+		this.maxParams = Math.max(...Object.values(this.OPS).map(v => v.params));
+		this.sharedModes = Array(this.maxParams).fill('0');
+
 		this.halted = false;
 	}
 
@@ -171,13 +174,25 @@ class Computer {
 		// "The opcode is a two-digit number based only on the ones and tens digit of the value, that is, the opcode is the rightmost two digits of the first value in an instruction"
 		let op = this.OPS[temp_op.substr(-2, 2)];
 
+		if (!op) {
+			debugger;
+		}
+
 		let full_op = temp_op.padStart(op.params + 2, '0');
 
-		let modes = [];
+		let modes = this.sharedModes;
 
 		// "Parameter modes are single digits, one per parameter, read **right-to-left** from the opcode"
 		for (let i = op.params - 1; i >= 0; i--) {
-			modes.push(full_op[i]);
+			// [0,1,2,3,4,5]
+			// ^ ops.params = 6
+			// 5 -> 0 # |(5 - 6 + 1)| = | 0| = 0
+			// 4 -> 1 # |(4 - 6 + 1)| = |-1| = 1
+			// 3 -> 2 # |(3 - 6 + 1)| = |-2| = 2
+			// 2 -> 3 # |(2 - 6 + 1)| = |-3| = 3
+			// 1 -> 4 # |(1 - 6 + 1)| = |-4| = 4
+			// 0 -> 5 # |(0 - 6 + 1)| = |-5| = 5
+			modes[Math.abs(i - op.params + 1)] = full_op[i];
 		}
 
 		let rtn_obj = {
@@ -189,10 +204,10 @@ class Computer {
 		return rtn_obj;
 	}
 
-	runOp({ modes, fn, jumps, write }) {
+	runOp({ modes, params, fn, jumps, write }) {
 		this.pointer++;
 		let values = [];
-		for (let i = 0; i < modes.length; i++) {
+		for (let i = 0; i < params; i++) {
 			let mode = modes[i];
 			let value = this.memory[this.pointer + i];
 
@@ -262,7 +277,7 @@ class Computer {
 				 * - I am running an op that does _not_ write to memory
 				 * - Or if I am not at the last parameter in the op
 				 */
-				const can_switch_to_position = !write || i < modes.length - 1;
+				const can_switch_to_position = !write || i < params - 1;
 
 				if (can_switch_to_position && mode === POSITION_MODE) {
 					value = this.memory[value];
