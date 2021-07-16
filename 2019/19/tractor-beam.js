@@ -73,13 +73,13 @@ class TractorBeam {
 		/**
 		 * Once we have a row that is wide enough, we can move onto the next phase.
 		 * Take the left most point in the row (bottom_edge.x). Calculate the value
-		 * at the point + `square_size` down from there. If we hit a `0`, go to B.
+		 * at the `point + square_size - 1` down from there. If we hit a `0`, go to B.
 		 *
-		 * If we hit a `1`, then move right `square_size` amount from that point.
+		 * If we hit a `1`, then move right `square_size - 1` amount from that point.
 		 * If _that_ is a `1`, we found our top-left point. Exit.
 		 *
 		 * B. If it's a `0`, then move inward `square_size - row_width` number of times,
-		 * continually checking the point + `square_size` down. If we iterate through
+		 * continually checking the `point + square_size - 1` down. If we iterate through
 		 * the available squares in the row, then the top-left point doesn't exist
 		 * in that row. Calculate the next set of edges and start again.
 		 */
@@ -88,14 +88,26 @@ class TractorBeam {
 			const row_width = this.getWidth(bottom_edge, top_edge);
 			for (
 				let x = bottom_edge.x;
-				x < bottom_edge.x + row_width - square_size;
+				x <= bottom_edge.x + row_width - square_size;
 				x++
 			) {
-				let y = bottom_edge.y + square_size;
+				/**
+				 * If I want a 2x2 square, and I'm at 0,0, I don't jump to 0,2 / 2,2 / 0,2
+				 *
+				 *       01234
+				 *     0 x.x--
+				 *     1 ...
+				 *     2 x.x
+				 *     3 |
+				 *     4 |
+				 *
+				 * That'd make a 3x3 square! So I jump forward the square size minus 1.
+				 */
+				let y = bottom_edge.y + square_size - 1;
 				let output = this.computeAt(x, y);
 				this.grid.set(x, y, output);
 				if (output === 1) {
-					let bottom_right = this.computeAt(x + square_size, y);
+					let bottom_right = this.computeAt(x + square_size - 1, y);
 					if (bottom_right === 1) {
 						found_square = { x, y: bottom_edge.y };
 						break;
