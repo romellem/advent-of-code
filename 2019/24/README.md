@@ -1,8 +1,8 @@
 # Answers
 
-| Part 1 | Part 2 |
-|--------|--------|
-| ` ` |  ` ` |
+|   Part 1   | Part 2 |
+|------------|--------|
+| `28781019` |  ` ` |
 
 ## --- Day 24: Planet of Discord ---
 
@@ -64,7 +64,7 @@ To understand the nature of the bugs, watch for the first time a layout of bugs 
     .#...
     
 
-To calculate the _biodiversity rating_ for this layout, consider each tile left-to-right in the top row, then left-to-right in the second row, and so on. Each of these tiles is worth biodiversity points equal to _increasing powers of two_: 1, 2, 4, 8, 16, 32, and so on. Add up the biodiversity points for tiles with bugs; in this example, the 16th tile (`32768` points) and 22nd tile (`2097152` points) have bugs, a total biodiversity rating of `_2129920_`.
+To calculate the _biodiversity rating_ for this layout, consider each tile left-to-right in the top row, then left-to-right in the second row, and so on. Each of these tiles is worth biodiversity points equal to _increasing powers of two_: 1, 2, 4, 8, 16, 32, and so on. Add up the biodiversity points for tiles with bugs; in this example, the 16th tile (`32768` points) and 22nd tile (`2097152` points) have bugs, a total biodiversity rating of _`2129920`_.
 
 _What is the biodiversity rating for the first layout that appears twice?_
 
@@ -74,7 +74,7 @@ _What is the biodiversity rating for the first layout that appears twice?_
 
 After careful analysis, one thing is certain: _you have no idea where all these bugs are coming from_.
 
-Then, you remember: Eris is an old [Plutonian](20) settlement! Clearly, the bugs are coming from recursively-folded space.
+Then, you remember: Eris is an old [Plutonian](https://adventofcode.com/2019/day/20) settlement! Clearly, the bugs are coming from recursively-folded space.
 
 This 5x5 grid is _only one_ level in an _infinite_ number of recursion levels. The tile in the middle of the grid is actually another 5x5 grid, the grid in your scan is contained as the middle tile of a larger 5x5 grid, and so on. Two levels of grids look like this:
 
@@ -236,6 +236,6 @@ The center tile is drawn as `?` to indicate the next recursive grid. Call this l
     .....
     
 
-In this example, after 10 minutes, a total of `_99_` bugs are present.
+In this example, after 10 minutes, a total of _`99`_ bugs are present.
 
 Starting with your scan, _how many bugs are present after 200 minutes?_
