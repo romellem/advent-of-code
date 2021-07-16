@@ -141,8 +141,13 @@ class Computer {
 			},
 		};
 
-		this.maxParams = Math.max(...Object.values(this.OPS).map(v => v.params));
-		this.sharedModes = Array(this.maxParams).fill('0');
+		const ops_list = Object.values(this.OPS);
+		const max_params = Math.max(...ops_list.map(v => v.params));
+		const shared_modes = Array(max_params).fill('0');
+		for (let op of ops_list) {
+			op.modes = shared_modes;
+			op.values = Array(op.params).fill(0);
+		}
 
 		this.halted = false;
 	}
@@ -176,8 +181,6 @@ class Computer {
 
 		let full_op = temp_op.padStart(op.params + 2, '0');
 
-		let modes = this.sharedModes;
-
 		// "Parameter modes are single digits, one per parameter, read **right-to-left** from the opcode"
 		for (let i = op.params - 1; i >= 0; i--) {
 			// [0,1,2,3,4,5]
@@ -188,18 +191,16 @@ class Computer {
 			// 2 -> 3 # |(2 - 6 + 1)| = |-3| = 3
 			// 1 -> 4 # |(1 - 6 + 1)| = |-4| = 4
 			// 0 -> 5 # |(0 - 6 + 1)| = |-5| = 5
-			modes[Math.abs(i - op.params + 1)] = full_op[i];
+			op.modes[Math.abs(i - op.params + 1)] = full_op[i];
 		}
 
-		op.modes = modes;
 		let end = new Date();
 		this.parseOpTime += (end - start);
 		return op;
 	}
 
-	runOp({ modes, params, fn, jumps, write }) {
+	runOp({ modes, values, params, fn, jumps, write }) {
 		this.pointer++;
-		let values = [];
 		for (let i = 0; i < params; i++) {
 			let mode = modes[i];
 			let value = this.memory[this.pointer + i];
@@ -294,7 +295,7 @@ class Computer {
 				value = 0;
 			}
 
-			values.push(value);
+			values[i] = value;
 		}
 
 		// If result is `true`, we moved the pointer
