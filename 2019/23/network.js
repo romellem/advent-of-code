@@ -3,7 +3,9 @@ const { Computer } = require('./intcode-computer-optimized');
 class Network {
 	constructor(program, nics_count = 50) {
 		this.original_program = [...program];
-		this.packet_queue = Array(nics_count).fill([]);
+		this.packet_queue = Array(nics_count)
+			.fill()
+			.map((_) => []);
 
 		this.nics = Array(nics_count)
 			.fill()
@@ -53,7 +55,6 @@ class Network {
 				}
 			}
 		}
-
 	}
 }
 
