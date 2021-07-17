@@ -3,13 +3,13 @@ const { partTwoInput } = require('./input');
 const offset = parseInt(partTwoInput.slice(0, 7).join(''), 10);
 const slice_to_iterate = partTwoInput.slice(offset);
 for (let j = 0; j < 100; j++) {
+	// We don't need to do anything with the last number so start at 2nd the last
 	for (let i = slice_to_iterate.length - 2; i >= 0; i--) {
 		slice_to_iterate[i] = (slice_to_iterate[i + 1] + slice_to_iterate[i]) % 10;
 	}
 }
 
 console.log('8 digits:', slice_to_iterate.slice(0, 8).join(''));
-
 
 /*
 
@@ -57,33 +57,38 @@ and loop up.
 
 Consider
 
-n + ...           = x_n      n + x_n-1 = x_n
-    d + c + b + a = x_4      d + x_3   = x_4
-        c + b + a = x_3  =>  c + x_2   = x_3
-            b + a = x_2      b + x_1   = x_2
-                a = x_1      a         = x_1
+    n + ...           = x_n      n + x_n-1 = x_n
+        d + c + b + a = x_4      d + x_3   = x_4
+            c + b + a = x_3  =>  c + x_2   = x_3
+                b + a = x_2      b + x_1   = x_2
+                    a = x_1      a         = x_1
 
-Let x_n = D_i..D_1D_0 , where D_n is a single digit.
-(x_n)mod 10 = D_0
-Let `l + x_n` be the next line up we want to add. So l is a single digit number.
-We only care about the last digit of all that addition, so I want to show that
-(l + x_n)mod 10 = (l + D_0)mod 10.
+Let `x_n` = `D_i..D_1D_0`, where `D_n` is a single digit.
+
+Clearly `(x_n)mod 10 = D_0`, aka the last digit.
+
+Let `l + x_n` be the next line up we want to add. So `l` is a single digit number.
+
+I'm saying we should only care about the last digit of all that addition, so I want to show that
+
+    (l + x_n)mod 10 = (l + D_0)mod 10.
+
 From the "Addition Property" of modular arithmetic, we know that
-(a + b)mod_n = [(a)mod_n + (b)mod_n]mod_n
 
-So, expanding (l + x_n)mod 10 is
+    (a + b)mod_n = [(a)mod_n + (b)mod_n]mod_n
 
-(l + x_n)mod_10 = ((l)mod_10 + (x_n)mod_10)mod_10.
+So, expanding `(l + x_n)mod 10` is
 
-Well (l)mod_10 is just l, since l is less than 10.
+    (l + x_n)mod_10 = ((l)mod_10 + (x_n)mod_10)mod_10.
+    
+    # Well `(l)mod_10` is just `l`, since `l` is less than 10 (aka a single digit).
+    
+    (l + x_n)mod_10 = ((l)       + (x_n)mod_10)mod_10.
+    
+    # Add (x_n)mod_10 = D_0
+    
+    (l + x_n)mod_10 = (l         + D0         )mod_10.
 
-                = ((l)       + (x_n)mod_10)mod_10.
-
-Add (x_n)mod_10 = D_0
-
-                = (l         + D0         )mod_10.
-
-QED.
-
+QED ∎
 
 */
