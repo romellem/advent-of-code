@@ -6,7 +6,7 @@
 details {
     font-family: monospace;
     font-size: 0.8rem;
-    color: $gray-700;
+    color: #444;
 
     padding: 1rem;
     margin: 0 -1rem;
@@ -26,12 +26,6 @@ details {
 
     .markdown-body & + p {
         margin-top: 16px;
-    }
-
-    em {
-        color: $black;
-        font-style: normal;
-        text-shadow: 0 0 2px rgba($black, 50%);
     }
 }
 
