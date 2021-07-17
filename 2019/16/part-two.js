@@ -9,7 +9,8 @@ for (let j = 0; j < 100; j++) {
 	}
 }
 
-console.log('8 digits:', slice_to_iterate.slice(0, 8).join(''));
+// First 8 digits from our offset
+console.log(slice_to_iterate.slice(0, 8).join(''));
 
 /*
 
