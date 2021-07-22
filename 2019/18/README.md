@@ -199,7 +199,7 @@ Finally, the top-right robot collects key `d`:
     #######
     
 
-In this example, it only took `_8_` steps to collect all of the keys.
+In this example, it only took _`8`_ steps to collect all of the keys.
 
 Sometimes, multiple robots might have keys available, or a robot might have to wait for multiple keys to be collected:
 
@@ -212,7 +212,7 @@ Sometimes, multiple robots might have keys available, or a robot might have to w
     ###############
     
 
-First, the top-right, bottom-left, and bottom-right robots take turns collecting keys `a`, `b`, and `c`, a total of `6 + 6 + 6 = 18` steps. Then, the top-left robot can access key `d`, spending another `6` steps; collecting all of the keys here takes a minimum of `_24_` steps.
+First, the top-right, bottom-left, and bottom-right robots take turns collecting keys `a`, `b`, and `c`, a total of `6 + 6 + 6 = 18` steps. Then, the top-left robot can access key `d`, spending another `6` steps; collecting all of the keys here takes a minimum of _`24`_ steps.
 
 Here's a more complex example:
 
