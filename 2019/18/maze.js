@@ -66,6 +66,7 @@ class Maze {
 		while (paths.some((path) => !path.at_end)) {
 			let new_paths = [];
 			for (let path of paths) {
+				console.log(paths.length)
 				const reachable_keys = new Map();
 				let { x, y } = path;
 
@@ -127,13 +128,17 @@ class Maze {
 				}
 			}
 
-			paths = new_paths;
-			for (let path of paths) {
+			let pruned_paths = new Map();
+			for (let path of new_paths) {
 				if (path.keys_collected.length === this.keys.size) {
 					// We collected all the keys!
 					path.at_end = true;
 				}
+				const sorted_keys_str = path.keys_collected.split('').sort().join('');
+				const path_id = `${path.x},${path.y},${path.steps},${sorted_keys_str}`;
+				pruned_paths.set(path_id, path);
 			}
+			paths = [...pruned_paths.values()];
 		}
 
 		return paths.sort((a, b) => a.steps - b.steps);
