@@ -50,20 +50,30 @@ class Maze {
 			at_end: false,
 		});
 
-		const countSteps = (from_coord, to_coord, came_from) => {
-			let current = to_coord;
-			let count = 0;
-			const from_id = InfiniteGrid.toId(...from_coord);
-			while (InfiniteGrid.toId(...current) !== from_id) {
-				count++;
-				current = came_from.get(InfiniteGrid.toId(...current));
-			}
-			return count;
-		};
-
 		// paths = [{ x, y, steps, keys_collected }, ...]
 		let paths = [makePath({ x: _x, y: _y })];
 		while (paths.some((path) => !path.at_end)) {
+			// Memo this function based on from / to coords
+			const countSteps = (() => {
+				const cache = {};
+				return (from_coord, to_coord, came_from) => {
+					let current = to_coord;
+					let count = 0;
+					const from_id = InfiniteGrid.toId(...from_coord);
+					const cache_key = `${InfiniteGrid.toId(...current)}/${from_id}`;
+
+					if (cache[cache_key] === undefined) {
+						while (InfiniteGrid.toId(...current) !== from_id) {
+							count++;
+							current = came_from.get(InfiniteGrid.toId(...current));
+						}
+						cache[cache_key] = count;
+					}
+
+					return cache[cache_key];
+				};
+			})();
+
 			let new_paths = [];
 			console.log(paths.length);
 			for (let path of paths) {
@@ -130,7 +140,7 @@ class Maze {
 				}
 			}
 
-			let pruned_paths = {};
+			let pruned_paths = new Map();
 			for (let path of new_paths) {
 				if (path.keys_collected.length === this.keys.size) {
 					// We collected all the keys!
@@ -138,7 +148,7 @@ class Maze {
 				}
 				const sorted_keys_str = path.keys_collected.split('').sort().join('');
 				const path_id = `${path.x},${path.y},${path.steps},${sorted_keys_str}`;
-				pruned_paths[path_id] = path;
+				pruned_paths.set(path_id, path);
 			}
 			paths = [...pruned_paths.values()];
 		}
