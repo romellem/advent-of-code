@@ -70,19 +70,20 @@ class Maze {
 				let { x, y } = path;
 
 				// Build frontier from current location
-				const frontier = new Queue([x, y]);
-				const came_from = new Map([InfiniteGrid.toId(x, y), null]);
+				const frontier = new Queue();
+				frontier.push([x, y]);
+				const came_from = new Map([[InfiniteGrid.toId(x, y), null]]);
 				while (!frontier.isEmpty()) {
 					const current_coord = frontier.shift();
-					for (let next_coord of this.grid
+					const neighbor_coords = this.grid
 						.neighbors(...current_coord)
-						.values()) {
+						.values();
+					for (let { coord: next_coord, value: next_cell } of neighbor_coords) {
 						const next_id = InfiniteGrid.toId(...next_coord);
-						const next_cell = this.grid.get(...next_coord);
 						if (next_cell === WALL) continue;
 						if (
 							this.doors.has(next_cell) &&
-							remaining_keys.has(next_cell.toLowerCase())
+							!path.keys_collected.includes(next_cell.toLowerCase())
 						) {
 							// Door is locked
 							continue;
@@ -94,8 +95,14 @@ class Maze {
 							if (next_cell === PASSAGE || next_cell === ENTRANCE) {
 								frontier.push(next_coord);
 							} else if (KEY_RE.test(next_cell)) {
-								reachable_keys.set(next_cell, next_coord);
+								if (!path.keys_collected.includes(next_cell.toLowerCase())) {
+									reachable_keys.set(next_cell, next_coord);
+								} else {
+									// Found keys are walkable
+									frontier.push(next_coord);
+								}
 							} else if (DOOR_RE.test(next_cell)) {
+								// Unlocked door, can walk
 								frontier.push(next_coord);
 							} else {
 								throw new Error(`Unknown cell: ${next_cell}`);
@@ -126,6 +133,8 @@ class Maze {
 
 			paths = new_paths;
 		}
+
+		return paths.sort((a, b) => a.steps - b.steps);
 	}
 }
 

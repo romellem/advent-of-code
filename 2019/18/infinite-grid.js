@@ -21,13 +21,13 @@ class InfiniteGrid {
 	static toCoords(id, return_as_object = false) {
 		let [x, y] = id.split(',');
 		x = parseInt(x, 10);
-		y = parseInt(x, 10);
+		y = parseInt(y, 10);
 		return return_as_object ? { x, y } : [x, y];
 	}
 
 	/**
-	 * @param {Number} x 
-	 * @param {Number} y 
+	 * @param {Number} x
+	 * @param {Number} y
 	 * @returns {Map} Return a map with optional keys N, W, E, S (if those neights are within the bounds of the map)
 	 */
 	neighbors(x, y) {
@@ -46,7 +46,7 @@ class InfiniteGrid {
 		for (let [key, coord] of neighbors_lookup) {
 			let [cx, cy] = coord;
 			if (this.inBounds(cx, cy)) {
-				neighboring_cells.set(key, this.get(cx, cy));
+				neighboring_cells.set(key, { coord, value: this.get(cx, cy) });
 			}
 		}
 
@@ -93,10 +93,7 @@ class InfiniteGrid {
 	}
 
 	inBounds(x, y) {
-		return x >= this.min_x &&
-		x <= this.max_x &&
-		y >= this.min_y &&
-		y <= this.max_y;
+		return x >= this.min_x && x <= this.max_x && y >= this.min_y && y <= this.max_y;
 	}
 
 	toGrid() {
