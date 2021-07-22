@@ -65,9 +65,8 @@ class Maze {
 		let paths = [makePath({ x: _x, y: _y })];
 		while (paths.some((path) => !path.at_end)) {
 			let new_paths = [];
-			console.log(paths.length)
+			console.log(paths.length);
 			for (let path of paths) {
-				
 				const reachable_keys = new Map();
 				let { x, y } = path;
 
@@ -81,8 +80,11 @@ class Maze {
 						.neighbors(...current_coord)
 						.values();
 					for (let { coord: next_coord, value: next_cell } of neighbor_coords) {
-						const next_id = InfiniteGrid.toId(...next_coord);
 						if (next_cell === WALL) continue;
+
+						const next_id = InfiniteGrid.toId(...next_coord);
+						if (came_from.has(next_id)) continue;
+
 						if (
 							this.doors.has(next_cell) &&
 							!path.keys_collected.includes(next_cell.toLowerCase())
@@ -92,26 +94,25 @@ class Maze {
 						}
 
 						// Otherwise, it is passage, key, or unlocked door
-						if (!came_from.has(next_id)) {
-							// We haven't visited this one yet
-							if (next_cell === PASSAGE || next_cell === ENTRANCE) {
-								frontier.push(next_coord);
-							} else if (KEY_RE.test(next_cell)) {
-								if (!path.keys_collected.includes(next_cell.toLowerCase())) {
-									reachable_keys.set(next_cell, next_coord);
-								} else {
-									// Found keys are walkable
-									frontier.push(next_coord);
-								}
-							} else if (DOOR_RE.test(next_cell)) {
-								// Unlocked door, can walk
-								frontier.push(next_coord);
-							} else {
-								throw new Error(`Unknown cell: ${next_cell}`);
-							}
 
-							came_from.set(next_id, current_coord);
+						// We haven't visited this one yet
+						if (next_cell === PASSAGE || next_cell === ENTRANCE) {
+							frontier.push(next_coord);
+						} else if (KEY_RE.test(next_cell)) {
+							if (!path.keys_collected.includes(next_cell.toLowerCase())) {
+								reachable_keys.set(next_cell, next_coord);
+							} else {
+								// Found keys are walkable
+								frontier.push(next_coord);
+							}
+						} else if (DOOR_RE.test(next_cell)) {
+							// Unlocked door, can walk
+							frontier.push(next_coord);
+						} else {
+							throw new Error(`Unknown cell: ${next_cell}`);
 						}
+
+						came_from.set(next_id, current_coord);
 					}
 				}
 
@@ -129,7 +130,7 @@ class Maze {
 				}
 			}
 
-			let pruned_paths = new Map();
+			let pruned_paths = {};
 			for (let path of new_paths) {
 				if (path.keys_collected.length === this.keys.size) {
 					// We collected all the keys!
@@ -137,7 +138,7 @@ class Maze {
 				}
 				const sorted_keys_str = path.keys_collected.split('').sort().join('');
 				const path_id = `${path.x},${path.y},${path.steps},${sorted_keys_str}`;
-				pruned_paths.set(path_id, path);
+				pruned_paths[path_id] = path;
 			}
 			paths = [...pruned_paths.values()];
 		}
