@@ -1,7 +1,8 @@
-const { sampleInputs } = require('./input');
+const { input, sampleInputs } = require('./input');
 const { Maze } = require('./maze');
 
-let maze = new Maze(sampleInputs[3].maze);
+let maze = new Maze(input);
+// let maze = new Maze(sampleInputs[3].maze);
 const [first_entrance] = [...maze.entrances.values()];
 
 const start = new Date();
