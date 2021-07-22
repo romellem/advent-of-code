@@ -113,10 +113,6 @@ class Maze {
 					}
 				}
 
-				if (path.keys_collected.length === this.keys.size) {
-					// We collected all the keys!
-					path.at_end = true;
-				}
 				for (let [reachable_key, reachable_key_coord] of reachable_keys) {
 					let [key_x, key_y] = reachable_key_coord;
 					const steps = countSteps([x, y], reachable_key_coord, came_from);
@@ -124,7 +120,7 @@ class Maze {
 						makePath({
 							x: key_x,
 							y: key_y,
-							steps,
+							steps: path.steps + steps,
 							keys_collected: path.keys_collected + reachable_key,
 						})
 					);
@@ -132,6 +128,12 @@ class Maze {
 			}
 
 			paths = new_paths;
+			for (let path of paths) {
+				if (path.keys_collected.length === this.keys.size) {
+					// We collected all the keys!
+					path.at_end = true;
+				}
+			}
 		}
 
 		return paths.sort((a, b) => a.steps - b.steps);
