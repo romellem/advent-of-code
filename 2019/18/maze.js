@@ -65,8 +65,9 @@ class Maze {
 		let paths = [makePath({ x: _x, y: _y })];
 		while (paths.some((path) => !path.at_end)) {
 			let new_paths = [];
+			console.log(paths.length)
 			for (let path of paths) {
-				console.log(paths.length)
+				
 				const reachable_keys = new Map();
 				let { x, y } = path;
 
