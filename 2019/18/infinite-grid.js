@@ -82,14 +82,14 @@ class InfiniteGrid {
 	/**
 	 * @param {RegExp|any} value
 	 * @param {Boolean} [as_coords] - When true, returns a Map of `[x, y]` number values, otherwise returns a Map of string IDs.
-	 * @returns {Map} - Returns a Map, with keys showing the value found (useful when a regex is passed).
+	 * @returns {Array<[any,Id|Coord]>} - Returns an Array, the first value matching the cell found, and the 2nd the coords or ID.
 	 */
 	findAll(value, as_coords = true) {
-		const found = new Map();
+		const found = [];
 		for (let [id, cell] of this.grid) {
 			const check = value instanceof RegExp ? value.test(cell) : value === cell;
 			if (check) {
-				found.set(cell, as_coords ? InfiniteGrid.toCoords(id) : id);
+				found.push([cell, as_coords ? InfiniteGrid.toCoords(id) : id]);
 			}
 		}
 

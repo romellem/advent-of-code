@@ -51,7 +51,7 @@ class Maze {
 		 *     .@.    ###
 		 *     ...    @#@
 		 */
-		let [ox, oy] = this.entrances.values().next().value;
+		let [ox, oy] = this.entrances[0][1];
 
 		// Top left corner
 		let top_x = ox - 1;
@@ -99,7 +99,7 @@ class Maze {
 
 	getReachableKeys(from_id, keys_collected) {
 		const reachable_keys = new Map();
-		for (let [key, key_coord] of this.keys.entries()) {
+		for (let [key, key_coord] of this.keys) {
 			const key_id = InfiniteGrid.toId(...key_coord);
 			if (from_id === key_id || keys_collected.includes(key)) {
 				// Don't say the current key or other keys collected are reachable
@@ -120,7 +120,8 @@ class Maze {
 				// Check if new cell is walkable
 				const cell = this.grid.get(...current);
 				const is_locked_door =
-					this.doors.has(cell) && !keys_collected.includes(cell.toLowerCase());
+					Boolean(this.doors.find(([door]) => door === cell)) &&
+					!keys_collected.includes(cell.toLowerCase());
 				const is_uncollected_key =
 					KEY_RE.test(cell) && !keys_collected.includes(cell);
 
@@ -141,7 +142,7 @@ class Maze {
 				}
 			}
 
-			if (InfiniteGrid.toId(...current) === from_id) {
+			if (current && InfiniteGrid.toId(...current) === from_id) {
 				// This key is reachable!
 				reachable_keys.set(key, cloneJSON(key_coord));
 			}
@@ -151,7 +152,7 @@ class Maze {
 	}
 
 	getShortestPath() {
-		const entrances_coords = [...this.entrances.values()];
+		const entrances_coords = this.entrances.map(([, coord]) => coord);
 
 		let paths = [
 			{
@@ -166,7 +167,7 @@ class Maze {
 			let new_paths = [];
 
 			console.log(
-				`${paths[0].keys_collected.length} / ${this.keys.size} (${paths.length} paths)`
+				`${paths[0].keys_collected.length} / ${this.keys.length} (${paths.length} paths)`
 			);
 			for (let path of paths) {
 				/** @type Array<Map<String, Coord> */
@@ -176,8 +177,6 @@ class Maze {
 						path.keys_collected
 					);
 				});
-				// console.log(reachable_keys_by_robots);
-				// process.exit(1)
 
 				for (let r = 0; r < reachable_keys_by_robots.length; r++) {
 					let [from_x, from_y] = path.robots_coords[r];
@@ -209,7 +208,7 @@ class Maze {
 			 */
 			let pruned_paths = new Map();
 			for (let path of new_paths) {
-				if (path.keys_collected.length === this.keys.size) {
+				if (path.keys_collected.length === this.keys.length) {
 					// We collected all the keys!
 					path.at_end = true;
 				}
@@ -221,9 +220,6 @@ class Maze {
 			}
 
 			paths = [...pruned_paths.values()].sort((a, b) => a.steps - b.steps);
-			// if (paths.length > 100) {
-			// 	paths = paths.slice(0, Math.ceil(paths.length * 0.7));
-			// }
 		}
 
 		return paths;
@@ -231,8 +227,9 @@ class Maze {
 
 	generatePathfinders() {
 		const pathfinders = new Map();
-		for (let iter of [this.entrances.values(), this.keys.values()]) {
-			for (let [x, y] of iter) {
+		for (let iter of [this.entrances, this.keys]) {
+			for (let [, coord] of iter) {
+				const [x, y] = coord;
 				const frontier = new Queue();
 				frontier.push([x, y]);
 				const came_from = new Map([[InfiniteGrid.toId(x, y), null]]);
