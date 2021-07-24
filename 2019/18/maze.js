@@ -84,44 +84,24 @@ class Frontier {
 		return came_from;
 	}
 
-	/**
-	 * I am being paranoid and only memoizing by adding an extra caching
-	 * layer by keys_collected, just in case new paths open up as new doors
-	 * get unlocked.
-	 */
-	countSteps(from_id, to_coord, keys_collected) {
-		let current = to_coord;
-		let count = 0;
-		if (!this.count_cache[keys_collected]) {
-			this.count_cache[keys_collected] = {};
-		}
-		const came_from = this.pathfinder.get(from_id);
-		const cache_key = `${InfiniteGrid.toId(current[0], current[1])}/${from_id}`;
-		if (this.count_cache[keys_collected][cache_key] === undefined) {
-			while (InfiniteGrid.toId(current[0], current[1]) !== from_id) {
-				count++;
-				current = came_from.get(InfiniteGrid.toId(current[0], current[1]));
-			}
-			this.count_cache[keys_collected][cache_key] = count;
-		}
-
-		return this.count_cache[keys_collected][cache_key];
-	}
-
 	getReachableKeys(from_x, from_y, keys, keys_collected) {
 		const came_from = this.pathfinder.get(InfiniteGrid.toId(from_x, from_y));
-		
+
 	}
 }
 
 class Maze {
-	constructor(raw_input, auto_create_frontiers = true) {
+	constructor(raw_input, auto_create_pathfinders = true) {
 		this.grid = Maze.parseInput(raw_input);
 		this.entrances = this.grid.findAll(ENTRANCE);
 		this.doors = this.grid.findAll(DOOR_RE);
 		this.keys = this.grid.findAll(KEY_RE);
+
+		// By keys_collected, then by from/to
+		this.count_cache = {};
+
 		if (auto_create_frontiers) {
-			this.frontiers = this.generateFrontiersFromKeys();
+			this.pathfinders = this.generatePathfinders();
 		}
 	}
 
@@ -167,6 +147,34 @@ class Maze {
 		}
 
 		this.entrances = this.grid.findAll(ENTRANCE);
+	}
+
+	/**
+	 * I am being paranoid and only memoizing by adding an extra caching
+	 * layer by keys_collected, just in case new paths open up as new doors
+	 * get unlocked.
+	 */
+	 countSteps(from_id, to_coord, keys_collected) {
+		let current = to_coord;
+		let count = 0;
+		if (!this.count_cache[keys_collected]) {
+			this.count_cache[keys_collected] = {};
+		}
+		const came_from = this.pathfinders.get(from_id);
+		const cache_key = `${InfiniteGrid.toId(...current)}/${from_id}`;
+		if (this.count_cache[keys_collected][cache_key] === undefined) {
+			while (InfiniteGrid.toId(...current) !== from_id) {
+				count++;
+				current = came_from.get(InfiniteGrid.toId(...current));
+			}
+			this.count_cache[keys_collected][cache_key] = count;
+		}
+
+		return this.count_cache[keys_collected][cache_key];
+	}
+
+	getReachableKeys(from_x, from_y) {
+		const reachable_keys = new Map();
 	}
 
 	getShortestPath() {
@@ -238,8 +246,8 @@ class Maze {
 		return paths;
 	}
 
-	generateFrontiersFromKeys() {
-		const frontiers = new Map();
+	generatePathfinders() {
+		const pathfinders = new Map();
 		for (let [x, y] of this.keys.values()) {
 			const frontier = new Queue();
 			frontier.push([x, y]);
@@ -270,10 +278,10 @@ class Maze {
 				}
 			}
 
-			frontiers.set(InfiniteGrid.toId(x, y), came_from);
+			pathfinders.set(InfiniteGrid.toId(x, y), came_from);
 		}
 
-		return frontiers;
+		return pathfinders;
 	}
 }
 
