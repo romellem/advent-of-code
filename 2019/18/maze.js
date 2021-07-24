@@ -203,8 +203,8 @@ class Maze {
 			}
 
 			/**
-			 * If we have identical robot positions, steps, and keys collected,
-			 * consider those paths as duplicates and prune them.
+			 * If we have identical robot positions, and keys collected,
+			 * then store the path with fewer steps.
 			 */
 			let pruned_paths = new Map();
 			for (let path of new_paths) {
@@ -213,10 +213,16 @@ class Maze {
 					path.at_end = true;
 				}
 				const sorted_keys_str = path.keys_collected.split('').sort().join('');
-				const path_id = `${JSON.stringify(path.robots_coords)};${
-					path.steps
-				};${sorted_keys_str}`;
-				pruned_paths.set(path_id, path);
+				const path_id = `${JSON.stringify(path.robots_coords)};${sorted_keys_str}`;
+				if (pruned_paths.has(path_id)) {
+					// Don't store path if it is longer than current stored path
+					if (pruned_paths.get(path_id, path).steps > path.steps) {
+						pruned_paths.set(path_id, path);
+					}
+				} else {
+					// Haven't seen this configuration before, store it
+					pruned_paths.set(path_id, path);
+				}
 			}
 
 			paths = [...pruned_paths.values()].sort((a, b) => a.steps - b.steps);
