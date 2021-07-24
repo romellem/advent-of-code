@@ -7,25 +7,12 @@ const WALL = '#';
 const DOOR_RE = /[A-Z]/;
 const KEY_RE = /[a-z]/;
 
-function* queueIterator(queue) {
-	let i = 0;
-	let value = queue.get(i);
-	while (value !== undefined) {
-		yield value;
-		value = queue.get(++i);
-	}
-}
-
 class Maze {
 	constructor(raw_input) {
 		this.grid = Maze.parseInput(raw_input);
 		this.entrances = this.grid.findAll(ENTRANCE);
 		this.doors = this.grid.findAll(DOOR_RE);
 		this.keys = this.grid.findAll(KEY_RE);
-
-		for (let [x, y] of this.entrances.values()) {
-			this.grid.set(x, y, PASSAGE);
-		}
 	}
 
 	static parseInput(raw_input) {
@@ -41,7 +28,38 @@ class Maze {
 		return grid;
 	}
 
-	getShortestPath(_x, _y) {
+	setupPartTwo() {
+		/**
+		 * Transform
+		 *
+		 *    FROM     TO
+		 *     ...    @#@
+		 *     .@.    ###
+		 *     ...    @#@
+		 */
+		let [ox, oy] = this.entrances.values().next().value;
+
+		// Top left corner
+		let top_x = ox - 1;
+		let top_y = oy - 1;
+
+		// prettier-ignore
+		let new_center = InfiniteGrid.split(
+			'@#@' + '\n' +
+			'###' + '\n' +
+			'@#@'
+		);
+		for (let y = 0; y < new_center.length; y++) {
+			for (let x = 0; x < new_center[y].length; x++) {
+				let cell = new_center[y][x];
+				this.grid.set(top_x + x, top_y + y, cell);
+			}
+		}
+
+		this.entrances = this.grid.findAll(ENTRANCE);
+	}
+
+	getShortestPath() {
 		const makePath = ({ x, y, steps = 0, keys_collected = '' } = {}) => ({
 			x,
 			y,
@@ -51,7 +69,7 @@ class Maze {
 		});
 
 		// paths = [{ x, y, steps, keys_collected }, ...]
-		let paths = [makePath({ x: _x, y: _y })];
+		let paths = [...this.entrances.values()].map(([x, y]) => makePath({ x, y }));
 		while (paths.some((path) => !path.at_end)) {
 			// Memo this function based on from / to coords
 			const countSteps = (() => {
@@ -79,7 +97,7 @@ class Maze {
 			})();
 
 			let new_paths = [];
-			console.log(paths.length);
+			console.log(`${paths[0].keys_collected.length} / ${this.keys.size}`);
 			for (let path of paths) {
 				const reachable_keys = new Map();
 				let { x, y } = path;
@@ -110,7 +128,6 @@ class Maze {
 
 						// Otherwise, it is passage, key, or unlocked door
 
-						// We haven't visited this one yet
 						if (next_cell === PASSAGE || next_cell === ENTRANCE) {
 							frontier.push(next_coord);
 						} else if (KEY_RE.test(next_cell)) {
@@ -166,7 +183,7 @@ class Maze {
 			 */
 			paths = [...pruned_paths.values()].sort((a, b) => a.steps - b.steps);
 			if (paths.length > 100) {
-				paths = paths.slice(0, Math.ceil((paths.length * 3) / 4));
+				paths = paths.slice(0, Math.ceil(paths.length * 0.75));
 			}
 		}
 

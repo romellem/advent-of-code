@@ -25,6 +25,10 @@ class InfiniteGrid {
 		return return_as_object ? { x, y } : [x, y];
 	}
 
+	static split(two_dimensional_string) {
+		return two_dimensional_string.split('\n').map(row => row.split(''));
+	}
+
 	/**
 	 * @param {Number} x
 	 * @param {Number} y
