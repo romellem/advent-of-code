@@ -100,6 +100,22 @@ class InfiniteGrid {
 		return x >= this.min_x && x <= this.max_x && y >= this.min_y && y <= this.max_y;
 	}
 
+	clone() {
+		const infinite_grid_clone = new InfiniteGrid();
+		const new_map = new Map();
+		for (let [key, val] of this.grid) {
+			new_map.set(key, typeof val === 'object' ? JSON.parse(JSON.stringify(val)) : val);
+		}
+		infinite_grid_clone.string_map = JSON.parse(JSON.stringify(this.string_map));
+		infinite_grid_clone.grid = new_map;
+		infinite_grid_clone.max_x = this.max_x;
+		infinite_grid_clone.min_x = this.min_x;
+		infinite_grid_clone.max_y = this.max_y;
+		infinite_grid_clone.min_y = this.min_y;
+
+		return infinite_grid_clone;
+	}
+
 	toGrid() {
 		let grid = [];
 		for (let y = this.min_y; y <= this.max_y; y++) {

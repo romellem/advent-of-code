@@ -1,4 +1,5 @@
 const Queue = require('double-ended-queue');
+const { templateSettings } = require('lodash');
 const { InfiniteGrid } = require('./infinite-grid');
 
 const ENTRANCE = '@';
@@ -99,6 +100,7 @@ class Maze {
 
 	getReachableKeys(from_id, keys_collected) {
 		const reachable_keys = new Map();
+		let testc = [];
 		for (let [key, key_coord] of this.keys.entries()) {
 			const key_id = InfiniteGrid.toId(...key_coord);
 			if (from_id === key_id || keys_collected.includes(key)) {
@@ -109,8 +111,14 @@ class Maze {
 			let current = key_coord;
 			const came_from = this.pathfinders.get(from_id);
 
+			if (key === 'p') {
+				testc.push(current.slice(0))
+			}
 			while (InfiniteGrid.toId(...current) !== from_id) {
 				current = came_from.get(InfiniteGrid.toId(...current));
+				if (key === 'p') {
+					testc.push(current.slice(0));
+				}
 				if (!current) {
 					// Key is in another quadrant
 					break;
@@ -145,6 +153,14 @@ class Maze {
 			}
 		}
 
+		if (testc.length) {
+			let test_grid = this.grid.clone();
+			for (let [x, y] of testc) {
+				test_grid.set(x, y, '?');
+				console.log(test_grid.toString());
+			}
+		}
+
 		return reachable_keys;
 	}
 
@@ -163,6 +179,10 @@ class Maze {
 		while (paths.some((path) => !path.at_end)) {
 			let new_paths = [];
 			console.log(`${paths[0].keys_collected.length} / ${this.keys.size} (${paths.length} paths)`);
+			if (paths.length >= 3) {
+				console.log(JSON.stringify(paths, null, '  '));
+				process.exit(1)
+			}
 			for (let path of paths) {
 				/** @type Array<Map<String, Coord> */
 				const reachable_keys_by_robots = path.robots_coords.map(([x, y]) => {
