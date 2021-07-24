@@ -2,7 +2,7 @@
 
 | Part 1 | Part 2 |
 |--------|--------|
-| ` ` | ` ` |
+| `2946` | `1222` |
 
 ## --- Day 18: Many-Worlds Interpretation ---
 
@@ -33,7 +33,7 @@ Then, you can move `6` steps to collect the only other key, `b`:
     #########
     
 
-So, collecting every key took a total of `_8_` steps.
+So, collecting every key took a total of _`8`_ steps.
 
 Here is a larger example:
 
@@ -80,7 +80,7 @@ Now, you have a choice between keys `d` and `e`. While key `e` is closer, collec
     ########################
     
 
-Finally, collect key `e` to unlock door `E`, then collect key `f`, taking a grand total of `_86_` steps.
+Finally, collect key `e` to unlock door `E`, then collect key `f`, taking a grand total of _`86`_ steps.
 
 Here are a few more examples:
 
@@ -142,14 +142,14 @@ Update your map to instead use the correct data:
 
 This change will split your map into four separate sections, each with its own entrance:
 
-    #######       #######
-    #a.#Cd#       #a.#Cd#
-    ##...##       ##@#@##
-    ##.@.##  -->  #######
-    ##...##       ##@#@##
-    #cB#Ab#       #cB#Ab#
-    #######       #######
-    
+<pre><code>#######       #######
+#a.#Cd#       #a.#Cd#
+##...##       ##<b>@#@</b>##
+##.@.##  --&gt;  ##<b>###</b>##
+##...##       ##<b>@#@</b>##
+#cB#Ab#       #cB#Ab#
+#######       #######
+</code></pre>
 
 Because some of the keys are for doors in other vaults, it would take much too long to collect all of the keys by yourself. Instead, you deploy four remote-controlled robots. Each starts at one of the entrances (`@`).
 
@@ -238,7 +238,7 @@ Here's a more complex example:
 *   Bottom-right robot collects key `k`.
 *   Top-right robot collects key `l`.
 
-In the above example, the fewest steps to collect all of the keys is `_32_`.
+In the above example, the fewest steps to collect all of the keys is _`32`_.
 
 Here's an example with more choices:
 
@@ -271,6 +271,6 @@ One solution with the fewest steps is:
 *   Bottom-left robot collects key `m`.
 *   Bottom-left robot collects key `o`.
 
-This example requires at least `_72_` steps to collect all keys.
+This example requires at least _`72`_ steps to collect all keys.
 
 After updating your map and using the remote-controlled robots, _what is the fewest steps necessary to collect all of the keys?_
