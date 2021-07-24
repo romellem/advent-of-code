@@ -10,6 +10,10 @@ const KEY_RE = /[a-z]/;
 // Works for our input
 const cloneJSON = (obj) => JSON.parse(JSON.stringify(obj));
 
+/**
+ * @typedef {[Number, Number]} Coord
+ */
+
 class Maze {
 	constructor(raw_input, auto_create_pathfinders = true) {
 		this.grid = Maze.parseInput(raw_input);
@@ -20,7 +24,7 @@ class Maze {
 		// By keys_collected, then by from/to
 		this.count_cache = {};
 
-		if (auto_create_frontiers) {
+		if (auto_create_pathfinders) {
 			this.pathfinders = this.generatePathfinders();
 		}
 	}
@@ -93,6 +97,57 @@ class Maze {
 		return this.count_cache[keys_collected][cache_key];
 	}
 
+	getReachableKeys(from_id, keys_collected) {
+		const reachable_keys = new Map();
+		for (let [key, key_coord] of this.keys.entries()) {
+			const key_id = InfiniteGrid.toId(...key_coord);
+			if (from_id === key_id || keys_collected.includes(key)) {
+				// Don't say the current key or other keys collected are reachable
+				continue;
+			}
+
+			let current = key_coord;
+			const came_from = this.pathfinders.get(from_id);
+
+			while (InfiniteGrid.toId(...current) !== from_id) {
+				current = came_from.get(InfiniteGrid.toId(...current));
+				if (!current) {
+					// Key is in another quadrant
+					break;
+				}
+
+				// Check if new cell is walkable
+				const cell = this.grid.get(...current);
+				if (
+					this.doors.has(cell) &&
+					!keys_collected.includes(cell.toLowerCase())
+				) {
+					// Door is locked
+					break;
+				}
+
+				// Otherwise it _has_ to be a passage, collected key, or entrance
+				const assert_walkable =
+					cell === PASSAGE ||
+					cell === ENTRANCE ||
+					KEY_RE.test(cell) ||
+					(DOOR_RE.test(cell) && keys_collected.includes(cell.toLowerCase()));
+				if (!assert_walkable) {
+					throw new Error(
+						`Unknown cell: ${cell}, keys_collected: ${keys_collected}`
+					);
+				}
+			}
+
+			if (InfiniteGrid.toId(...current) === from_id) {
+				// This key is reachable!
+				reachable_keys.set(key, cloneJSON(key_coord));
+			}
+		}
+
+		return reachable_keys;
+	}
+
 	getShortestPath() {
 		const entrances_coords = [...this.entrances.values()];
 
@@ -106,24 +161,80 @@ class Maze {
 			},
 		];
 		while (paths.some((path) => !path.at_end)) {
-			// Memo this function based on from / to coords
-			const countSteps = makeCountSteps();
-
 			let new_paths = [];
-			console.log(`${paths[0].keys_collected.length} / ${this.keys.size}`);
+			console.log(`${paths[0].keys_collected.length} / ${this.keys.size} (${paths.length} paths)`);
 			for (let path of paths) {
-				const reachable_keys = new Map();
-				let { x, y } = path;
-				const path_id = InfiniteGrid.toId(x, y);
+				/** @type Array<Map<String, Coord> */
+				const reachable_keys_by_robots = path.robots_coords.map(([x, y]) => {
+					return this.getReachableKeys(
+						InfiniteGrid.toId(x, y),
+						path.keys_collected
+					);
+				});
+				// console.log(reachable_keys_by_robots);
+				// process.exit(1)
 
-				// Build frontier from current location
+				for (let r = 0; r < reachable_keys_by_robots.length; r++) {
+					let [from_x, from_y] = path.robots_coords[r];
+					const from_id = InfiniteGrid.toId(from_x, from_y);
+					let reachable_keys = reachable_keys_by_robots[r];
+					for (let [reachable_key, reachable_key_coord] of reachable_keys) {
+						let [key_x, key_y] = reachable_key_coord;
+						const steps = this.countSteps(
+							from_id,
+							reachable_key_coord,
+							path.keys_collected
+						);
+						const new_robots_coords = cloneJSON(path.robots_coords);
+						new_robots_coords[r][0] = key_x;
+						new_robots_coords[r][1] = key_y;
+						new_paths.push({
+							keys_collected: path.keys_collected + reachable_key,
+							at_end: false,
+							steps: path.steps + steps,
+							robots_coords: new_robots_coords,
+						});
+					}
+				}
+			}
+
+			/**
+			 * If we have identical robot positions, steps, and keys collected,
+			 * consider those paths as duplicates and prune them.
+			 */
+			let pruned_paths = new Map();
+			for (let path of new_paths) {
+				if (path.keys_collected.length === this.keys.size) {
+					// We collected all the keys!
+					path.at_end = true;
+				}
+				const sorted_keys_str = path.keys_collected.split('').sort().join('');
+				const path_id = `${JSON.stringify(path.robots_coords)};${
+					path.steps
+				};${sorted_keys_str}`;
+				pruned_paths.set(path_id, path);
+			}
+
+			paths = [...pruned_paths.values()].sort((a, b) => a.steps - b.steps);
+			// if (paths.length > 100) {
+			// 	paths = paths.slice(0, Math.ceil(paths.length * 0.7));
+			// }
+		}
+
+		return paths;
+	}
+
+	generatePathfinders() {
+		const pathfinders = new Map();
+		for (let iter of [this.entrances.values(), this.keys.values()]) {
+			for (let [x, y] of iter) {
 				const frontier = new Queue();
 				frontier.push([x, y]);
 				const came_from = new Map([[InfiniteGrid.toId(x, y), null]]);
 				while (!frontier.isEmpty()) {
 					const current_coord = frontier.shift();
 					const neighbor_coords = this.grid
-						.neighbors(current_coord[0], current_coord[1])
+						.neighbors(...current_coord)
 						.values();
 					for (let { coord: next_coord, value: next_cell } of neighbor_coords) {
 						if (next_cell === WALL) continue;
@@ -131,27 +242,14 @@ class Maze {
 						const next_id = InfiniteGrid.toId(...next_coord);
 						if (came_from.has(next_id)) continue;
 
-						if (
-							this.doors.has(next_cell) &&
-							!path.keys_collected.includes(next_cell.toLowerCase())
-						) {
-							// Door is locked
-							continue;
-						}
+						// Coord is walkable
+						const is_walkable =
+							next_cell === PASSAGE ||
+							next_cell === ENTRANCE ||
+							KEY_RE.test(next_cell) ||
+							DOOR_RE.test(next_cell);
 
-						// Otherwise, it is passage, key, or unlocked door
-
-						if (next_cell === PASSAGE || next_cell === ENTRANCE) {
-							frontier.push(next_coord);
-						} else if (KEY_RE.test(next_cell)) {
-							if (!path.keys_collected.includes(next_cell.toLowerCase())) {
-								reachable_keys.set(next_cell, next_coord);
-							} else {
-								// Found keys are walkable
-								frontier.push(next_coord);
-							}
-						} else if (DOOR_RE.test(next_cell)) {
-							// Unlocked door, can walk
+						if (is_walkable) {
 							frontier.push(next_coord);
 						} else {
 							throw new Error(`Unknown cell: ${next_cell}`);
@@ -161,81 +259,8 @@ class Maze {
 					}
 				}
 
-				for (let [reachable_key, reachable_key_coord] of reachable_keys) {
-					let [key_x, key_y] = reachable_key_coord;
-					const steps = countSteps(path_id, reachable_key_coord, came_from);
-					new_paths.push(
-						makePath({
-							x: key_x,
-							y: key_y,
-							steps: path.steps + steps,
-							keys_collected: path.keys_collected + reachable_key,
-						})
-					);
-				}
+				pathfinders.set(InfiniteGrid.toId(x, y), came_from);
 			}
-
-			let pruned_paths = new Map();
-			for (let path of new_paths) {
-				if (path.keys_collected.length === this.keys.size) {
-					// We collected all the keys!
-					path.at_end = true;
-				}
-				const sorted_keys_str = path.keys_collected.split('').sort().join('');
-				const path_id = `${path.x},${path.y},${path.steps},${sorted_keys_str}`;
-				pruned_paths.set(path_id, path);
-			}
-
-			/**
-			 * I'm cheating here a bit, but as an optimization prune the 25%
-			 * longest paths so far when I have a decent amount, set at 100.
-			 * I don't have a guarantee that some path _currently_ neat the bottom
-			 * won't eventually overtake the number one spot, but 25% ends up being
-			 * a safe cutoff point for my inputs. This speeds up part one by
-			 * a factor of 10 (500s -> 50s)
-			 */
-			paths = [...pruned_paths.values()].sort((a, b) => a.steps - b.steps);
-			if (paths.length > 100) {
-				paths = paths.slice(0, Math.ceil(paths.length * 0.75));
-			}
-		}
-
-		return paths;
-	}
-
-	generatePathfinders() {
-		const pathfinders = new Map();
-		for (let [x, y] of this.keys.values()) {
-			const frontier = new Queue();
-			frontier.push([x, y]);
-			const came_from = new Map([[InfiniteGrid.toId(x, y), null]]);
-			while (!frontier.isEmpty()) {
-				const current_coord = frontier.shift();
-				const neighbor_coords = this.grid.neighbors(...current_coord).values();
-				for (let { coord: next_coord, value: next_cell } of neighbor_coords) {
-					if (next_cell === WALL) continue;
-
-					const next_id = InfiniteGrid.toId(...next_coord);
-					if (came_from.has(next_id)) continue;
-
-					// Coord is walkable
-					const is_walkable =
-						next_cell === PASSAGE ||
-						next_cell === ENTRANCE ||
-						KEY_RE.test(next_cell) ||
-						DOOR_RE.test(next_cell);
-
-					if (is_walkable) {
-						frontier.push(next_coord);
-					} else {
-						throw new Error(`Unknown cell: ${next_cell}`);
-					}
-
-					came_from.set(next_id, current_coord);
-				}
-			}
-
-			pathfinders.set(InfiniteGrid.toId(x, y), came_from);
 		}
 
 		return pathfinders;
