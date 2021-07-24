@@ -1,13 +1,11 @@
 const { input, sampleInputs } = require('./input');
 const { Maze } = require('./maze');
 
-let maze = new Maze(input);
-console.log([...maze.keys])
-// maze.setupPartTwo();
-// let maze = new Maze(sampleInputs[3].maze);
-// const [first_entrance] = [...maze.entrances.values()];
+let maze = new Maze(input, false);
+maze.setupPartTwo();
+maze.pathfinders = maze.generatePathfinders();
 
-// const start = new Date();
-// const paths = maze.getShortestPath(...first_entrance);
-// console.log(`Took ${new Date() - start}ms`);
-// console.log(paths[0]);
+const start = new Date();
+const paths = maze.getShortestPath();
+console.log(`Took ${new Date() - start}ms`);
+console.log(paths[0]);
