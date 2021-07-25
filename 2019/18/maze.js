@@ -78,22 +78,23 @@ class Maze {
 	 * get unlocked.
 	 */
 	countSteps(from_id, to_coord, keys_collected) {
+		const sorted_keys = keys_collected.split('').sort().join('');
 		let current = to_coord;
 		let count = 0;
-		if (!this.count_cache[keys_collected]) {
-			this.count_cache[keys_collected] = {};
+		if (!this.count_cache[sorted_keys]) {
+			this.count_cache[sorted_keys] = {};
 		}
 		const came_from = this.pathfinders.get(from_id);
 		const cache_key = `${InfiniteGrid.toId(...current)}/${from_id}`;
-		if (this.count_cache[keys_collected][cache_key] === undefined) {
+		if (this.count_cache[sorted_keys][cache_key] === undefined) {
 			while (InfiniteGrid.toId(...current) !== from_id) {
 				count++;
 				current = came_from.get(InfiniteGrid.toId(...current));
 			}
-			this.count_cache[keys_collected][cache_key] = count;
+			this.count_cache[sorted_keys][cache_key] = count;
 		}
 
-		return this.count_cache[keys_collected][cache_key];
+		return this.count_cache[sorted_keys][cache_key];
 	}
 
 	getReachableKeys(from_id, keys_collected) {
