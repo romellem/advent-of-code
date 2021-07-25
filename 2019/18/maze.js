@@ -1,4 +1,3 @@
-const Queue = require('double-ended-queue');
 const { InfiniteGrid } = require('./infinite-grid');
 
 const ENTRANCE = '@';
@@ -213,7 +212,9 @@ class Maze {
 					path.at_end = true;
 				}
 				const sorted_keys_str = path.keys_collected.split('').sort().join('');
-				const path_id = `${JSON.stringify(path.robots_coords)};${sorted_keys_str}`;
+				const path_id = `${JSON.stringify(
+					path.robots_coords
+				)};${sorted_keys_str}`;
 				if (pruned_paths.has(path_id)) {
 					// Don't store path if it is longer than current stored path
 					if (pruned_paths.get(path_id, path).steps > path.steps) {
@@ -236,10 +237,11 @@ class Maze {
 		for (let iter of [this.entrances, this.keys]) {
 			for (let [, coord] of iter) {
 				const [x, y] = coord;
-				const frontier = new Queue();
+				// Arrays as FIFO queues are slow, but fast enough here for these small(ish) numbers
+				const frontier = [];
 				frontier.push([x, y]);
 				const came_from = new Map([[InfiniteGrid.toId(x, y), null]]);
-				while (!frontier.isEmpty()) {
+				while (frontier.length) {
 					const current_coord = frontier.shift();
 					const neighbor_coords = this.grid
 						.neighbors(...current_coord)
