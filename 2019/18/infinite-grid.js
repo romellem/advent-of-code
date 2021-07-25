@@ -5,7 +5,7 @@ class InfiniteGrid {
 	 * @param {Object} [options.string_map] - Map grid values to strings.
 	 */
 	constructor({ defaultFactory = (x, y) => 0, string_map = {} } = {}) {
-		this.defaultFactory = defaultFactory;
+		this.defaultFactory = defaultFactory.bind(this);
 		this.string_map = string_map;
 		this.grid = new Map();
 		this.max_x = -Infinity;
@@ -106,6 +106,7 @@ class InfiniteGrid {
 		for (let [key, val] of this.grid) {
 			new_map.set(key, typeof val === 'object' ? JSON.parse(JSON.stringify(val)) : val);
 		}
+		infinite_grid_clone.defaultFactory = this.defaultFactory.bind(this);
 		infinite_grid_clone.string_map = JSON.parse(JSON.stringify(this.string_map));
 		infinite_grid_clone.grid = new_map;
 		infinite_grid_clone.max_x = this.max_x;
