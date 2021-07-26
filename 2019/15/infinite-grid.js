@@ -3,10 +3,12 @@ class InfiniteGrid {
 	 * @param {Object} options
 	 * @param {Function<x, y>} [options.defaultFactory] - Defaults to returning 0 for new coords
 	 * @param {Object} [options.string_map] - Map grid values to strings.
+	 * @param {Object} [options.walls] - Mark values that are walls / not walkable (truthy)
 	 */
-	constructor({ defaultFactory = (x, y) => 0, string_map = {} } = {}) {
+	constructor({ defaultFactory = (x, y) => 0, string_map = {}, walls = {} } = {}) {
 		this.defaultFactory = defaultFactory.bind(this);
 		this.string_map = string_map;
+		this.walls = walls;
 		this.grid = new Map();
 		this.max_x = -Infinity;
 		this.min_x = Infinity;
@@ -29,6 +31,41 @@ class InfiniteGrid {
 		return two_dimensional_string.split('\n').map((row) => row.split(''));
 	}
 
+	buildFrontierFrom(x, y) {
+		// Arrays as FIFO queues can be slow for large lengths
+		const frontier = [];
+		const came_from = new Map();
+		frontier.push({ coord: [x, y], distance: 0 });
+		came_from.set(InfiniteGrid.toId(x, y), { coord: null, distance: 0 });
+		while (frontier.length > 0) {
+			const { coord: current_coord, distance } = frontier.shift();
+			const neighbor_coords = this.neighbors(...current_coord).values();
+			for (let { coord: next_coord, value: next_cell } of neighbor_coords) {
+				if (this.walls[next_cell]) {
+					continue;
+				}
+
+				const next_id = InfiniteGrid.toId(...next_coord);
+				if (came_from.has(next_id)) {
+					continue;
+				}
+
+				// Coord is walkable
+				frontier.push({
+					coord: next_coord,
+					distance: distance + 1,
+				});
+
+				came_from.set(next_id, {
+					coord: current_coord,
+					distance: distance + 1,
+				});
+			}
+		}
+
+		return came_from;
+	}
+
 	clone() {
 		const infinite_grid_clone = new InfiniteGrid();
 		const new_map = new Map();
@@ -40,6 +77,7 @@ class InfiniteGrid {
 		}
 		infinite_grid_clone.defaultFactory = this.defaultFactory.bind(this);
 		infinite_grid_clone.string_map = Object.assign({}, this.string_map);
+		infinite_grid_clone.walls = Object.assign({}, this.walls);
 		infinite_grid_clone.grid = new_map;
 		infinite_grid_clone.max_x = this.max_x;
 		infinite_grid_clone.min_x = this.min_x;
@@ -51,7 +89,7 @@ class InfiniteGrid {
 
 	/**
 	 * @param {RegExp|any} value
-	 * @param {Boolean} [as_coords] - When true, returns a Map of `[x, y]` number values, otherwise returns a Map of string IDs.
+	 * @param {Boolean} [as_coords=true] - When true, returns an Array of `[x, y]` number values, otherwise returns the string ID for the cell.
 	 * @returns {Array<[any,Id|Coord]>} - Returns an Array, the first value matching the cell found, and the 2nd the coords or ID.
 	 */
 	findAll(value, as_coords = true) {
@@ -72,6 +110,25 @@ class InfiniteGrid {
 			this.set(x, y, this.defaultFactory(x, y));
 		}
 		return this.grid.get(id);
+	}
+
+	/**
+	 * Resets current grid and applies cells from a grid array to our map.
+	 * @param {String|Array} grid_str_or_arr - If a string is passed, string is first split into 2D array.
+	 */
+	import(grid_str_or_arr) {
+		let grid_arr = grid_str_or_arr;
+		if (typeof grid_arr === 'string') {
+			grid_arr = InfiniteGrid.split(grid_arr);
+		}
+
+		this.reset();
+
+		for (let y = 0; y < grid_arr.length; y++) {
+			for (let x = 0; x < grid_arr[y].length; x++) {
+				this.set(x, y, grid_arr[y][x]);
+			}
+		}
 	}
 
 	inBounds(x, y) {
