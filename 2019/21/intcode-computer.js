@@ -17,26 +17,39 @@ const IMMEDIATE_MODE = '1';
 const RELATIVE_MODE = '2';
 
 class Computer {
+	static ADD = ADD;
+	static MUL = MUL;
+	static INP = INP;
+	static OUT = OUT;
+	static JIT = JIT;
+	static JIF = JIF;
+	static LTH = LTH;
+	static EQU = EQU;
+	static ARB = ARB;
+	static STP = STP;
+
+	static POSITION_MODE = POSITION_MODE;
+	static IMMEDIATE_MODE = IMMEDIATE_MODE;
+	static RELATIVE_MODE = RELATIVE_MODE;
+
 	constructor({
 		memory,
 		inputs = [],
-		replenish_input = undefined,
-		pause_on_output = true,
-		id = 0,
+		// Called with computer as it's only arg
+		defaultInput,
+		pause_on = { [OUT]: true },
 		clone_memory = false,
 	}) {
-		// For debugging
-		this.id = String.fromCharCode('A'.charCodeAt(0) + id);
-
 		this.original_memory = clone_memory && memory.slice(0);
 		this.memory = memory.slice(0);
 		this.pointer = 0;
 		this.relative_base = 0;
-		this.pause_on_output = pause_on_output;
+		this.pause_on = pause_on;
 
 		this.inputs = Array.isArray(inputs) ? inputs.slice(0) : [inputs];
-		this.replenish_input = replenish_input;
 		this.outputs = [];
+
+		this.defaultInput = defaultInput;
 
 		this.OPS = {
 			[ADD]: {
@@ -63,11 +76,12 @@ class Computer {
 				name: INP,
 				realName: 'INP',
 				params: 1,
-				fn: a => {
-					this.memory[a] = this.inputs.shift();
-					if (this.replenish_input !== undefined) {
-						this.inputs.push(this.replenish_input);
+				fn: (a) => {
+					if (this.defaultInput && this.inputs.length === 0) {
+						let default_input_value = this.defaultInput(this);
+						this.inputs.push(default_input_value);
 					}
+					this.memory[a] = this.inputs.shift();
 				},
 				write: true,
 			},
@@ -76,14 +90,14 @@ class Computer {
 				name: OUT,
 				realName: 'OUT',
 				params: 1,
-				fn: a => this.output(a),
+				fn: (a) => this.outputs.push(a),
 			},
 
 			[ARB]: {
 				name: ARB,
 				realName: 'ARB',
 				params: 1,
-				fn: a => (this.relative_base += a),
+				fn: (a) => (this.relative_base += a),
 			},
 
 			[STP]: {
@@ -142,7 +156,37 @@ class Computer {
 			},
 		};
 
+		const ops_list = Object.values(this.OPS);
+		const max_params = Math.max(...ops_list.map((v) => v.params));
+		const shared_modes = Array(max_params).fill('0');
+
+		/**
+		 * Use shared arrays for `modes` and `value`.
+		 *
+		 * We can share a single array for `modes` since we know
+		 * the number of params for an op, meaning if an op has
+		 * 2 params, we can determine the modes for the 1st and
+		 * 2nd values, and the 3rd value will just be "junk" data
+		 * we'll ignore.
+		 *
+		 * The `values` for the ops need to be unique though, since
+		 * we spread out the values into our function call. Also
+		 * good to note that another optimization is we have hard-coded
+		 * fn calls for the number of params. `fn(...[1, 2])` is
+		 * slower than `fn(1, 2)`, so we code for 0 - 3 params, with
+		 * a default case of a spread. Similar libraries like lodash
+		 * do this.
+		 */
+		for (let op of ops_list) {
+			op.modes = shared_modes;
+			op.values = Array(op.params).fill(0);
+		}
+
 		this.halted = false;
+	}
+
+	static parseAsciiInputToArray(input_str) {
+		return input_str.split('').map((c) => c.charCodeAt(0));
 	}
 
 	run() {
@@ -152,10 +196,10 @@ class Computer {
 			this.runOp(op);
 
 			/**
-			 * In circuits, computer execution should be paused on outout so that value can be passed to the next computer.
+			 * In circuits, computer execution should be paused on output so that value can be passed to the next computer.
 			 * Additionally, execution should immediately stopped if we have halted.
 			 */
-			if ((this.pause_on_output && op.name === OUT) || this.halted) {
+			if (this.pause_on[op.name] || this.halted) {
 				break;
 			}
 
@@ -173,23 +217,25 @@ class Computer {
 
 		let full_op = temp_op.padStart(op.params + 2, '0');
 
-		let modes = [];
-
 		// "Parameter modes are single digits, one per parameter, read **right-to-left** from the opcode"
 		for (let i = op.params - 1; i >= 0; i--) {
-			modes.push(full_op[i]);
+			// [0,1,2,3,4,5]
+			// ^ ops.params = 6
+			// 5 -> 0 # |(5 - 6 + 1)| = | 0| = 0
+			// 4 -> 1 # |(4 - 6 + 1)| = |-1| = 1
+			// 3 -> 2 # |(3 - 6 + 1)| = |-2| = 2
+			// 2 -> 3 # |(2 - 6 + 1)| = |-3| = 3
+			// 1 -> 4 # |(1 - 6 + 1)| = |-4| = 4
+			// 0 -> 5 # |(0 - 6 + 1)| = |-5| = 5
+			op.modes[Math.abs(i - op.params + 1)] = full_op[i];
 		}
 
-		return {
-			...op,
-			modes,
-		};
+		return op;
 	}
 
-	runOp({ modes, fn, jumps, write }) {
+	runOp({ modes, values, params, fn, jumps, write }) {
 		this.pointer++;
-		let values = [];
-		for (let i = 0; i < modes.length; i++) {
+		for (let i = 0; i < params; i++) {
 			let mode = modes[i];
 			let value = this.memory[this.pointer + i];
 
@@ -227,7 +273,7 @@ class Computer {
 				 *
 				 * Now, if I were to re-map the pointer'd `@` symbols, I'd get
 				 *
-				 *     @3 = @1 + 2
+				 *     7 = 9 + 2
 				 *
 				 * But _that isn't what we want!_ Namely, it doesn't make sense
 				 * to set the _literal_ number 7 equal to some addition operation.
@@ -259,7 +305,7 @@ class Computer {
 				 * - I am running an op that does _not_ write to memory
 				 * - Or if I am not at the last parameter in the op
 				 */
-				const can_switch_to_position = !write || i < modes.length - 1;
+				const can_switch_to_position = !write || i < params - 1;
 
 				if (can_switch_to_position && mode === POSITION_MODE) {
 					value = this.memory[value];
@@ -283,32 +329,51 @@ class Computer {
 				value = 0;
 			}
 
-			values.push(value);
+			values[i] = value;
 		}
 
 		// If result is `true`, we moved the pointer
-		let result = fn(...values);
+		let result;
+
+		/**
+		 * Always spreading args is slow, so we can create a few base cases
+		 * (actually all our base cases) to speed up these function calls.
+		 * We still have a default case if for some reason we have an op
+		 * with more than 3 params (we don't), so this code is future proof,
+		 * but this change offers a ~2x speed improvement.
+		 */
+		switch (params) {
+			case 0:
+				result = fn();
+				break;
+			case 1:
+				result = fn(values[0]);
+				break;
+			case 2:
+				result = fn(values[0], values[1]);
+				break;
+			case 3:
+				result = fn(values[0], values[1], values[2]);
+				break;
+			default:
+				// Spreads are slow, so use direct branches for known number of params
+				result = fn(...values);
+				break;
+		}
 
 		if (!jumps || (jumps && !result)) {
-			this.pointer += modes.length;
+			this.pointer += params;
 		}
 	}
 
-	output(v) {
-		this.outputs.push(v);
-	}
+	flushOutputs({ MAX_ASCII_NUM = 127 } = {}) {
+		let flushed_outputs_str = '';
+		while (this.outputs.length > 0) {
+			let output = this.outputs.shift();
+			flushed_outputs_str += (output > MAX_ASCII_NUM ? `\n${output}\n` : String.fromCharCode(output))
+		}
 
-	static parseAsciiInputToArray(input_str) {
-		return input_str.split('').map(c => c.charCodeAt(0));
-	}
-
-	flushOutputs(as_ascii = true) {
-		const MAX_ASCII_NUM = 127;
-		let outputs_str = as_ascii
-			? this.outputs.map(c => (c > MAX_ASCII_NUM ? `\n${c}\n` : String.fromCharCode(c))).join('')
-			: this.outputs.join(',');
-		this.outputs = [];
-		return outputs_str;
+		return flushed_outputs_str;
 	}
 
 	// For debugging
@@ -317,17 +382,6 @@ class Computer {
 	}
 }
 
-class ASCII {
-	constructor(memory, options = {}) {
-		this.computer = new Computer({ memory, ...options });
-	}
-
-	run() {
-		this.computer.run();
-	}
-}
-
 module.exports = {
 	Computer,
-	ASCII,
 };
