@@ -1,5 +1,5 @@
 const distance = require('manhattan');
-const input = require('./input');
+const { input } = require('./input');
 const cloned_input = JSON.parse(JSON.stringify(input));
 
 cloned_input.sort((a, b) => {

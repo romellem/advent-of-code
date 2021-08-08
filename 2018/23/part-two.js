@@ -1,5 +1,5 @@
 const distance = require('manhattan');
-const input = require('./input');
+const {input} = require('./input');
 // const input = require('./sample-input2');
 const cloned_input = JSON.parse(JSON.stringify(input));
 
