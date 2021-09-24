@@ -10,7 +10,8 @@ cloned_input.sort((a, b) => {
 
 let largest = cloned_input[cloned_input.length - 1];
 
-let in_range = 0;
+// Count self as "in range"
+let in_range = 1;
 for (let i = 0; i < input.length - 1; i++) {
     let bot = input[i];
     if (distance(bot.pos, largest.pos) <= largest.r) {

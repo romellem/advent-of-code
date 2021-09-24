@@ -39,12 +39,19 @@ function getInitialBounds(bots) {
 }
 
 function findGlobalMaxima(bots, steps = 100, top_n = 10) {
+	debugger;
 	let { min_x, max_x, min_y, max_y, min_z, max_z } = getInitialBounds(bots);
 
 	// Points between `-1 to 1` is `|1 - -1| + 1 = 3` (e.g., {-1, 0, 1})
 	let chunk_x = Math.floor(Math.abs(max_x - min_x) + 1 / steps);
+	chunk_x = chunk_x % 2 === 1 ? chunk_x - 1 : chunk_x;
 	let chunk_y = Math.floor(Math.abs(max_y - min_y) + 1 / steps);
+	chunk_y = chunk_y % 2 === 1 ? chunk_y - 1 : chunk_y;
 	let chunk_z = Math.floor(Math.abs(max_z - min_z) + 1 / steps);
+	chunk_z = chunk_z % 2 === 1 ? chunk_z - 1 : chunk_z;
+	let rx = chunk_x / 2;
+	let ry = chunk_y / 2;
+	let rz = chunk_z / 2;
 
 	// Reuse arrays as optimization
 	let point = [0, 0, 0];
@@ -53,14 +60,17 @@ function findGlobalMaxima(bots, steps = 100, top_n = 10) {
 	for (let z = min_z; z < max_z; z += chunk_z) {
 		for (let y = min_y; y < max_y; y += chunk_y) {
 			for (let x = min_x; x < max_x; x += chunk_x) {
-				point[0] = x;
-				point[1] = y;
-				point[2] = z;
+				// Center point of cuboid
+				point[0] = x + rx;
+				point[1] = y + ry;
+				point[2] = z + rz;
 
 				let bots_in_range = 0;
-				for (let i = 0; i < bots.length; i++) {
-					let bot = bots[i];
-					if (manhattan(point, bot.pos) <= bot.r) {
+				for (let bot of bots) {
+					let in_x = bot.pos[0] >= point[0] - rx && bot.pos[0] <= point[0] + rx;
+					let in_y = bot.pos[1] >= point[1] - rx && bot.pos[1] <= point[1] + rx;
+					let in_z = bot.pos[2] >= point[2] - rx && bot.pos[2] <= point[2] + rx;
+					if (in_x && in_y && in_z) {
 						bots_in_range++;
 					}
 				}
