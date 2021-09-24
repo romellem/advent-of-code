@@ -1,0 +1,20 @@
+NOT C J  # J = !C
+AND D J  # J = !C & D
+NOT B T
+OR  T J  # J = (!C & D) | !B
+NOT A T
+OR  T J  # J = ((!C & D) | !B) | !A
+AND D J  # J = (((!C & D) | !B) | !A) & D
+
+(!A | !B | (!C & D)) & D
+(!A&D | !B&D | (!C & D)&D)
+(!A&D | !B&D | !C & (D&D))
+(!A&D | !B&D | !C & (D))
+(!A | !B | !C ) & D
+
+NOT C J  # J = !C
+NOT B T
+OR  T J  # J = !C | !B
+NOT A T
+OR  T J  # J = !C | !B | !A
+AND D J  # J = (!C | !B | !A) & D
