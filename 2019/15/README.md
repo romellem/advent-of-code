@@ -2,7 +2,7 @@
 
 | Part 1 | Part 2 |
 |--------|--------|
-|  ` ` | ` ` |
+|  `304` |  `310` |
 
 ## --- Day 15: Oxygen System ---
 
@@ -83,7 +83,7 @@ Then, perhaps west (`3`) gets a reply of `0`, south (`2`) gets a reply of `1`, s
        #  
     
 
-Now, because of the reply of `2`, you know you've found the _oxygen system_! In this example, it was only `_2_` moves away from the repair droid's starting position.
+Now, because of the reply of `2`, you know you've found the _oxygen system_! In this example, it was only _`2`_ moves away from the repair droid's starting position.
 
 _What is the fewest number of movement commands_ required to move the repair droid from its starting position to the location of the oxygen system?
 
@@ -140,6 +140,6 @@ And finally, the whole region is full of oxygen after a total of four minutes:
      ###  
     
 
-So, in this example, all locations contain oxygen after `_4_` minutes.
+So, in this example, all locations contain oxygen after _`4`_ minutes.
 
 Use the repair droid to get a complete map of the area. _How many minutes will it take to fill with oxygen?_

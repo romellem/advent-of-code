@@ -23,4 +23,4 @@ for (let cell of frontier.values()) {
 	}
 }
 
-console.log(max_cell);
+console.log(max_cell.distance);
