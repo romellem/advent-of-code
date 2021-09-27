@@ -29,14 +29,14 @@ class InfiniteGrid {
 	}
 
 	static toCoords(id, return_as_object = false) {
-		let [x, y] = id.split(",");
+		let [x, y] = id.split(',');
 		x = parseInt(x, 10);
 		y = parseInt(y, 10);
 		return return_as_object ? { x, y } : [x, y];
 	}
 
 	static split(two_dimensional_string) {
-		return two_dimensional_string.split("\n").map((row) => row.split(""));
+		return two_dimensional_string.split('\n').map((row) => row.split(''));
 	}
 
 	/**
@@ -107,7 +107,7 @@ class InfiniteGrid {
 		const infinite_grid_clone = new InfiniteGrid();
 		const new_map = new Map();
 		for (let [key, val] of this.grid) {
-			new_map.set(key, typeof val === "object" ? JSON.parse(JSON.stringify(val)) : val);
+			new_map.set(key, typeof val === 'object' ? JSON.parse(JSON.stringify(val)) : val);
 		}
 		infinite_grid_clone.defaultFactory = this.defaultFactory.bind(this);
 		infinite_grid_clone.string_map = Object.assign({}, this.string_map);
@@ -139,20 +139,6 @@ class InfiniteGrid {
 	}
 
 	/**
-	 * @param {RegExp|any} value
-	 * @param {Boolean} [as_coords=true] - When true, returns an Array of `[x, y]` number values, otherwise returns the string ID for the cell.
-	 * @returns {[any, Id|Coord]} - Returns the first match, the first value matching the cell found, and the 2nd the coords or ID.
-	 */
-	find(value, as_coords = true) {
-		for (let [id, cell] of this.grid) {
-			const check = value instanceof RegExp ? value.test(cell) : value === cell;
-			if (check) {
-				return [cell, as_coords ? InfiniteGrid.toCoords(id) : id];
-			}
-		}
-	}
-
-	/**
 	 * @param {Number} x
 	 * @param {Number} y
 	 * @returns {any}
@@ -172,7 +158,7 @@ class InfiniteGrid {
 	 */
 	import(grid_str_or_arr) {
 		let grid_arr = grid_str_or_arr;
-		if (typeof grid_arr === "string") {
+		if (typeof grid_arr === 'string') {
 			grid_arr = InfiniteGrid.split(grid_arr);
 		}
 
@@ -199,22 +185,22 @@ class InfiniteGrid {
 	 * @param {Number} y
 	 * @returns {Map<"N"|"W"|"E"|"S", { coord: [Number, Number], value: any }} Return a map with optional keys N, W, E, S (if those beighbors are within the bounds of the map)
 	 */
-	neighbors(x, y) {
+	neighbors(x, y, in_bounds_check = true) {
 		const neighboring_cells = new Map();
-		if (!this.inBounds(x, y)) {
+		if (in_bounds_check && !this.inBounds(x, y)) {
 			return neighboring_cells;
 		}
 
 		const neighbors_lookup = [
-			["N", [x, y - 1]],
-			["W", [x - 1, y]],
-			["E", [x + 1, y]],
-			["S", [x, y + 1]],
+			['N', [x, y - 1]],
+			['W', [x - 1, y]],
+			['E', [x + 1, y]],
+			['S', [x, y + 1]],
 		];
 
 		for (let [key, coord] of neighbors_lookup) {
 			let [cx, cy] = coord;
-			if (this.inBounds(cx, cy)) {
+			if (in_bounds_check && this.inBounds(cx, cy)) {
 				neighboring_cells.set(key, { coord, value: this.get(cx, cy) });
 			}
 		}
@@ -238,7 +224,7 @@ class InfiniteGrid {
 	}
 
 	set(x, y, value) {
-		if (typeof x !== "number" || typeof y !== "number") {
+		if (typeof x !== 'number' || typeof y !== 'number') {
 			throw new Error(`x and y must be numbers, got (${typeof x})${x} and (${typeof y})${y}`);
 		}
 		if (x < this.min_x) this.min_x = x;
@@ -283,15 +269,15 @@ class InfiniteGrid {
 	 */
 	toString() {
 		let grid = this.toGrid();
-		let rows = "";
+		let rows = '';
 		for (let y = 0; y < grid.length; y++) {
-			let row = "";
+			let row = '';
 			for (let x = 0; x < grid[y].length; x++) {
 				let cell = grid[y][x];
 				let cell_string = cell in this.string_map ? this.string_map[cell] : String(cell);
 				row += cell_string;
 			}
-			rows += rows.length ? "\n" + row : row;
+			rows += rows.length ? '\n' + row : row;
 		}
 
 		return rows;

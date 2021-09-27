@@ -1,3 +1,18 @@
+/**
+ * @typedef {Object} ComputerOptions
+ * @property {Array<Number>} memory
+ * @property {Array<Number>} [inputs]
+ * @property {DefaultInputFn} defaultInput
+ * @property {Object} [pause_on]
+ */
+
+/**
+ * This callback is displayed as part of the Requester class.
+ * @callback DefaultInputFn
+ * @param {Computer} computer
+ * @returns {Number}
+ */
+
 const ADD = '01'; // Add
 const MUL = '02'; // Multiply
 const INP = '03'; // Input
@@ -29,22 +44,16 @@ class Computer {
 	static IMMEDIATE_MODE = IMMEDIATE_MODE;
 	static RELATIVE_MODE = RELATIVE_MODE;
 
+	/**
+	 * @param {ComputerOptions} options 
+	 */
 	constructor({
 		memory,
 		inputs = [],
 		// Called with computer as it's only arg
 		defaultInput,
 		pause_on = { [OUT]: true },
-		address,
-		clone_memory = false,
 	}) {
-		// Must match initial input
-		this.address = address;
-		if (this.address !== inputs[0]) {
-			throw new Error(`Invalid address: ${address}, inputs: ${JSON.stringify(inputs)}`);
-		}
-
-		this.original_memory = clone_memory && memory.slice(0);
 		this.memory = memory.slice(0);
 		this.pointer = 0;
 		this.relative_base = 0;

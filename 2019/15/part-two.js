@@ -1,8 +1,5 @@
-const path = require('path');
-const fs = require('fs');
 const { InfiniteGrid } = require('./infinite-grid');
-
-const grid_str = fs.readFileSync(path.join(__dirname, 'grid.txt'), 'utf8').toString();
+const grid_str = require('./frontier.js');
 
 let grid = new InfiniteGrid({
 	defaultFactory: (x, y) => ' ',
@@ -12,8 +9,7 @@ let grid = new InfiniteGrid({
 });
 grid.import(grid_str);
 
-let [found] = grid.findAll('O');
-let [, [start_x, start_y]] = found;
+let [, [start_x, start_y]] = grid.findAll('O').pop();
 let frontier = grid.buildFrontierFrom(start_x, start_y);
 
 let max_cell = { distance: 0 };

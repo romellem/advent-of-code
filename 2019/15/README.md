@@ -10,7 +10,7 @@ Out here in deep space, many things can go wrong. Fortunately, many of those thi
 
 According to the readouts, the oxygen system must have failed days ago after a rupture in oxygen tank two; that section of the ship was automatically sealed once oxygen levels went dangerously low. A single remotely-operated _repair droid_ is your only option for fixing the oxygen system.
 
-The Elves' care package included an [Intcode](9) program (your puzzle input) that you can use to remotely control the repair droid. By running that program, you can direct the repair droid to the oxygen system and fix the problem.
+The Elves' care package included an [Intcode](https://adventofcode.com/2019/day/9) program (your puzzle input) that you can use to remotely control the repair droid. By running that program, you can direct the repair droid to the oxygen system and fix the problem.
 
 The remote control program executes the following steps in a loop forever:
 
