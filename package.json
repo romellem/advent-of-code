@@ -49,7 +49,7 @@
     "bracketSameLine": false,
     "bracketSpacing": true,
     "jsxSingleQuote": false,
-    "printWidth": 120,
+    "printWidth": 90,
     "quoteProps": "as-needed",
     "semi": true,
     "singleQuote": true,

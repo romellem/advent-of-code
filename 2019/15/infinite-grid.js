@@ -63,10 +63,6 @@ class InfiniteGrid {
 					continue;
 				}
 
-				// if (next_coord[0] === 39 && next_coord[1] === 39) {
-				// 	console.log("Checking", next_coord);
-				// }
-
 				// Coord is walkable
 				frontier.push({
 					coord: next_coord,
@@ -107,7 +103,10 @@ class InfiniteGrid {
 		const infinite_grid_clone = new InfiniteGrid();
 		const new_map = new Map();
 		for (let [key, val] of this.grid) {
-			new_map.set(key, typeof val === 'object' ? JSON.parse(JSON.stringify(val)) : val);
+			new_map.set(
+				key,
+				typeof val === 'object' ? JSON.parse(JSON.stringify(val)) : val
+			);
 		}
 		infinite_grid_clone.defaultFactory = this.defaultFactory.bind(this);
 		infinite_grid_clone.string_map = Object.assign({}, this.string_map);
@@ -225,7 +224,9 @@ class InfiniteGrid {
 
 	set(x, y, value) {
 		if (typeof x !== 'number' || typeof y !== 'number') {
-			throw new Error(`x and y must be numbers, got (${typeof x})${x} and (${typeof y})${y}`);
+			throw new Error(
+				`x and y must be numbers, got (${typeof x})${x} and (${typeof y})${y}`
+			);
 		}
 		if (x < this.min_x) this.min_x = x;
 		if (x > this.max_x) this.max_x = x;
@@ -245,6 +246,50 @@ class InfiniteGrid {
 		}
 
 		return sum;
+	}
+
+	/**
+	 * @returns {[Number, Number]} Returns a tuple of `[width, height]` of cells that are set
+	 */
+	size() {
+		const width = Math.abs(this.max_x - this.min_x) + 1;
+		const height = Math.abs(this.max_y - this.min_y) + 1;
+		return [width, height];
+	}
+
+	/**
+	 * @param {Number|"top-left"|"top-right"|"bottom-left"|"bottom-right"} x - Can be a string, one of "top-left", "top-right", "bottom-left", or "bottom-right"
+	 * @param {Number} [y]
+	 */
+	centerAt(x, y) {
+		if (typeof x === 'string') {
+			switch (x) {
+				case 'top-left':
+					x = this.min_x;
+					y = this.min_y;
+					break;
+				case 'top-right':
+					x = this.max_x;
+					y = this.min_y;
+					break;
+				case 'bottom-left':
+					x = this.min_x;
+					y = this.max_y;
+					break;
+				case 'bottom-right':
+					x = this.max_x;
+					y = this.max_y;
+					break;
+				default:
+					throw new Error(`Invalid enum for centerAt() call: ${x}`);
+			}
+		}
+		
+		let original_grid = this.reset();
+		for (let [coord_id, value] of original_grid) {
+			let [cell_x, cell_y] = InfiniteGrid.toCoords(coord_id);
+			this.set(cell_x - x, cell_y - y, value);
+		}
 	}
 
 	/**
@@ -274,7 +319,8 @@ class InfiniteGrid {
 			let row = '';
 			for (let x = 0; x < grid[y].length; x++) {
 				let cell = grid[y][x];
-				let cell_string = cell in this.string_map ? this.string_map[cell] : String(cell);
+				let cell_string =
+					cell in this.string_map ? this.string_map[cell] : String(cell);
 				row += cell_string;
 			}
 			rows += rows.length ? '\n' + row : row;
