@@ -1,10 +1,13 @@
 const { input } = require('./input');
-const G = require('generatorics');
 
-for (let [a, b] of G.combination(input, 2)) {
-	if (a + b === 2020) {
-		console.log({ a, b });
-		console.log('a * b = ', a * b);
-		return;
+let count = 0;
+for (let i = 0; i < input.length - 1; i++) {
+	let current = input[i];
+	let next = input[i + 1];
+
+	if (next > current) {
+		count++;
 	}
 }
+
+console.log(count);
