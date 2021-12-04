@@ -21,4 +21,4 @@ console.log('Called:\n' + game.called.map(num => winning_board.has(num) ? cyan(n
 console.log('Board Num:', winning_board.id)
 winning_board.print(game.called);
 console.log('-----')
-console.log(game.partOne(winning_board));
+console.log(winning_board.getScore(game.called));

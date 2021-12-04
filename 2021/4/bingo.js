@@ -95,6 +95,12 @@ class Board {
 
 		return uncalled;
 	}
+
+	getScore(called) {
+		let uncalled = this.getUncalled(called);
+		let uncalled_sum = uncalled.reduce((a, b) => a + b, 0);
+		return uncalled_sum * called[called.length - 1];
+	}
 }
 
 class Bingo {
@@ -118,10 +124,12 @@ class Bingo {
 
 		let bingos = [];
 		for (let board of this.boards) {
+			// For part two, make sure we don't double count boards that already won
 			if (board.hasBingo()) {
 				continue;
 			}
 
+			// If adding the number caused a bingo, add the board to our winners
 			if (board.add(number)) {
 				bingos.push(board);
 			}
@@ -132,12 +140,6 @@ class Bingo {
 		}
 
 		return false;
-	}
-
-	partOne(winning_board) {
-		let uncalled = winning_board.getUncalled(this.called);
-		let uncalled_sum = uncalled.reduce((a, b) => a + b, 0);
-		return uncalled_sum * this.called[this.called.length - 1];
 	}
 }
 
