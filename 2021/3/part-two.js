@@ -1,7 +1,7 @@
 const { input } = require('./input');
 
-let nums = JSON.parse(JSON.stringify(input));
-let nums2 = JSON.parse(JSON.stringify(input));
+let oxy = [...input];
+let co2 = [...input];
 
 function getMinsMaxes(lines) {
 	let count = {};
@@ -40,26 +40,26 @@ function getMinsMaxes(lines) {
 }
 
 let bit = 0;
-while (nums.length > 1) {
-	let { max } = getMinsMaxes(nums);
-	nums = nums.filter((num) => {
+while (oxy.length > 1) {
+	let { max } = getMinsMaxes(oxy);
+	oxy = oxy.filter((num) => {
 		return max[bit] === null ? num[bit] === '1' : num[bit] === max[bit];
 	});
 
 	bit++;
 }
 
-let a = parseInt(nums[0], 2);
+const oxy_rating = parseInt(oxy[0], 2);
 
 bit = 0;
-while (nums2.length > 1) {
-	let { min } = getMinsMaxes(nums2);
-	nums2 = nums2.filter((num) => {
+while (co2.length > 1) {
+	let { min } = getMinsMaxes(co2);
+	co2 = co2.filter((num) => {
 		return min[bit] === null ? num[bit] === '0' : num[bit] === min[bit];
 	});
 	bit++;
 }
 
-console.log(nums2);
+const co2_rating = parseInt(co2[0], 2);
 
-console.log(a * b);
+console.log(oxy_rating * co2_rating);
