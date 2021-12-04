@@ -123,15 +123,8 @@ class Bingo {
 			}
 		}
 
-		if (bingos.length > 1) {
-			for (let board of bingos) {
-				board.print();
-			}
-			throw new Error(`More than one board had a bingo!`, {
-				cause: bingos,
-			});
-		} else if (bingos.length === 1) {
-			return bingos[0];
+		if (bingos.length > 0) {
+			return bingos;
 		}
 
 		return false;
