@@ -6,7 +6,10 @@ class Board {
 		this.block_str = block_str;
 		let rows = block_str.split('\n');
 		this.grid = rows.map((row) =>
-			row.trim().split(/\s+/).map((v) => parseInt(v, 10))
+			row
+				.trim()
+				.split(/\s+/)
+				.map((v) => parseInt(v, 10))
 		);
 
 		this.board_size = this.grid.length;
@@ -66,12 +69,12 @@ class Board {
 			.map((row) => {
 				let rows = [];
 				for (let cell of row) {
-
-
 					let padded_cell = String(cell).padStart(2);
-					rows.push(called_lookup[cell]
-						? green(padded_cell)
-						: red(padded_cell));
+					rows.push(
+						called_lookup[cell]
+							? green(padded_cell)
+							: red(padded_cell)
+					);
 				}
 
 				return rows.join(' ');
