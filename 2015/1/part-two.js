@@ -3,7 +3,7 @@ const input = require('./input');
 const GO_UP = '(';
 const GO_DOWN = ')';
 
-let instructions = input.split('').map(v => (v === GO_UP ? 1 : -1));
+let instructions = input.map(v => (v === GO_UP ? 1 : -1));
 
 let accumulator = 0;
 let i;

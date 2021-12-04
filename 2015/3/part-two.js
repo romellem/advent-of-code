@@ -1,7 +1,5 @@
-const input = require('./input');
+const directions = require('./input');
 const SantaAndRoboSanta = require('./santa-and-robo-santa');
-
-let directions = input.split('');
 
 let santa = new SantaAndRoboSanta(directions);
 
