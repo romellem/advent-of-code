@@ -4,16 +4,19 @@ let count = {};
 
 for (let line of input) {
 	for (let i = 0; i < line.length; i++) {
-		if (!count[i]) count[i] = [0, 0];
+		if (!count[i]) {
+			// Initialize [zeros_count, ones_count]
+			count[i] = [0, 0];
+		}
+
 		let val = +line[i];
-		count[i][val]++
+		count[i][val]++;
 	}
 }
 
 let mins = [];
 let maxs = [];
-for (let [p, counts] of Object.entries(count)) {
-	let position = +p;
+for (let counts of Object.values(count)) {
 	if (counts[0] > counts[1]) {
 		maxs.push(0);
 		mins.push(1);
@@ -23,8 +26,7 @@ for (let [p, counts] of Object.entries(count)) {
 	}
 }
 
-let min = parseInt(mins.join(''), 2)
-let max = parseInt(maxs.join(''), 2)
+let min = parseInt(mins.join(''), 2);
+let max = parseInt(maxs.join(''), 2);
 
-console.log(min*max);
-
+console.log(min * max);
