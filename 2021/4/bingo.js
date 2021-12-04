@@ -6,7 +6,7 @@ class Board {
 		this.block_str = block_str;
 		let rows = block_str.split('\n');
 		this.grid = rows.map((row) =>
-			row.split(/\s+/).map((v) => parseInt(v, 10))
+			row.trim().split(/\s+/).map((v) => parseInt(v, 10))
 		);
 
 		this.board_size = this.grid.length;
@@ -118,6 +118,10 @@ class Bingo {
 
 		let bingos = [];
 		for (let board of this.boards) {
+			if (board.hasBingo()) {
+				continue;
+			}
+
 			if (board.add(number)) {
 				bingos.push(board);
 			}
