@@ -1,3 +1,8 @@
+/**
+ * @typedef {String} GridId - Two numbers separated by a comma.
+ * @example "10,5"
+ */
+
 class InfiniteGrid {
 	/**
 	 * @param {Object} options
@@ -14,10 +19,20 @@ class InfiniteGrid {
 		this.min_y = Infinity;
 	}
 
+	/**
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @returns {GridId}
+	 */
 	static toId(x, y) {
 		return `${x},${y}`;
 	}
 
+	/**
+	 * @param {GridId} id
+	 * @param {Boolean} [return_as_object=false]
+	 * @returns {{x: Number, y: Number} | [Number, Number]}
+	 */
 	static toCoords(id, return_as_object = false) {
 		let [x, y] = id.split(',');
 		x = parseInt(x, 10);
@@ -25,6 +40,10 @@ class InfiniteGrid {
 		return return_as_object ? { x, y } : [x, y];
 	}
 
+	/**
+	 * @param {String} two_dimensional_string 
+	 * @returns {any[][]}
+	 */
 	static split(two_dimensional_string) {
 		return two_dimensional_string.split('\n').map((row) => row.split(''));
 	}
@@ -57,6 +76,11 @@ class InfiniteGrid {
 		return neighboring_cells;
 	}
 
+	/**
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {any} value
+	 */
 	set(x, y, value) {
 		if (typeof x !== 'number' || typeof y !== 'number') {
 			throw new Error(
@@ -71,6 +95,11 @@ class InfiniteGrid {
 		this.grid.set(id, value);
 	}
 
+	/**
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @returns {any}
+	 */
 	get(x, y) {
 		const id = InfiniteGrid.toId(x, y);
 		if (!this.grid.has(id)) {
@@ -82,7 +111,7 @@ class InfiniteGrid {
 	/**
 	 * @param {RegExp|any} value
 	 * @param {Boolean} [as_coords] - When true, returns a Map of `[x, y]` number values, otherwise returns a Map of string IDs.
-	 * @returns {Array<[any,Id|Coord]>} - Returns an Array, the first value matching the cell found, and the 2nd the coords or ID.
+	 * @returns {Array<[any,GridId|Coord]>} - Returns an Array, the first value matching the cell found, and the 2nd the coords or ID.
 	 */
 	findAll(value, as_coords = true) {
 		const found = [];
