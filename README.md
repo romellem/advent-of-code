@@ -19,13 +19,14 @@ of manual tinkering.
 
 ## 2021 Puzzles List
 
-Completed: **5 / 25** (20%)
+Completed: **6 / 25** (24%)
 
 *  [✅ Day 1](2021/1/)
 *  [✅ Day 2](2021/2/)
 *  [✅ Day 3](2021/3/)
 *  [✅ Day 4](2021/4/)
 *  [✅ Day 5](2021/5/)
+*  [✅ Day 6](2021/6/)
 
 ## 2020 Puzzles List
 
