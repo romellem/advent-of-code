@@ -32,7 +32,7 @@ class Cave {
          */
         // let grid_size = target_coords[0] + target_coords[1] + 2;
         // let grid_size = depth;
-        // let grid_size = Math.max.apply(null, target_coords) + 50;
+        // let grid_size = Math.max(...target_coords) + 50;
 
         this.depth = depth;
         this.target_x = target_coords[0];

@@ -10,7 +10,7 @@ let input = raw_input.split('\n').filter(n => n);
 let coordinates = input.map(p => p.split(',').map(n => +n));
 
 let flattened = coordinates.flat();
-let largest = Math.max.apply(null, flattened);
+let largest = Math.max(...flattened);
 
 let grid = Array(largest + 2)
     .fill()

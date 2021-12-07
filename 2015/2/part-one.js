@@ -7,7 +7,7 @@ let input_areas =  input.map(box => {
     let b = s1 * s3;
     let c = s2 * s3;
 
-    let min_side = Math.min.apply(null, [a, b, c]);
+    let min_side = Math.min(a, b, c);
 
     return (a * 2) + (b * 2) + (c * 2) + min_side;
 });

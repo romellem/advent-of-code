@@ -7,7 +7,7 @@ const { genMazeFromNumber, getMazeAsString } = require('./maze');
  * Tests
  */
 
-let test_size = Math.max.apply(null, sampleInput.finish);
+let test_size = Math.max(...sampleInput.finish);
 
 // Create a map that is twice the size of the largest ending coord.
 // This is just a guess, most likely this will create enough cells for us to solve.
@@ -29,7 +29,7 @@ assert.strictEqual(test_path.length - 1, sampleInput.steps);
  * Real input
  */
 
-let size = Math.max.apply(null, input.finish);
+let size = Math.max(...input.finish);
 size *= 3;
 
 let maze_grid = genMazeFromNumber(input.num, size);

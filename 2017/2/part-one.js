@@ -2,8 +2,8 @@ const input = require('./input');
 
 const checksum = input
     .map(row => {
-        let max = Math.max.apply(null, row);
-        let min = Math.min.apply(null, row);
+        let max = Math.max(...row);
+        let min = Math.min(...row);
 
         return max - min;
     })

@@ -68,14 +68,14 @@ if (total_days >= MAX_DAYS_SIMULATING) {
     console.log(` STABILIZED AFTER ${total_days}`.green);
 }
 
-let max_pad_start = Math.abs(Math.min.apply(null, unpadded_pixel_rows.map(r => r.min)));
+let max_pad_start = Math.abs(Math.min(...unpadded_pixel_rows.map(r => r.min)));
 let half_padded_pixel_rows = unpadded_pixel_rows.map(row => {
     let zero_index = Math.abs(row.min);
     let left_empty_pots = Array(max_pad_start - zero_index).fill('.').join('');
     return left_empty_pots + row.string;
 });
 
-let max_row_lenth = Math.max.apply(null, half_padded_pixel_rows.map(r => r.length));
+let max_row_lenth = Math.max(...half_padded_pixel_rows.map(r => r.length));
 let padded_pixel_rows = half_padded_pixel_rows.map(row => row.padEnd(max_row_lenth, '.'));
 
 const BLACK = Jimp.rgbaToInt(0, 0, 0, 255);

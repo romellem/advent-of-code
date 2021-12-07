@@ -2,8 +2,8 @@
 
 const { input } = require('./input');
 const coords = Object.keys(input).map(xy => xy.split(',').map(v => +v));
-const max_x = Math.max.apply(null, coords.map(coord => coord[0]));
-const max_y = Math.max.apply(null, coords.map(coord => coord[1]));
+const max_x = Math.max(...coords.map(coord => coord[0]));
+const max_y = Math.max(...coords.map(coord => coord[1]));
 
 const grid = [];
 for (let y = 0; y <= max_y; y++) {

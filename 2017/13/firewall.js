@@ -71,7 +71,7 @@ class Firewall {
     }
 
     getMaxDepth(layers) {
-        return Math.max.apply(null, layers.map(l => l.depth));
+        return Math.max(...layers.map(l => l.depth));
     }
 
     /**

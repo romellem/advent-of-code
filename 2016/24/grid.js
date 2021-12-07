@@ -62,7 +62,7 @@ class Grid {
 			return total_distance;
 		});
 
-		return Math.min.apply(null, possible_distances);
+		return Math.min(...possible_distances);
 	}
 }
 

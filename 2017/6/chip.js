@@ -30,7 +30,7 @@ class Chip {
     }
 
     getLargestBlockIndex() {
-        let largest_block = Math.max.apply(null, this.memory);
+        let largest_block = Math.max(...this.memory);
         return this.memory.indexOf(largest_block);
     }
 }

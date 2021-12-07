@@ -100,7 +100,7 @@ class Bridges {
 
 	getLongestAndHighestScoringBridge() {
 		// The `Math.max` gives a 'call stack exceeded' error. ¯\_(ツ)_/¯
-		// let max_length = Math.max.apply(null, this.solutions.map(b => b.length));
+		// let max_length = Math.max(...this.solutions.map(b => b.length));
 		let max_length = this.solutions
 			.map(b => b.length)
 			.sort((a, b) => a - b)

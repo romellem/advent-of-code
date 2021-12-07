@@ -91,7 +91,7 @@ class Program {
             this.executeLine(instruction);
         });
 
-        return Math.max.apply(null, Object.values(this.registers));
+        return Math.max(...Object.values(this.registers));
     }
 
     executeAndGetLargestRegisterAtAnyTime() {

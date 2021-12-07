@@ -7,7 +7,7 @@ let input_areas = input.map(box => {
     let p2 = s1 + s3 + s1 + s3;
     let p3 = s2 + s3 + s2 + s3;
 
-    let min_perimeter = Math.min.apply(null, [p1, p2, p3]);
+    let min_perimeter = Math.min(p1, p2, p3);
 
     let volume = s1 * s2 * s3;
 
