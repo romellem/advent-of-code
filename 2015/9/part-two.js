@@ -1,40 +1,6 @@
-const fs = require('fs');
-const path = require('path');
+const { unique_cities, distances } = require('./input');
 const G = require('generatorics');
 
-let raw_input_txt = fs.readFileSync(path.resolve(__dirname, './input.txt'), 'utf8');
-
-let raw_input = raw_input_txt.split('\n').filter(n => n);
-
-// @example `Tristram to Norrath = 111`
-const CITY_REGEX = /^(\w+) to (\w+) = (\d+)$/;
-
-let unique_cities_lookup = {};
-let distances = {};
-
-let input = raw_input.map(line => {
-    let [match, from, to, distance] = CITY_REGEX.exec(line);
-    distance = parseInt(distance);
-
-    if (!unique_cities_lookup[from]) {
-        unique_cities_lookup[from] = true;
-    }
-    if (!unique_cities_lookup[to]) {
-        unique_cities_lookup[to] = true;
-    }
-
-    // Each distance works from either direction
-    distances[`${from}${to}`] = distance;
-    distances[`${to}${from}`] = distance;
-
-    return {
-        from,
-        to,
-        distance,
-    };
-});
-
-const unique_cities = Object.keys(unique_cities_lookup);
 let longest_distance = -1;
 
 for (let permuation of G.permutation(unique_cities)) {

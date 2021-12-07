@@ -7,4 +7,6 @@ const input = fs
 	.trim()
 	.split('\n');
 
-module.exports = { input };
+module.exports = {
+    input,
+};

@@ -2,7 +2,7 @@
 
 |   Part 1   |   Part 2   |
 |------------|------------|
-| `hepxxyzz` | `hepxcrrq` |
+| `hepxxyzz` | `heqaabcc` |
 
 ## --- Day 10: Elves Look, Elves Say ---
 
