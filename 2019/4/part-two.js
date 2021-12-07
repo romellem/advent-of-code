@@ -1,4 +1,3 @@
-const matchAll = require('string.prototype.matchall');
 const { uniq } = require('lodash');
 const { input } = require('./input');
 
@@ -29,8 +28,8 @@ for (let n = range_start; n <= range_end; n++) {
 	 * Test that the double digit isn't a part of a larger group
 	 */
 
-	// matchAll('111122', re) -> [["11", "1"], ["11", "1"], ["22", "2"]]
-	let full_matches = [...matchAll(n_str, /(\d)\1/g)];
+	// '111122'.matchAll(re) -> [["11", "1"], ["11", "1"], ["22", "2"]]
+	let full_matches = [...n_str.matchAll(/(\d)\1/g)];
 
 	// [["11", "1"], ["11", "1"], ["22", "2"]] -> ["11", "11", "22"]
 	let full_matches_mapped = full_matches.map(v => v[0]);

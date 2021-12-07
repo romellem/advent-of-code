@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const distance = require('manhattan');
-const flat = require('array.prototype.flat');
 
 let raw_input = fs.readFileSync(path.resolve(__dirname, './input.txt'), 'utf8');
 
@@ -10,7 +9,7 @@ let input = raw_input.split('\n').filter(n => n);
 
 let coordinates = input.map(p => p.split(',').map(n => +n));
 
-let flattened = flat(coordinates);
+let flattened = coordinates.flat();
 let largest = Math.max.apply(null, flattened);
 
 let grid = Array(largest + 2)
