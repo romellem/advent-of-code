@@ -11,7 +11,7 @@ function addUniqueCharToStringSorted(a, b) {
 	return _.uniq(all_chars).join('');
 }
 
-function overlaps({ bottom_wire, top_wire }) {
+function wiresOverlap({ bottom_wire, top_wire }) {
 	return addUniqueCharToStringSorted(bottom_wire, top_wire) === bottom_wire;
 }
 
@@ -269,8 +269,6 @@ function solveWires({ wires, wiresAsArrays, outputs } = {}) {
 		return map;
 	}, new Map());
 
-	let eight_wire = number_to_wire.get(8);
-
 	const mapping = new Map();
 	const reverse_mapping = new Map();
 
@@ -341,7 +339,7 @@ function solveWires({ wires, wiresAsArrays, outputs } = {}) {
 	 */
 	const two_or_three_or_five = wires_by_length.get(5);
 	for (let wire of two_or_three_or_five) {
-		if (overlaps({ bottom_wire: wire, top_wire: number_to_wire.get(7) })) {
+		if (wiresOverlap({ bottom_wire: wire, top_wire: number_to_wire.get(7) })) {
 			// Then `wire` is digit `3`
 			let d_or_g = uniqueSegments(wire, number_to_wire.get(7));
 
@@ -353,27 +351,44 @@ function solveWires({ wires, wiresAsArrays, outputs } = {}) {
 		}
 	}
 
-	const zero_or_six_or_nine = wires_by_length.get(6);
-	for (let wire of zero_or_six_or_nine) {
-		// 9
-		if (addUniqueCharToStringSorted(wire, [a, b, d, g, ...c_or_f].join('')) === wire) {
-			let nine_wire = wire;
-			[e] = _.xor(eight_wire.split(''), nine_wire.split(''));
-			break;
-		}
-	}
+	/**
+	 * Step 5:
+	 *
+	 * We currently know `a`, `b`, `d`, `g`, and know what wires are `c or f`.
+	 * When we put all those segments together, we get digit `9`.
+	 * We also already know digit `8` (it has a unique number of segments).
+	 * So we can get segment `e` by seeing what extra segment `8` has that `9` doesn't.
+	 *
+	 *     _   _
+	 *    '_' '_|
+	 *    '_'  _'
+	 */
+	number_to_wire.set(9, [a, b, d, g, ...c_or_f].sort().join(''));
+	[e] = uniqueSegments(number_to_wire.get(8), number_to_wire.get(9));
 
-	// let two_or_three_or_five = wires_by_length.get(5);
-	let [two_wire] = wires_by_length.get(5).filter((wire) => {
-		return addUniqueCharToStringSorted(wire, [a, d, e, g].join('')) === wire;
-	});
-
-	if (two_wire.includes(c_or_f[0])) {
+	/**
+	 * Step 6:
+	 *
+	 * Digits that have 5 segments include `2`, `3`, and `5`.
+	 * 2 is the only digit that includes segment `e`, which is known.
+	 *
+	 * Once we have the `2` wire, grab the first segment from `c_or_f`. If that segment is `c`,
+	 * it'll overlap with `2`. If it's `f`, it won't overlap with `2`.
+	 *
+	 *      _  _   _
+	 *      _' _' '_
+	 *     '_  _'  _'
+	 */
+	let two_wire = wires_by_length.get(5).find((wire) => wire.includes(e));
+	if (wiresOverlap({ bottom_wire: two_wire, top_wire: c_or_f[0] })) {
+		// `c` is the first segment of `c_or_f`
 		[c, f] = c_or_f;
 	} else {
+		// `f` is the first segment of `c_or_f`
 		[f, c] = c_or_f;
 	}
 
+	// We have our mapping / ordering!
 	const solved_segment_mapping = [a, b, c, d, e, f, g];
 
 	let num_sr = '';
@@ -382,13 +397,8 @@ function solveWires({ wires, wiresAsArrays, outputs } = {}) {
 		num_sr += num;
 	}
 
-	return parseInt(num_sr);
+	return parseInt(num_sr, 10);
 }
 
-let sum = 0;
-for (let inp of input) {
-	sum += solveWires(inp);
-}
-console.log(sum);
-
-// 689837 too low
+const output_sum = input.reduce((sum, input_line) => sum + solveWires(input_line), 0);
+console.log(output_sum);
