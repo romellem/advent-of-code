@@ -312,10 +312,10 @@ function solveWires({ wires, outputs } = {}) {
 	 * Step 4:
 	 *
 	 * The digits with 5 segments are `2`, `3`, and `5`.
-	 * If you overlap `7` completely overlaps `3`, so if you remove the segments in `7` from `3`,
+	 * `7` completely overlaps `3`, so if you remove the segments in `7` from `3`,
 	 * you get segments that are either `d or g`.
 	 *
-	 * Since we already know what wires are `b or d`, then we just interesct these to find `d`.
+	 * Since we already know what wires are `b or d`, then we just intersect these to find `d`.
 	 * After that we can calcuate `b` and `g`.
 	 *
 	 *     _  _
@@ -355,7 +355,7 @@ function solveWires({ wires, outputs } = {}) {
 	 * Step 6:
 	 *
 	 * Digits that have 5 segments include `2`, `3`, and `5`.
-	 * 2 is the only digit that includes segment `e`, which is known.
+	 * 2 is the only digit that includes segment `e`, which is now known.
 	 *
 	 * Once we have the `2` wire, grab the first segment from `c_or_f`. If that segment is `c`,
 	 * it'll overlap with `2`. If it's `f`, it won't overlap with `2`.
@@ -365,7 +365,8 @@ function solveWires({ wires, outputs } = {}) {
 	 *     '_  _'  _'
 	 */
 	let two_wire = wires_by_length.get(5).find((wire) => wire.includes(e));
-	if (wiresOverlap({ bottom_wire: two_wire, top_wire: c_or_f[0] })) {
+	number_to_wire.set(2, two_wire);
+	if (wiresOverlap({ bottom_wire: number_to_wire.get(2), top_wire: c_or_f[0] })) {
 		// `c` is the first segment of `c_or_f`
 		[c, f] = c_or_f;
 	} else {
