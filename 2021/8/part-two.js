@@ -11,6 +11,49 @@ function addUniqueCharToStringSorted(a, b) {
 	return _.uniq(all_chars).join('');
 }
 
+function overlaps({ bottom_wire, top_wire }) {
+	return addUniqueCharToStringSorted(bottom_wire, top_wire) === bottom_wire;
+}
+
+function uniqueSegments(wire_a, wire_b) {
+	let char_counts = {};
+	for (let char of [...wire_a, ...wire_b]) {
+		if (!char_counts[char]) {
+			char_counts[char] = 0;
+		}
+		char_counts[char]++;
+	}
+
+	let unique_chars = [];
+	for (let [char, count] of Object.entries(char_counts)) {
+		if (count === 1) {
+			unique_chars.push(char);
+		}
+	}
+
+	return unique_chars;
+}
+
+function intersectingSegments(wire_a, wire_b) {
+	// Assumes a given wire is unique
+	let char_counts = {};
+	for (let char of [...wire_a, ...wire_b]) {
+		if (!char_counts[char]) {
+			char_counts[char] = 0;
+		}
+		char_counts[char]++;
+	}
+
+	let intersecting_chars = [];
+	for (let [char, count] of Object.entries(char_counts)) {
+		if (count > 1) {
+			intersecting_chars.push(char);
+		}
+	}
+
+	return intersecting_chars;
+}
+
 /**
  * Mark each number as an array of 7 segments, either on (1) or off (0).
  * The order of the segments is read left-to-right, top-to-bottom.
@@ -214,9 +257,20 @@ function solveWires({ wires, wiresAsArrays, outputs } = {}) {
 		return obj;
 	}, new Map());
 
-	let [eight_wire] = wires_by_length.get(7);
+	const number_to_wire = wires.reduce((map, wire) => {
+		const size = wire.length;
 
-	const solved_segments = Array(7).fill();
+		const number = numbers_groups_by_segments_count[size];
+		const wire_has_one_possibility = number.length === 1;
+		if (wire_has_one_possibility) {
+			// Sets 1, 4, 7, 8. Those are the only unique digits with unique wire sizes at the start.
+			map.set(number[0], wire);
+		}
+		return map;
+	}, new Map());
+
+	let eight_wire = number_to_wire.get(8);
+
 	const mapping = new Map();
 	const reverse_mapping = new Map();
 
@@ -230,56 +284,87 @@ function solveWires({ wires, wiresAsArrays, outputs } = {}) {
 		}
 	}
 
+	/**
+	 *      aaaaa
+	 *     b     c
+	 *     b     c
+	 *      ddddd
+	 *     e     f
+	 *     e     f
+	 *      ggggg
+	 */
 	let a, b, c, d, e, f, g;
-	[a] = _.xor(
-		reverse_mapping.get(numbers_as_segments[1]),
-		reverse_mapping.get(numbers_as_segments[7])
-	);
-	solved_segments[0] = a;
 
-	let c_or_f = reverse_mapping.get(numbers_as_segments[7]).filter((v) => v !== a);
-	let b_or_d = reverse_mapping.get(numbers_as_segments[4]).filter((v) => !c_or_f.includes(v));
-	for (let wire of wires) {
-		const seven = reverse_mapping.get(numbers_as_segments[7]);
-		const seven_str = seven.join('');
-		if (wire.length === 5) {
-			if (addUniqueCharToStringSorted(wire, seven_str) === wire) {
-				let d_or_g = _.difference(wire.split(''), seven);
+	/**
+	 * Step 1:
+	 *
+	 * The `1` digit only consists of segments `c` and `f`, so get that wire
+	 * and mark the segments as such
+	 */
+	let c_or_f = number_to_wire.get(1);
 
-				[d] = _.intersection(d_or_g, b_or_d);
-				[g] = d_or_g.filter((v) => v !== d);
-				[b] = b_or_d.filter((v) => v !== d);
-				solved_segments[1] = b;
-				solved_segments[3] = d;
-				solved_segments[6] = g;
-				break;
-			}
-		}
-	}
+	/**
+	 * Step 2:
+	 *
+	 * Now that we know `c or f`, we can figure out what wires are `b or d` by
+	 * seeing where digit 4 overlaps.
+	 *
+	 *     | '_|
+	 *     |   |
+	 */
+	let b_or_d = uniqueSegments(number_to_wire.get(4), c_or_f);
 
-	let zero_or_six_or_nine = wires_by_length.get(6);
-	let nine_wire;
-	for (let wire of zero_or_six_or_nine) {
-		// 9
-		if (addUniqueCharToStringSorted(wire, [a, b, d, g, ...c_or_f].join('')) === wire) {
-			nine_wire = wire;
-			[e] = _.xor(eight_wire.split(''), nine_wire.split(''));
-			solved_segments[4] = e;
+	/**
+	 * Step 3:
+	 *
+	 * 1 and 7 overlap except for the top segment, `a`. Find which one is different and mark that as `a`
+	 *.
+	 *        _
+	 *     |   |
+	 *     |   |
+	 */
+	[a] = uniqueSegments(number_to_wire.get(1), number_to_wire.get(7));
+
+	/**
+	 * Step 4:
+	 *
+	 * The digits with 5 segments are `2`, `3`, and `5`.
+	 * If you overlap `7` completely overlaps `3`, so if you remove the segments in `7` from `3`,
+	 * you get segments that are either `d or g`.
+	 *
+	 * Since we already know what wires are `b or d`, then we just interesct these to find `d`.
+	 * After that we can calcuate `b` and `g`.
+	 *
+	 *     _  _
+	 *     _|  |
+	 *     _'  '
+	 */
+	const two_or_three_or_five = wires_by_length.get(5);
+	for (let wire of two_or_three_or_five) {
+		if (overlaps({ bottom_wire: wire, top_wire: number_to_wire.get(7) })) {
+			// Then `wire` is digit `3`
+			let d_or_g = uniqueSegments(wire, number_to_wire.get(7));
+
+			[d] = intersectingSegments(d_or_g, b_or_d);
+			[g] = uniqueSegments(d_or_g, d);
+			[b] = uniqueSegments(b_or_d, d);
+
 			break;
 		}
 	}
 
-	// let zero_or_six = zero_or_six_or_nine.filter((v) => v !== nine_wire);
-	// let zero_wire;
-	// for (let wire of zero_or_six) {
-	// 	// 0
-	// 	if (addUniqueCharToStringSorted(wire, c_or_f.join('')) === wire) {
-	// 		zero_wire = wire;
-	// 	}
-	// }
+	const zero_or_six_or_nine = wires_by_length.get(6);
+	for (let wire of zero_or_six_or_nine) {
+		// 9
+		if (addUniqueCharToStringSorted(wire, [a, b, d, g, ...c_or_f].join('')) === wire) {
+			let nine_wire = wire;
+			[e] = _.xor(eight_wire.split(''), nine_wire.split(''));
+			break;
+		}
+	}
 
-	let two_or_three_or_five = wires_by_length.get(5);
-	let [two_wire] = two_or_three_or_five.filter((wire) => {
+	// let two_or_three_or_five = wires_by_length.get(5);
+	let [two_wire] = wires_by_length.get(5).filter((wire) => {
 		return addUniqueCharToStringSorted(wire, [a, d, e, g].join('')) === wire;
 	});
 
@@ -288,12 +373,12 @@ function solveWires({ wires, wiresAsArrays, outputs } = {}) {
 	} else {
 		[f, c] = c_or_f;
 	}
-	solved_segments[2] = c;
-	solved_segments[5] = f;
+
+	const solved_segment_mapping = [a, b, c, d, e, f, g];
 
 	let num_sr = '';
 	for (let output of outputs) {
-		const num = convertWireToNumber(solved_segments, output);
+		const num = convertWireToNumber(solved_segment_mapping, output);
 		num_sr += num;
 	}
 
