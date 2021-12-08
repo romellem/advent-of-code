@@ -215,6 +215,6 @@ For example:
       \---/
     
 
-After four very expensive crashes, a tick ends with only one cart remaining; its final location is `_6,4_`.
+After four very expensive crashes, a tick ends with only one cart remaining; its final location is _`6,4`_.
 
 _What is the location of the last cart_ at the end of the first tick where it is the only cart left?

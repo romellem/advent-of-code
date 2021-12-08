@@ -61,7 +61,7 @@ Drawing this same cave system with rocky as `.`, wet as `=`, narrow as `|`, the 
 
 Before you go in, you should determine the _risk level_ of the area. For the rectangle that has a top-left corner of region `0,0` and a bottom-right corner of the region containing the target, add up the risk level of each individual region: `0` for rocky regions, `1` for wet regions, and `2` for narrow regions.
 
-In the cave system above, because the mouth is at `0,0` and the target is at `10,10`, adding up the risk level of all regions with an `X` coordinate from `0` to `10` and a `Y` coordinate from `0` to `10`, this total is `_114_`.
+In the cave system above, because the mouth is at `0,0` and the target is at `10,10`, adding up the risk level of all regions with an `X` coordinate from `0` to `10` and a `Y` coordinate from `0` to `10`, this total is _`114`_.
 
 _What is the total risk level for the smallest rectangle that includes `0,0` and the target's coordinates?_
 

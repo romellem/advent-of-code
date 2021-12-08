@@ -61,9 +61,9 @@ Finally, `24` is drawn:
  1 12 20 15 19        <b>14</b> <b>21</b> 16 12  6         <b>2</b>  <b>0</b> 12  3  <b>7</b>
 </code></pre>
 
-At this point, the third board _wins_ because it has at least one complete row or column of marked numbers (in this case, the entire top row is marked: `_14 21 17 24 4_`).
+At this point, the third board _wins_ because it has at least one complete row or column of marked numbers (in this case, the entire top row is marked: _`14 21 17 24 4`_).
 
-The _score_ of the winning board can now be calculated. Start by finding the _sum of all unmarked numbers_ on that board; in this case, the sum is `188`. Then, multiply that sum by _the number that was just called_ when the board won, `24`, to get the final score, `188 * 24 = _4512_`.
+The _score_ of the winning board can now be calculated. Start by finding the _sum of all unmarked numbers_ on that board; in this case, the sum is `188`. Then, multiply that sum by _the number that was just called_ when the board won, `24`, to get the final score, <code>188 * 24 = <em>4512</em></code>.
 
 To guarantee victory against the giant squid, figure out which board will win first. _What will your final score be if you choose that board?_
 
@@ -75,6 +75,6 @@ On the other hand, it might be wise to try a different strategy: let the giant s
 
 You aren't sure how many bingo boards a giant squid could play at once, so rather than waste time counting its arms, the safe thing to do is to _figure out which board will win last_ and choose that one. That way, no matter which boards it picks, it will win for sure.
 
-In the above example, the second board is the last to win, which happens after `13` is eventually called and its middle column is completely marked. If you were to keep playing until this point, the second board would have a sum of unmarked numbers equal to `148` for a final score of `148 * 13 = _1924_`.
+In the above example, the second board is the last to win, which happens after `13` is eventually called and its middle column is completely marked. If you were to keep playing until this point, the second board would have a sum of unmarked numbers equal to `148` for a final score of <code>148 * 13 = <em>1924</em></code>.
 
 Figure out which board will win last. _Once it wins, what would its final score be?_
