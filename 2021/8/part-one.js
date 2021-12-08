@@ -1,21 +1,26 @@
 const { input } = require('./input');
-const { InfiniteGrid } = require('./infinite-grid');
-const PF = require('pathfinding');
 
-const data = new InfiniteGrid();
-data.load(input);
-
-let grid = new PF.Grid(data.toGrid());
-
-let finder = new PF.AStarFinder(/*
-	{
-		allowDiagonal: true,
-		dontCrossCorners: true,
-		heuristic: PF.Heuristic.chebyshev,
+const segment = {
+	1: 2,
+	4: 4,
+	7: 3,
+};
+let count = 0;
+for (let { after } of input) {
+	for (let signal of after) {
+		if (signal.length === 2) {
+			// 1
+			count++;
+		} else if (signal.length === 4) {
+			// 4
+			count++;
+		} else if (signal.length === 3) {
+			// 7
+			count++;
+		} else if (signal.length === 7) {
+			// 8
+			count++;
+		}
 	}
-*/);
-
-// including both the start and end positions
-let path = finder.findPath(from_x, from_y, to_x, to_y, grid.clone());
-
-console.log(path.length - 1)
+}
+console.log(count);
