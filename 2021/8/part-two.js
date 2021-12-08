@@ -1,14 +1,12 @@
-const _ = require('lodash');
 const { input } = require('./input');
 
-const arraysAreEqual = _.memoize(
-	(a, b) => a.join(',') === b.join(','),
-	(a, b) => `${a};${b}`
-);
+// We are comparing arrays of strings or numbers, so we can use this simple comparison
+const arraysAreEqual = (a, b) => a.join(',') === b.join(',');
 
 function addUniqueCharToStringSorted(a, b) {
 	const all_chars = [...a.split(''), ...b.split('')].sort();
-	return _.uniq(all_chars).join('');
+
+	return [...new Set(all_chars)].join('');
 }
 
 function wiresOverlap({ bottom_wire, top_wire }) {
@@ -246,7 +244,7 @@ function convertWireToNumber(mapping_arr, wire) {
 	}
 }
 
-function solveWires({ wires, wiresAsArrays, outputs } = {}) {
+function solveWires({ wires, outputs } = {}) {
 	const wires_by_length = wires.reduce((obj, wire) => {
 		const size = wire.length;
 		if (!obj.has(size)) {
@@ -268,19 +266,6 @@ function solveWires({ wires, wiresAsArrays, outputs } = {}) {
 		}
 		return map;
 	}, new Map());
-
-	const mapping = new Map();
-	const reverse_mapping = new Map();
-
-	for (let i = 0; i < wires.length; i++) {
-		const wire = wires[i];
-		const wire_arr = wiresAsArrays[i];
-		let possibilities = numbers_groups_by_segments_count[wire.length];
-		if (possibilities.length === 1) {
-			mapping.set(wire, numbers_as_segments[possibilities[0]]);
-			reverse_mapping.set(numbers_as_segments[possibilities[0]], wire_arr);
-		}
-	}
 
 	/**
 	 *      aaaaa

@@ -15,9 +15,7 @@ const input = fs
 
 		return {
 			wires,
-			wiresAsArrays: wires.map((wire) => wire.split('')),
 			outputs,
-			outputsAsArrays: outputs.map((wire) => wire.split('')),
 		};
 	});
 
