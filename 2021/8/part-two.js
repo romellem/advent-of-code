@@ -28,7 +28,7 @@ const numbers = {
 };
 
 const reverseNumbers = Object.entries(numbers).reduce((map, [num, segs]) => {
-	map.set(segs, num);
+	map.set(segs, +num);
 	return map;
 }, new Map());
 
@@ -99,7 +99,9 @@ function getNum(mapping, wire) {
 	}
 
 	for (let [arr, answer] of reverseNumbers) {
-		if (arraysAreEqual(seg, arr)) return answer;
+		if (seg.join(',') === arr.join(',')) {
+			return answer;
+		}
 	}
 }
 
@@ -146,7 +148,7 @@ function solveWires({ wires, wiresAsArrays, outputs, outputsAsArrays } = {}) {
 			if (concatSortedDeDuped(wire, seven_str) === wire) {
 				let d_or_g = _.difference(wire.split(''), seven);
 
-				[d] = _.union(d_or_g, b_or_d);
+				[d] = _.intersection(d_or_g, b_or_d);
 				[g] = d_or_g.filter((v) => v !== d);
 				[b] = b_or_d.filter((v) => v !== d);
 				solved_segments[1] = b;
