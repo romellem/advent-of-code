@@ -7,8 +7,12 @@ const input = fs
 	.split('\n')
 	.map((line) => {
 		let [before, after] = line.split(' | ');
+
+		// Sort our wires while parsing.
+		// e.g. wire 'abcd' is the same as 'dcba', so by sorting we can more easily compare them later.
 		let wires = before.split(' ').map((wire) => wire.split('').sort().join(''));
 		let outputs = after.split(' ').map((wire) => wire.split('').sort().join(''));
+
 		return {
 			wires,
 			wiresAsArrays: wires.map((wire) => wire.split('')),
