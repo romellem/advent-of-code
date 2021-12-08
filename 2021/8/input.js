@@ -7,9 +7,13 @@ const input = fs
 	.split('\n')
 	.map((line) => {
 		let [before, after] = line.split(' | ');
+		let wires = before.split(' ').map((wire) => wire.split('').sort().join(''));
+		let outputs = after.split(' ').map((wire) => wire.split('').sort().join(''));
 		return {
-			before: before.split(' '),
-			after: after.split(' '),
+			wires,
+			wiresAsArrays: wires.map((wire) => wire.split('')),
+			outputs,
+			outputsAsArrays: outputs.map((wire) => wire.split('')),
 		};
 	});
 
