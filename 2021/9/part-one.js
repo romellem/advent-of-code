@@ -1,27 +1,16 @@
-const { input } = require("./input");
-const { InfiniteGrid } = require("./infinite-grid");
+const { input } = require('./input');
+const { InfiniteGrid } = require('./infinite-grid');
+const { getLowPoints } = require('./lava');
 
-let grid = new InfiniteGrid({ defaultFactory: (x, y) => 9999 });
+let grid = new InfiniteGrid({
+	// Don't think I need the factory, but just in case
+	defaultFactory: () => 9,
+	load: input,
+});
 
-for (let y = 0; y < input.length; y++) {
-	for (let x = 0; x < input[y].length; x++) {
-		grid.set(x, y, input[y][x]);
-	}
-}
+let lows = getLowPoints(grid);
 
-let lows = [];
-for (let y = 0; y < input.length; y++) {
-	for (let x = 0; x < input[y].length; x++) {
-		let cell = grid.get(x, y);
-		let neighbors = grid.neighbors(x, y);
+// The *risk level* of a low point is 1 plus its height
+let risk_level = lows.reduce((sum, { cell }) => sum + (cell + 1), 0);
 
-		let nvs = [...neighbors.values()].map((v) => v.value);
-		if (nvs.every((n) => n > cell)) {
-			lows.push({ x, y, cell });
-		}
-	}
-}
-
-let answer = lows.reduce((sum, { cell }) => sum + (cell + 1), 0);
-
-console.log(answer);
+console.log(risk_level);
