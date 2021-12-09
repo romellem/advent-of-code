@@ -24,23 +24,27 @@ for (let y = 0; y < input.length; y++) {
 
 let basins = [];
 for (let point of lows) {
-	let ns = new Map();
+	let queue = [point];
+	let visited = new Set();
+	visited.add(InfiniteGrid.toId(point.x, point.y));
 
-	let added;
+	// let added;
 	do {
-		added = false;
-		let n = grid.neighbors(point.x, point.y);
+		// added = false;
+		let cell = queue.shift();
+		let n = grid.neighbors(cell.x, cell.y);
 		for (let { coord, value } of n.values()) {
 			let id = InfiniteGrid.toId(...coord);
-			if (value < 9 && !ns.has(id)) {
+			if (value < 9 && !visited.has(id)) {
 				let [x, y] = coord;
-				ns.set(id, { x, y, value });
-				added = true;
+				queue.push(id, { x, y, value });
+				visited.add(id);
+				// added = true;
 			}
 		}
-	} while (added);
+	} while (queue.length > 0);
 
-	basins.push(ns);
+	basins.push(visited);
 }
 
 basins.sort((m, n) => m.size - n.size);
