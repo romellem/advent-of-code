@@ -3,13 +3,21 @@
  * @example "10,5"
  */
 
+/**
+ * @typedef {Object} InfiniteGridConstructorOptions
+ * @property {?Function<x, y>} defaultFactory - Defaults to returning 0 for new coords
+ * @property {?Object} string_map - Map grid values to strings.
+ * @property {String|any[][]} load - Initial grid to load. Can be a "2D" string (string with new lines), or a "2D" array.
+ */
+
 class InfiniteGrid {
 	/**
-	 * @param {Object} options
+	 * @param {InfiniteGridConstructorOptions} options
 	 * @param {Function<x, y>} [options.defaultFactory] - Defaults to returning 0 for new coords
 	 * @param {Object} [options.string_map] - Map grid values to strings.
+	 * @param {Object} [options.string_map] - Map grid values to strings.
 	 */
-	constructor({ defaultFactory = (x, y) => 0, string_map = {} } = {}) {
+	constructor({ defaultFactory = (x, y) => 0, string_map = {}, load } = {}) {
 		this.defaultFactory = defaultFactory.bind(this);
 		this.string_map = string_map;
 		this.grid = new Map();
@@ -17,6 +25,10 @@ class InfiniteGrid {
 		this.min_x = Infinity;
 		this.max_y = -Infinity;
 		this.min_y = Infinity;
+
+		if (load) {
+			this.load(load);
+		}
 	}
 
 	/**
@@ -34,7 +46,7 @@ class InfiniteGrid {
 	 * @returns {{x: Number, y: Number} | [Number, Number]}
 	 */
 	static toCoords(id, return_as_object = false) {
-		let [x, y] = id.split(",");
+		let [x, y] = id.split(',');
 		x = parseInt(x, 10);
 		y = parseInt(y, 10);
 		return return_as_object ? { x, y } : [x, y];
@@ -45,7 +57,33 @@ class InfiniteGrid {
 	 * @returns {any[][]}
 	 */
 	static split(two_dimensional_string) {
-		return two_dimensional_string.split("\n").map((row) => row.split(""));
+		return two_dimensional_string.split('\n').map((row) => row.split(''));
+	}
+
+	reset() {
+		this.grid = new Map();
+		this.max_x = -Infinity;
+		this.min_x = Infinity;
+		this.max_y = -Infinity;
+		this.min_y = Infinity;
+		return this;
+	}
+
+	/**
+	 * @param {String|any[][]} input
+	 */
+	load(input) {
+		this.reset();
+		let grid = input;
+		if (typeof input === 'string') {
+			grid = InfiniteGrid.split(input);
+		}
+
+		for (let y = 0; y < grid.length; y++) {
+			for (let x = 0; x < grid[y].length; x++) {
+				this.set(x, y, grid[y][x]);
+			}
+		}
 	}
 
 	/**
@@ -60,10 +98,10 @@ class InfiniteGrid {
 		}
 
 		const neighbors_lookup = [
-			["N", [x, y - 1]],
-			["W", [x - 1, y]],
-			["E", [x + 1, y]],
-			["S", [x, y + 1]],
+			['N', [x, y - 1]],
+			['W', [x - 1, y]],
+			['E', [x + 1, y]],
+			['S', [x, y + 1]],
 		];
 
 		for (let [key, coord] of neighbors_lookup) {
@@ -82,7 +120,7 @@ class InfiniteGrid {
 	 * @param {any} value
 	 */
 	set(x, y, value) {
-		if (typeof x !== "number" || typeof y !== "number") {
+		if (typeof x !== 'number' || typeof y !== 'number') {
 			throw new Error(`x and y must be numbers, got (${typeof x})${x} and (${typeof y})${y}`);
 		}
 		if (x < this.min_x) this.min_x = x;
@@ -131,7 +169,7 @@ class InfiniteGrid {
 		const infinite_grid_clone = new InfiniteGrid();
 		const new_map = new Map();
 		for (let [key, val] of this.grid) {
-			new_map.set(key, typeof val === "object" ? JSON.parse(JSON.stringify(val)) : val);
+			new_map.set(key, typeof val === 'object' ? JSON.parse(JSON.stringify(val)) : val);
 		}
 		infinite_grid_clone.defaultFactory = this.defaultFactory.bind(this);
 		infinite_grid_clone.string_map = JSON.parse(JSON.stringify(this.string_map));
@@ -169,15 +207,15 @@ class InfiniteGrid {
 
 	toString() {
 		let grid = this.toGrid();
-		let rows = "";
+		let rows = '';
 		for (let y = 0; y < grid.length; y++) {
-			let row = "";
+			let row = '';
 			for (let x = 0; x < grid[y].length; x++) {
 				let cell = grid[y][x];
 				let cell_string = cell in this.string_map ? this.string_map[cell] : String(cell);
 				row += cell_string;
 			}
-			rows += rows.length ? "\n" + row : row;
+			rows += rows.length ? '\n' + row : row;
 		}
 
 		return rows;
