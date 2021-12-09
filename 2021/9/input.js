@@ -7,7 +7,7 @@ const input = fs
 	.trim()
 	.split("\n")
 	.map((line) => {
-		return line;
+		return line.split("").map((v) => +v);
 	});
 
 module.exports = {
