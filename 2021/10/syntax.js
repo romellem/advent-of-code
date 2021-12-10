@@ -1,11 +1,18 @@
 const open_chars = new Set(['(', '[', '{', '<']);
 const closed_chars = new Set([')', ']', '}', '>']);
 
-const score = {
+const CORRUPTED_SCORE = {
 	')': 3,
 	']': 57,
 	'}': 1197,
 	'>': 25137,
+};
+
+const INCOMPLETE_SCORE = {
+	')': 1,
+	']': 2,
+	'}': 3,
+	'>': 4,
 };
 
 const chars = {
@@ -52,5 +59,9 @@ const getLineStatus = (_line) => {
 
 module.exports = {
 	getLineStatus,
-	score,
+	CORRUPTED_SCORE,
+	INCOMPLETE_SCORE,
+	open_chars,
+	closed_chars,
+	chars,
 };
