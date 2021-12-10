@@ -7,7 +7,6 @@ const incomplete_scores = input
 		if (status.incomplete) {
 			// I need to reverse the stack first to get the correct "completion" order
 			const completion_string = status.stack.reverse().map((c) => chars[c]);
-			console.log(completion_string.join(''));
 			const completion_score = completion_string.reduce((sum, char) => {
 				sum *= 5;
 				sum += INCOMPLETE_SCORE[char];
