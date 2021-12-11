@@ -2,9 +2,8 @@ const { input } = require('./input');
 const { InfiniteGrid } = require('./infinite-grid');
 
 let grid = new InfiniteGrid({
-	// Don't think I need the factory, but just in case
-	defaultFactory: () => 0,
 	load: input,
+	parseAs: Number,
 });
 
 function doFlashing(flashed) {

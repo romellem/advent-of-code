@@ -3,6 +3,7 @@ const { InfiniteGrid } = require('./infinite-grid');
 
 let grid = new InfiniteGrid({
 	load: input,
+	parseAs: Number,
 });
 
 function doFlashing(flashed) {
