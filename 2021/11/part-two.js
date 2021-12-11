@@ -12,21 +12,24 @@ function doFlashing(flashed) {
 		let neighbors = grid.neighbors(...InfiniteGrid.toCoords(id), true);
 
 		for (let { coord, value } of neighbors.values()) {
-			let v = value;
-			let new_v = v + 1;
-			if (v <= 9 && new_v > 9) {
-				new_flashes.push(InfiniteGrid.toId(...coord));
+			let [x, y] = coord;
+			let new_value = value + 1;
+
+			// Only flash once when we are at 10 energy
+			if (new_value === 10) {
+				new_flashes.push(InfiniteGrid.toId(x, y));
 			}
-			grid.set(...coord, v + 1);
+
+			grid.set(x, y, new_value);
 		}
 	}
 
 	return new_flashes;
 }
 
-let count = 0;
-let i = 0;
-while (true) {
+let all_flashed = false;
+let step = 0;
+while (!all_flashed) {
 	let flashed = [];
 	for (let [id, value] of grid) {
 		let new_value = value + 1;
@@ -36,13 +39,11 @@ while (true) {
 		}
 	}
 
-	count += flashed.length;
-
 	while (flashed.length > 0) {
 		flashed = doFlashing(flashed);
-		count += flashed.length;
 	}
 
+	// Count and reset all flashed octos back to `0`
 	let total_flashed = 0;
 	for (let [id, value] of grid) {
 		if (value > 9) {
@@ -50,9 +51,14 @@ while (true) {
 			grid.grid.set(id, 0);
 		}
 	}
-	i++;
+
+	// The step is finished, increment
+	step++;
+
 	if (total_flashed === 100) {
-		console.log(i);
-		break;
+		// We can break our loop, we have our answer
+		all_flashed = true;
 	}
 }
+
+console.log(step);
