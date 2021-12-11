@@ -2,8 +2,6 @@ const { input } = require('./input');
 const { InfiniteGrid } = require('./infinite-grid');
 
 let grid = new InfiniteGrid({
-	// Don't think I need the factory, but just in case
-	defaultFactory: () => 0,
 	load: input,
 });
 
@@ -26,7 +24,8 @@ function doFlashing(flashed) {
 }
 
 let count = 0;
-for (let i = 0; i < 100; i++) {
+let i = 0;
+while (true) {
 	let flashed = [];
 	for (let [id, value] of grid) {
 		let new_value = value + 1;
@@ -43,11 +42,16 @@ for (let i = 0; i < 100; i++) {
 		count += flashed.length;
 	}
 
+	let total_flashed = 0;
 	for (let [id, value] of grid) {
 		if (value > 9) {
+			total_flashed++;
 			grid.grid.set(id, 0);
 		}
 	}
+	i++;
+	if (total_flashed === 100) {
+		console.log(i);
+		break;
+	}
 }
-
-console.log(count);
