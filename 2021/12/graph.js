@@ -68,6 +68,7 @@ class Graph {
 				let dead_end = true;
 				for (let j = 0; j < tail.connections.length; j++) {
 					const connection = tail.connections[j];
+					let mark_path_with_two_small_caves = false;
 					if (isLowerCase(connection) && path.includes(connection)) {
 						if (
 							visit_single_small_cave_twice &&
@@ -79,7 +80,7 @@ class Graph {
 							 * Abuse JS objects and mark the array that is has a duplicate
 							 * small cave within its path, but only the one.
 							 */
-							path.small_cave_twice = true;
+							mark_path_with_two_small_caves = true;
 						} else {
 							// We already visited the lowercase cave, skip it
 							continue;
@@ -92,10 +93,14 @@ class Graph {
 
 						// We also don't need to take another path, its the same one we are on
 						path.push(connection);
+
+						if (mark_path_with_two_small_caves) {
+							path.small_cave_twice = true;
+						}
 					} else {
 						// Add new paths
 						let new_path = path.slice(0, -1);
-						if (visit_single_small_cave_twice && path.small_cave_twice) {
+						if (mark_path_with_two_small_caves) {
 							new_path.small_cave_twice = true;
 						}
 						new_path.push(connection);
