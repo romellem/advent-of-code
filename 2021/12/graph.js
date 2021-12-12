@@ -50,7 +50,8 @@ class Graph {
 						path_lookup[connection] = 0;
 					}
 
-					if (isLowerCase(connection)) {
+					const not_start_or_end = connection !== 'start' && connection !== 'end';
+					if (isLowerCase(connection) && not_start_or_end) {
 						// If we have visited the lowercase node, then don't allow 2nd visits
 						if (path_lookup[connection]) {
 							continue;
