@@ -48,7 +48,7 @@ class Graph {
 		}
 	}
 
-	getPaths(start, end) {
+	getPaths(start, end, { visit_single_small_cave_twice = false } = {}) {
 		const finished = [];
 		const paths = [[start]];
 		while (paths.length > 0) {
@@ -69,8 +69,16 @@ class Graph {
 				for (let j = 0; j < tail.connections.length; j++) {
 					const connection = tail.connections[j];
 					if (isLowerCase(connection) && path.includes(connection)) {
-						// We already visited the lowercase cave, skip it
-						continue;
+						if (visit_single_small_cave_twice && !path.small_cave_twice) {
+							/**
+							 * Abuse JS objects and mark the array that is has a duplicate
+							 * small cave within its path, but only the one.
+							 */
+							path.small_cave_twice = true;
+						} else {
+							// We already visited the lowercase cave, skip it
+							continue;
+						}
 					}
 
 					if (dead_end) {
@@ -82,6 +90,9 @@ class Graph {
 					} else {
 						// Add new paths
 						let new_path = path.slice(0, -1);
+						if (visit_single_small_cave_twice && path.small_cave_twice) {
+							new_path.small_cave_twice = true;
+						}
 						new_path.push(connection);
 						to_add.push(new_path);
 					}
@@ -98,45 +109,6 @@ class Graph {
 		}
 
 		return finished;
-	}
-
-	_countPaths = _.memoize(
-		(node_id, count = 0) => {
-			const node = this.nodes.get(node_id);
-
-			if (node_id === 'end') {
-				return count;
-			}
-
-			count++;
-			// } else {
-			// Otherwise recurse through all the adjacent vertices
-			const start_node = this.nodes.get(start);
-			for (let connection of start_node.connections) {
-				if (!path_lookup[connection]) {
-					path_lookup[connection] = 0;
-				}
-
-				// const not_start_or_end = connection !== 'start' && connection !== 'end';
-				if (isLowerCase(connection) && connection !== 'end') {
-					// If we have visited the lowercase node, then don't allow 2nd visits
-					if (path_lookup[connection]) {
-						continue;
-					}
-				}
-				path_lookup[connection]++;
-
-				count += this.countPaths(connection, end, count, path_lookup);
-			}
-			// }
-
-			return count;
-		},
-		(start, end) => (start < end ? start + '-' + end : end + '-' + start)
-	);
-
-	countPaths() {
-		return this._countPaths('start', 0);
 	}
 }
 
