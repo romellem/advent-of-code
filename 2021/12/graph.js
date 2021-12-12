@@ -73,11 +73,11 @@ class Graph {
 						continue;
 					}
 
-					// If we are here, we can take another stop
-					dead_end = false;
+					if (dead_end) {
+						// If we are here, we can take another stop
+						dead_end = false;
 
-					if (j === 0) {
-						// No new path
+						// We also don't need to take another path, its the same one we are on
 						path.push(connection);
 					} else {
 						// Add new paths
