@@ -40,7 +40,39 @@ class Graph {
 		}
 	}
 
-	countPaths = _.memoize(
+	countPaths = (() => {
+		const cache = new Map();
+		const paths = [];
+
+		return (start, end, i = 0) => {
+			if (!paths.length) {
+				paths.push([start]);
+			}
+
+			let count = 0;
+			let still_walking = true;
+			while (still_walking) {
+				still_walking = false;
+				let to_add = [];
+				for (let path of paths) {
+					let tail_id = path[path.length - 1];
+					let tail_node = this.nodes.get(tail_id);
+
+					if (tail_node.connections.length === 1) {
+						// Only have one step to take
+						path.push(tail_node.connections[0]);
+					} else {
+						
+					}
+				}
+			}
+			
+			
+
+			const start_node = this.nodes.get(start);
+			
+		}
+	})();
 		(start, end, count = 0, path_lookup = { start: 1 }) => {
 			// If current vertex is same as destination, then increment count
 			if (start === end) {
