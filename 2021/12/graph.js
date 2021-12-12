@@ -69,7 +69,12 @@ class Graph {
 				for (let j = 0; j < tail.connections.length; j++) {
 					const connection = tail.connections[j];
 					if (isLowerCase(connection) && path.includes(connection)) {
-						if (visit_single_small_cave_twice && !path.small_cave_twice) {
+						if (
+							visit_single_small_cave_twice &&
+							!path.small_cave_twice &&
+							connection !== start &&
+							connection !== end
+						) {
 							/**
 							 * Abuse JS objects and mark the array that is has a duplicate
 							 * small cave within its path, but only the one.
