@@ -2,5 +2,5 @@ const { input } = require('./input');
 const { Graph } = require('./graph');
 
 let graph = new Graph(input);
-let count = graph.countPaths('start', 'end');
-console.log(count);
+let paths = graph.getPaths('start', 'end');
+console.log(paths.length);
