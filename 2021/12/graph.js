@@ -1,0 +1,71 @@
+const _ = require('lodash');
+
+class Node {
+	constructor(id) {
+		this.id = id;
+		this.connections = new Set();
+	}
+}
+
+function isLowerCase(str) {
+	return str === str.toLowerCase();
+}
+
+class Graph {
+	/**
+	 * @param {Array<[from, to]>} connections
+	 */
+	constructor(connections) {
+		const node_ids = new Set(connections.flat());
+
+		this.nodes = new Map();
+		for (let node_id of node_ids) {
+			this.nodes.set(node_id, new Node(node_id));
+		}
+
+		// Edits `this.nodes` in place
+		this.buildEdges(connections);
+	}
+
+	buildEdges(connections) {
+		for (let [a, b] of connections) {
+			const node_a = this.nodes.get(a);
+			const node_b = this.nodes.get(b);
+			node_a.connections.add(b);
+			node_b.connections.add(a);
+		}
+	}
+
+	countPaths = _.memoize(
+		(start, end, count = 0, path_lookup = {}) => {
+			// If current vertex is same as destination, then increment count
+			if (start === end) {
+				count++;
+			} else {
+				// Otherwise recurse through all the adjacent vertices
+
+				const start_node = this.nodes.get(start);
+				for (let connection of start_node.connections) {
+					if (!path_lookup[connection]) {
+						path_lookup[connection] = 0;
+					}
+
+					if (isLowerCase(connection)) {
+						// If we have visited the lowercase node, then don't allow 2nd visits
+						if (path_lookup[connection]) {
+							continue;
+						}
+					}
+					path_lookup[connection]++;
+
+					count += this.countPaths(connection, end, count, path_lookup);
+				}
+			}
+
+			return count;
+		},
+		(start, end) => (start < end ? start + '-' + end : end + '-' + start)
+	);
+}
+
+module.exports = { Node, Graph };
