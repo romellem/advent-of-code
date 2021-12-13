@@ -9,7 +9,7 @@ function isLowerCase(str) {
 let graph = new Graph(input);
 let paths = graph.getPaths('start', 'end', { visit_single_small_cave_twice: true });
 
-console.log(paths.join('\n'));
+// console.log(paths.join('\n'));
 
 console.log(paths.length);
 

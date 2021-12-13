@@ -2,11 +2,13 @@ function isLowerCase(str) {
 	return str === str.toLowerCase();
 }
 
-function canAddSmallCave(path) {
+function canAddSmallCave(path, will_be_new_path) {
 	let small_caves = new Set();
 
-	// If all lower case caves are unique, we can add the next small
-	for (let cave of path) {
+	// If all lower case caves are unique, we can add the next small cave
+	const length = will_be_new_path ? path.length - 1 : path.length;
+	for (let i = 0; i < length; i++) {
+		const cave = path[i];
 		if (!isLowerCase(cave) || cave === 'start') {
 			continue;
 		}
@@ -89,7 +91,7 @@ class Graph {
 							visit_single_small_cave_twice &&
 							connection !== start &&
 							connection !== end &&
-							canAddSmallCave(path)
+							canAddSmallCave(path, !dead_end)
 						) {
 							// Do nothing, allow the small cave to be added to the path
 						} else {
