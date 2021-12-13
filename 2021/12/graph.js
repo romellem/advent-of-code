@@ -1,10 +1,50 @@
 const _ = require('lodash');
 const Queue = require('double-ended-queue');
 
+class Path {
+	constructor(...initial_values) {
+		this.arr = initial_values;
+		this.small_cave_counts = new Map();
+	}
+
+	includes(value) {
+		return this.arr.includes(value);
+	}
+
+	push(value) {
+		if (isLowerCase(value) && value !== 'start' && value !== 'end') {
+			this.small_cave_counts.set(value, (this.small_cave_counts.get(value) || 0) + 1);
+		}
+
+		return this.arr.push(value);
+	}
+
+	slice(start, end) {
+		let new_path = new Path();
+		new_path.arr = this.arr.slice(start, end);
+		return new_path;
+	}
+
+	hasDuplicateSmallCave() {
+		for (let count of this.small_cave_counts.values()) {
+			if (count > 1) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	toString() {
+		return this.arr.toString();
+	}
+}
+
 class Node {
 	constructor(id) {
 		this.id = id;
-		// this.connections = new Set();
+
+		// Only use an array to make watching / debugging easier
 		this.connections = [];
 		this.visited = false;
 	}
@@ -35,10 +75,13 @@ class Graph {
 			const node_a = this.nodes.get(a);
 			const node_b = this.nodes.get(b);
 
-			if (!node_a.connections.includes(b)) node_a.connections.push(b);
-			if (!node_b.connections.includes(a)) node_b.connections.push(a);
-			// node_a.connections.add(b);
-			// node_b.connections.add(a);
+			// This only happens once, and our connections are short enough this isn't too taxing
+			if (!node_a.connections.includes(b)) {
+				node_a.connections.push(b);
+			}
+			if (!node_b.connections.includes(a)) {
+				node_b.connections.push(a);
+			}
 		}
 	}
 
@@ -50,7 +93,8 @@ class Graph {
 
 	getPaths(start, end, { visit_single_small_cave_twice = false } = {}) {
 		const finished = [];
-		const paths = [[start]];
+		const initial = visit_single_small_cave_twice ? new Path(start) : [start];
+		const paths = [initial];
 		while (paths.length > 0) {
 			let to_add = [];
 			for (let i = 0; i < paths.length; i++) {
@@ -72,15 +116,11 @@ class Graph {
 					if (isLowerCase(connection) && path.includes(connection)) {
 						if (
 							visit_single_small_cave_twice &&
-							!path.small_cave_twice &&
+							!path.hasDuplicateSmallCave() &&
 							connection !== start &&
 							connection !== end
 						) {
-							/**
-							 * Abuse JS objects and mark the array that is has a duplicate
-							 * small cave within its path, but only the one.
-							 */
-							mark_path_with_two_small_caves = true;
+							// Do nothing
 						} else {
 							// We already visited the lowercase cave, skip it
 							continue;
@@ -93,16 +133,10 @@ class Graph {
 
 						// We also don't need to take another path, its the same one we are on
 						path.push(connection);
-
-						if (mark_path_with_two_small_caves) {
-							path.small_cave_twice = true;
-						}
 					} else {
 						// Add new paths
 						let new_path = path.slice(0, -1);
-						if (mark_path_with_two_small_caves || path.small_cave_twice) {
-							new_path.small_cave_twice = true;
-						}
+
 						new_path.push(connection);
 						to_add.push(new_path);
 					}
