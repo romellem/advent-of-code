@@ -100,7 +100,7 @@ class Graph {
 					} else {
 						// Add new paths
 						let new_path = path.slice(0, -1);
-						if (mark_path_with_two_small_caves) {
+						if (mark_path_with_two_small_caves || path.small_cave_twice) {
 							new_path.small_cave_twice = true;
 						}
 						new_path.push(connection);
