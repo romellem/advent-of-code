@@ -14,32 +14,36 @@ for (let [x, y] of input) {
 }
 
 for (let { axis, line } of folds) {
-	let points_below_right = [];
-	let points_above_left = [];
+	let points_to_fold_across = [];
 	for (let [id, cell] of grid) {
-		if (cell === 0) continue;
+		// This shouldn't happen, but just in case
+		if (cell === 0) {
+			continue;
+		}
 
 		let [x, y] = InfiniteGrid.toCoords(id);
 		const compare = axis === 'x' ? x : y;
+
 		if (compare < line) {
-			points_above_left.push([x, y]);
-		} else if (compare > line) {
-			points_below_right.push([x, y]);
-		} else {
-			console.log('err');
+			// This point is above / to the left of the line, it stays
+			continue;
 		}
+
+		// This point is below the line (if folding along y) or to the right (if folding along x)
+		points_to_fold_across.push([x, y]);
 	}
 
-	for (let [x, y] of points_below_right) {
+	for (let [x, y] of points_to_fold_across) {
 		if (axis === 'x') {
 			let new_x = line - Math.abs(x - line);
 			grid.set(new_x, y, 1);
-			grid.grid.delete(InfiniteGrid.toId(x, y));
 		} else {
 			let new_y = line - Math.abs(y - line);
 			grid.set(x, new_y, 1);
-			grid.grid.delete(InfiniteGrid.toId(x, y));
 		}
+
+		// Remove point from grid map directly. Don't worry about resizing just yet, we can do that at the very end.
+		grid.grid.delete(InfiniteGrid.toId(x, y));
 	}
 }
 
