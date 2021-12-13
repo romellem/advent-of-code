@@ -926,10 +926,10 @@ fold along y=27
 fold along y=13
 fold along y=6`
 	.split('\n')
-	.map((line) => {
-		let [axis, amount] = line.replace('fold along ', '').split('=');
-		amount = +amount;
-		return { axis, amount };
+	.map((q) => {
+		let [axis, line] = q.replace('fold along ', '').split('=');
+		line = +line;
+		return { axis, line };
 	});
 
 module.exports = {
