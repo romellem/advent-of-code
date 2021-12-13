@@ -37,6 +37,7 @@ let paths = graph.getPaths('start', 'end', { visit_single_small_cave_twice: true
 // });
 
 console.log(paths.length);
+console.log(paths.join('\n'));
 // console.log(correct_paths.length);
 
 // 9151 too low

@@ -7,6 +7,10 @@ class Path {
 		this.small_cave_counts = new Map();
 	}
 
+	get tail() {
+		return this.arr[this.arr.length - 1];
+	}
+
 	includes(value) {
 		return this.arr.includes(value);
 	}
@@ -22,6 +26,10 @@ class Path {
 	slice(start, end) {
 		let new_path = new Path();
 		new_path.arr = this.arr.slice(start, end);
+		new_path.small_cave_counts = new Map();
+		for (let [key, value] of this.small_cave_counts) {
+			new_path.small_cave_counts.set(key, value);
+		}
 		return new_path;
 	}
 
@@ -100,7 +108,7 @@ class Graph {
 			for (let i = 0; i < paths.length; i++) {
 				const path = paths[i];
 
-				const tail_id = path[path.length - 1];
+				const tail_id = visit_single_small_cave_twice ? path.tail : path[path.length - 1];
 				if (tail_id === end) {
 					finished.push(path);
 					paths.splice(i, 1);
@@ -112,7 +120,6 @@ class Graph {
 				let dead_end = true;
 				for (let j = 0; j < tail.connections.length; j++) {
 					const connection = tail.connections[j];
-					let mark_path_with_two_small_caves = false;
 					if (isLowerCase(connection) && path.includes(connection)) {
 						if (
 							visit_single_small_cave_twice &&
@@ -149,7 +156,10 @@ class Graph {
 				}
 			}
 
-			paths.push(...to_add);
+			for (let value of to_add) {
+				paths.push(value);
+			}
+			// paths.push(...to_add);
 		}
 
 		return finished;
