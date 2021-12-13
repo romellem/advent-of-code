@@ -4,7 +4,7 @@ const { InfiniteGrid } = require('./infinite-grid');
 let grid = new InfiniteGrid({
 	defaultFactory: () => 0,
 	string_map: {
-		0: '.',
+		0: ' ',
 		1: '#',
 	},
 });
@@ -40,8 +40,9 @@ for (let { axis, line } of folds) {
 			grid.set(x, new_y, 1);
 			grid.grid.delete(InfiniteGrid.toId(x, y));
 		}
-		grid.resize();
 	}
 }
+
+grid.resize();
 
 console.log(grid.toString());
