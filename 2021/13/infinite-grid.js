@@ -14,9 +14,6 @@
 class InfiniteGrid {
 	/**
 	 * @param {InfiniteGridConstructorOptions} options
-	 * @param {Function<x, y>} [options.defaultFactory] - Defaults to returning 0 for new coords
-	 * @param {Object} [options.string_map] - Map grid values to strings.
-	 * @param {Object} [options.string_map] - Map grid values to strings.
 	 */
 	constructor({ defaultFactory = (x, y) => 0, string_map = {}, load, parseAs } = {}) {
 		this.defaultFactory = defaultFactory.bind(this);
@@ -211,6 +208,21 @@ class InfiniteGrid {
 		}
 
 		return sum;
+	}
+
+	resize() {
+		this.max_x = -Infinity;
+		this.min_x = Infinity;
+		this.max_y = -Infinity;
+		this.min_y = Infinity;
+
+		for (let [id, value] of this.grid) {
+			let [x, y] = InfiniteGrid.toCoords(id);
+			if (x < this.min_x) this.min_x = x;
+			if (x > this.max_x) this.max_x = x;
+			if (y < this.min_y) this.min_y = y;
+			if (y > this.max_y) this.max_y = y;
+		}
 	}
 
 	toString() {

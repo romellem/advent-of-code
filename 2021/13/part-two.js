@@ -3,6 +3,10 @@ const { InfiniteGrid } = require('./infinite-grid');
 
 let grid = new InfiniteGrid({
 	defaultFactory: () => 0,
+	string_map: {
+		0: '.',
+		1: '#',
+	},
 });
 
 for (let [x, y] of input) {
@@ -10,8 +14,6 @@ for (let [x, y] of input) {
 }
 
 for (let { axis, line } of folds) {
-	// let { axis, line } = folds[0];
-
 	let points_below_right = [];
 	let points_above_left = [];
 	for (let [id, cell] of grid) {
@@ -19,7 +21,6 @@ for (let { axis, line } of folds) {
 
 		let [x, y] = InfiniteGrid.toCoords(id);
 		const compare = axis === 'x' ? x : y;
-		// if (axis === 'x') {
 		if (compare < line) {
 			points_above_left.push([x, y]);
 		} else if (compare > line) {
@@ -27,26 +28,20 @@ for (let { axis, line } of folds) {
 		} else {
 			console.log('err');
 		}
-		// }
 	}
 
 	for (let [x, y] of points_below_right) {
 		if (axis === 'x') {
 			let new_x = line - Math.abs(x - line);
 			grid.set(new_x, y, 1);
-			grid.set(x, y, 0);
+			grid.grid.delete(InfiniteGrid.toId(x, y));
 		} else {
 			let new_y = line - Math.abs(y - line);
 			grid.set(x, new_y, 1);
-			grid.set(x, y, 0);
+			grid.grid.delete(InfiniteGrid.toId(x, y));
 		}
-		// grid.set(x, y, 0);
+		grid.resize();
 	}
 }
-
-// let sum = 0;
-// for (let [id, cell] of grid) {
-// 	sum += cell;
-// }
 
 console.log(grid.toString());

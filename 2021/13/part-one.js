@@ -44,9 +44,4 @@ for (let [x, y] of points_below_right) {
 }
 // }
 
-let sum = 0;
-for (let [id, cell] of grid) {
-	sum += cell;
-}
-
-console.log(sum);
+console.log(grid.sum());

@@ -17,8 +17,6 @@ const folds = raw_folds.split('\n').map((q) => {
 	return { axis, line };
 });
 
-console.log(folds);
-
 module.exports = {
 	input,
 	folds,
