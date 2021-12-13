@@ -2,33 +2,10 @@ function isLowerCase(str) {
 	return str === str.toLowerCase();
 }
 
-function canAddSmallCave(path, will_be_new_path) {
-	let small_caves = new Set();
-
-	// If all lower case caves are unique, we can add the next small cave
-	const length = will_be_new_path ? path.length - 1 : path.length;
-	for (let i = 0; i < length; i++) {
-		const cave = path[i];
-		if (!isLowerCase(cave) || cave === 'start') {
-			continue;
-		}
-
-		if (small_caves.has(cave)) {
-			return false;
-		}
-
-		small_caves.add(cave);
-	}
-
-	return true;
-}
-
 class Node {
 	constructor(id) {
 		this.id = id;
-		// this.connections = new Set();
-		this.connections = [];
-		this.visited = false;
+		this.connections = new Set();
 	}
 }
 
@@ -48,21 +25,40 @@ class Graph {
 		this.buildEdges(connections);
 	}
 
+	/**
+	 * This is slow to do every time we check a new node but it was the best I could come up with.
+	 */
+	static canAddSmallCave(path, will_be_new_path) {
+		let small_caves = new Set();
+
+		// Since we update `path` for first step, don't include that part we will slice off later when testing the cave
+		const length = will_be_new_path ? path.length - 1 : path.length;
+		for (let i = 0; i < length; i++) {
+			const cave = path[i];
+			if (!isLowerCase(cave) || cave === 'start') {
+				continue;
+			}
+
+			// All small caves are not unique, we can't add another one
+			if (small_caves.has(cave)) {
+				return false;
+			}
+
+			small_caves.add(cave);
+		}
+
+		return true;
+	}
+
 	buildEdges(connections) {
 		for (let [a, b] of connections) {
 			const node_a = this.nodes.get(a);
 			const node_b = this.nodes.get(b);
 
-			if (!node_a.connections.includes(b)) node_a.connections.push(b);
-			if (!node_b.connections.includes(a)) node_b.connections.push(a);
-			// node_a.connections.add(b);
-			// node_b.connections.add(a);
-		}
-	}
-
-	resetNodes() {
-		for (let node of this.nodes.values()) {
-			node.visited = false;
+			// if (!node_a.connections.includes(b)) node_a.connections.push(b);
+			// if (!node_b.connections.includes(a)) node_b.connections.push(a);
+			node_a.connections.add(b);
+			node_b.connections.add(a);
 		}
 	}
 
@@ -84,18 +80,18 @@ class Graph {
 
 				const tail = this.nodes.get(tail_id);
 				let dead_end = true;
-				for (let j = 0; j < tail.connections.length; j++) {
-					const connection = tail.connections[j];
+				for (let connection of tail.connections) {
 					if (isLowerCase(connection) && path.includes(connection)) {
 						if (
 							visit_single_small_cave_twice &&
 							connection !== start &&
 							connection !== end &&
-							canAddSmallCave(path, !dead_end)
+							Graph.canAddSmallCave(path, !dead_end)
 						) {
 							// Do nothing, allow the small cave to be added to the path
 						} else {
 							// We already visited the lowercase cave, skip it
+							// Note that for part one, we alway arrive at this branch since `visit_single_small_cave_twice` is false
 							continue;
 						}
 					}
