@@ -55,8 +55,6 @@ class Graph {
 			const node_a = this.nodes.get(a);
 			const node_b = this.nodes.get(b);
 
-			// if (!node_a.connections.includes(b)) node_a.connections.push(b);
-			// if (!node_b.connections.includes(a)) node_b.connections.push(a);
 			node_a.connections.add(b);
 			node_b.connections.add(a);
 		}
