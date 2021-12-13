@@ -1,65 +1,33 @@
-const _ = require('lodash');
-const Queue = require('double-ended-queue');
+function isLowerCase(str) {
+	return str === str.toLowerCase();
+}
 
-class Path {
-	constructor(...initial_values) {
-		this.arr = initial_values;
-		this.small_cave_counts = new Map();
-	}
+function canAddSmallCave(path) {
+	let small_caves = new Set();
 
-	get tail() {
-		return this.arr[this.arr.length - 1];
-	}
-
-	includes(value) {
-		return this.arr.includes(value);
-	}
-
-	push(value) {
-		if (isLowerCase(value) && value !== 'start' && value !== 'end') {
-			this.small_cave_counts.set(value, (this.small_cave_counts.get(value) || 0) + 1);
+	// If all lower case caves are unique, we can add the next small
+	for (let cave of path) {
+		if (!isLowerCase(cave) || cave === 'start') {
+			continue;
 		}
 
-		return this.arr.push(value);
-	}
-
-	slice(start, end) {
-		let new_path = new Path();
-		new_path.arr = this.arr.slice(start, end);
-		new_path.small_cave_counts = new Map();
-		for (let [key, value] of this.small_cave_counts) {
-			new_path.small_cave_counts.set(key, value);
-		}
-		return new_path;
-	}
-
-	hasDuplicateSmallCave() {
-		for (let count of this.small_cave_counts.values()) {
-			if (count > 1) {
-				return true;
-			}
+		if (small_caves.has(cave)) {
+			return false;
 		}
 
-		return false;
+		small_caves.add(cave);
 	}
 
-	toString() {
-		return this.arr.toString();
-	}
+	return true;
 }
 
 class Node {
 	constructor(id) {
 		this.id = id;
-
-		// Only use an array to make watching / debugging easier
+		// this.connections = new Set();
 		this.connections = [];
 		this.visited = false;
 	}
-}
-
-function isLowerCase(str) {
-	return str === str.toLowerCase();
 }
 
 class Graph {
@@ -83,13 +51,10 @@ class Graph {
 			const node_a = this.nodes.get(a);
 			const node_b = this.nodes.get(b);
 
-			// This only happens once, and our connections are short enough this isn't too taxing
-			if (!node_a.connections.includes(b)) {
-				node_a.connections.push(b);
-			}
-			if (!node_b.connections.includes(a)) {
-				node_b.connections.push(a);
-			}
+			if (!node_a.connections.includes(b)) node_a.connections.push(b);
+			if (!node_b.connections.includes(a)) node_b.connections.push(a);
+			// node_a.connections.add(b);
+			// node_b.connections.add(a);
 		}
 	}
 
@@ -101,14 +66,13 @@ class Graph {
 
 	getPaths(start, end, { visit_single_small_cave_twice = false } = {}) {
 		const finished = [];
-		const initial = visit_single_small_cave_twice ? new Path(start) : [start];
-		const paths = [initial];
+		const paths = [[start]];
 		while (paths.length > 0) {
 			let to_add = [];
 			for (let i = 0; i < paths.length; i++) {
 				const path = paths[i];
 
-				const tail_id = visit_single_small_cave_twice ? path.tail : path[path.length - 1];
+				const tail_id = path[path.length - 1];
 				if (tail_id === end) {
 					finished.push(path);
 					paths.splice(i, 1);
@@ -123,11 +87,11 @@ class Graph {
 					if (isLowerCase(connection) && path.includes(connection)) {
 						if (
 							visit_single_small_cave_twice &&
-							!path.hasDuplicateSmallCave() &&
 							connection !== start &&
-							connection !== end
+							connection !== end &&
+							canAddSmallCave(path)
 						) {
-							// Do nothing
+							// Do nothing, allow the small cave to be added to the path
 						} else {
 							// We already visited the lowercase cave, skip it
 							continue;
@@ -156,10 +120,7 @@ class Graph {
 				}
 			}
 
-			for (let value of to_add) {
-				paths.push(value);
-			}
-			// paths.push(...to_add);
+			paths.push(...to_add);
 		}
 
 		return finished;
