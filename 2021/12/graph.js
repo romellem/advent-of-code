@@ -95,7 +95,7 @@ class Graph {
 					}
 
 					if (dead_end) {
-						// If we are here, we can take another stop
+						// If we are here, we can take another step
 						dead_end = false;
 
 						// We also don't need to take another path, its the same one we are on
