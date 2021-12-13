@@ -11,6 +11,7 @@ for (let [x, y] of input) {
 
 // for (let { axis, line } of folds) {
 let { axis, line } = folds[0];
+
 let points_below_right = [];
 let points_above_left = [];
 for (let [id, cell] of grid) {
@@ -31,10 +32,12 @@ for (let [id, cell] of grid) {
 
 for (let [x, y] of points_below_right) {
 	if (axis === 'x') {
-		grid.set(x - Math.abs(x - line), y, 1);
+		let new_x = line - Math.abs(x - line);
+		grid.set(new_x, y, 1);
 		grid.set(x, y, 0);
 	} else {
-		grid.set(x, y - Math.abs(y - line), 1);
+		let new_y = line - Math.abs(y - line);
+		grid.set(x, new_y, 1);
 		grid.set(x, y, 0);
 	}
 	// grid.set(x, y, 0);
