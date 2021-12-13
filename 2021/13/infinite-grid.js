@@ -7,7 +7,8 @@
  * @typedef {Object} InfiniteGridConstructorOptions
  * @property {?Function<x, y>} defaultFactory - Defaults to returning 0 for new coords
  * @property {?Object} string_map - Map grid values to strings.
- * @property {String|any[][]} load - Initial grid to load. Can be a "2D" string (string with new lines), or a "2D" array.
+ * @property {?String|any[][]} load - Initial grid to load. Can be a "2D" string (string with new lines), or a "2D" array.
+ * @property {?Function<v>} parseAs - When `load` is defined, this parses the cell in the split string. Defaults to `String`.
  */
 
 class InfiniteGrid {
@@ -17,7 +18,7 @@ class InfiniteGrid {
 	 * @param {Object} [options.string_map] - Map grid values to strings.
 	 * @param {Object} [options.string_map] - Map grid values to strings.
 	 */
-	constructor({ defaultFactory = (x, y) => 0, string_map = {}, load } = {}) {
+	constructor({ defaultFactory = (x, y) => 0, string_map = {}, load, parseAs } = {}) {
 		this.defaultFactory = defaultFactory.bind(this);
 		this.string_map = string_map;
 		this.grid = new Map();
@@ -27,7 +28,7 @@ class InfiniteGrid {
 		this.min_y = Infinity;
 
 		if (load) {
-			this.load(load);
+			this.load(load, parseAs);
 		}
 	}
 
@@ -72,7 +73,7 @@ class InfiniteGrid {
 	/**
 	 * @param {String|any[][]} input
 	 */
-	load(input) {
+	load(input, parseAs = String) {
 		this.reset();
 		let grid = input;
 		if (typeof input === 'string') {
@@ -81,7 +82,7 @@ class InfiniteGrid {
 
 		for (let y = 0; y < grid.length; y++) {
 			for (let x = 0; x < grid[y].length; x++) {
-				this.set(x, y, grid[y][x]);
+				this.set(x, y, parseAs(grid[y][x]));
 			}
 		}
 	}
@@ -89,9 +90,10 @@ class InfiniteGrid {
 	/**
 	 * @param {Number} x
 	 * @param {Number} y
+	 * @param {Boolean} [diagonals=false]
 	 * @returns {Map} Return a map with optional keys N, W, E, S (if those neights are within the bounds of the map)
 	 */
-	neighbors(x, y) {
+	neighbors(x, y, diagonals = true) {
 		const neighboring_cells = new Map();
 		if (!this.inBounds(x, y)) {
 			return neighboring_cells;
@@ -102,6 +104,12 @@ class InfiniteGrid {
 			['W', [x - 1, y]],
 			['E', [x + 1, y]],
 			['S', [x, y + 1]],
+			...(diagonals && [
+				['NW', [x - 1, y - 1]],
+				['NE', [x + 1, y - 1]],
+				['SW', [x - 1, y + 1]],
+				['SE', [x + 1, y + 1]],
+			]),
 		];
 
 		for (let [key, coord] of neighbors_lookup) {
