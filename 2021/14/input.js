@@ -7,11 +7,17 @@ const [poly, raw_rules] = fs
 	.trim()
 	.split('\n\n');
 
-const rules = raw_rules.split('\n').map((rule) => {
+const rules = raw_rules.split('\n').reduce((map, rule) => {
 	// FC -> F
-	return ([from, to] = rule.split(' -> ').map((s) => s.trim()));
-	return { from, to };
-});
+	let [from, to] = rule.split(' -> ').map((s) => s.trim());
+
+	if (map.has(from)) {
+		throw new Error(`Duplicate rule: ${from}`);
+	}
+	map.set(from, to);
+
+	return map;
+}, new Map());
 
 module.exports = {
 	poly,
