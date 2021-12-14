@@ -20,43 +20,30 @@ let list = poly.split('').map((v) => new Element(v));
 
 let count = {};
 for (let i = 0; i < 40; i++) {
-	console.log(list.length);
+	console.log(list.join(''));
 	for (let j = 0; j < list.length - 1; j++) {
 		let a = list[j];
-		if (a.dead) {
-			list.splice(j + 1, 1);
-		}
 		let b = list[j + 1];
 
 		let pair = '' + a + b;
 
 		if (rules.has(pair)) {
 			a.next = new Element(rules.get(pair));
+		} else {
+			count[a.name] = (count[a.name] || 0) + 1;
+			list.splice(j, 1);
+			j--;
 		}
 	}
 
 	let new_list = [];
 	for (let j = 0; j < list.length; j++) {
 		let a = list[j];
-		let b = list[j + 1];
-		if (b) {
-			if (!a.next && !b.next) {
-				new_list.push(a);
-				a.dead = true;
-				count[b.name] = (count[b.name] || 0) + 1;
-			} else {
-				new_list.push(a);
-				if (a.next) {
-					new_list.push(a.next);
-					a.reset();
-				}
-			}
-		} else {
-			new_list.push(a);
-			if (a.next) {
-				new_list.push(a.next);
-				a.reset();
-			}
+		new_list.push(a);
+
+		if (a.next) {
+			new_list.push(a.next);
+			a.reset();
 		}
 	}
 
