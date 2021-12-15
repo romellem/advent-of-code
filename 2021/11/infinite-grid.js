@@ -14,9 +14,6 @@
 class InfiniteGrid {
 	/**
 	 * @param {InfiniteGridConstructorOptions} options
-	 * @param {Function<x, y>} [options.defaultFactory] - Defaults to returning 0 for new coords
-	 * @param {Object} [options.string_map] - Map grid values to strings.
-	 * @param {Object} [options.string_map] - Map grid values to strings.
 	 */
 	constructor({ defaultFactory = (x, y) => 0, string_map = {}, load, parseAs } = {}) {
 		this.defaultFactory = defaultFactory.bind(this);
