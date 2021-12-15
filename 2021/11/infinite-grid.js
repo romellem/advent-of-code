@@ -88,7 +88,7 @@ class InfiniteGrid {
 	 * @param {Number} x
 	 * @param {Number} y
 	 * @param {Boolean} [diagonals=false]
-	 * @returns {Map} Return a map with optional keys N, W, E, S (if those neights are within the bounds of the map)
+	 * @returns {Map} Return a map with optional keys N, W, E, S (and NW, NE, SW, SE if `diagonals` is true) if those neighbors are within the bounds of the map.
 	 */
 	neighbors(x, y, diagonals = false) {
 		const neighboring_cells = new Map();
