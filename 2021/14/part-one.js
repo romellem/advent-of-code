@@ -49,10 +49,11 @@ let obj = list.reduce((obj, item) => {
 }, {});
 
 let things = Object.entries(obj);
-things.sort((a, b) => b[1] - a[1]);
+things.sort((a, b) => a[1] - b[1]);
 
 let min = things[0];
 let max = things[things.length - 1];
 
-console.log('min', min);
-console.log('max', max);
+console.log('min:', min);
+console.log('max:', max);
+console.log(max[1] - min[1]);
