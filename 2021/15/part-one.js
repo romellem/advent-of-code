@@ -29,6 +29,9 @@ function getShortestPathToTarget(digraph) {
 }
 
 const path = getShortestPathToTarget(createDirectedGraphFromGrid());
-console.log(path.map((p) => grid.grid.get(p)).reduce((a, b) => a + b));
+const sum = path.map((p) => grid.grid.get(p)).reduce((a, b) => a + b);
+const without_upper_left = sum - grid.get(0, 0);
+
+console.log(without_upper_left);
 
 // );
