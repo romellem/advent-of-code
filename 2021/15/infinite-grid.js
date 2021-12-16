@@ -101,13 +101,16 @@ class InfiniteGrid {
 			['W', [x - 1, y]],
 			['E', [x + 1, y]],
 			['S', [x, y + 1]],
-			// ...(diagonals && [
-			// 	['NW', [x - 1, y - 1]],
-			// 	['NE', [x + 1, y - 1]],
-			// 	['SW', [x - 1, y + 1]],
-			// 	['SE', [x + 1, y + 1]],
-			// ]),
 		];
+
+		if (diagonals) {
+			neighbors_lookup.push(
+				['NW', [x - 1, y - 1]],
+				['NE', [x + 1, y - 1]],
+				['SW', [x - 1, y + 1]],
+				['SE', [x + 1, y + 1]]
+			);
+		}
 
 		for (let [key, coord] of neighbors_lookup) {
 			let [cx, cy] = coord;
