@@ -31,30 +31,37 @@ export class Bits {
 		const stream = data.reader();
 
 		const packets = [];
-		while (stream.position < stream.length) {
-			/**
-			 * The first three bits encode the packet version,
-			 * and the next three bits encode the packet type ID.
-			 */
-			const version = stream.read(3);
-			const type = stream.read(3);
-			let value_stream;
-			if (type === LITERAL) {
-				value_stream = new BitOutputStream();
-				let should_continue;
-				do {
-					should_continue = stream.readBit();
-					value_stream.write(stream.read(4), 4);
-				} while (should_continue);
+		try {
+			while (stream.position < stream.length) {
+				/**
+				 * The first three bits encode the packet version,
+				 * and the next three bits encode the packet type ID.
+				 */
+				const version = stream.read(3);
+				const type = stream.read(3);
+				let value_stream;
+				if (type === LITERAL) {
+					value_stream = new BitOutputStream();
+					let should_continue;
+					do {
+						should_continue = stream.readBit();
+						value_stream.write(stream.read(4), 4);
+					} while (should_continue);
+				}
+
+				const value_bits = [...value_stream.reader()].join('');
+				const value = parseInt(value_bits, 2);
+
+				// Flush any padded zeros
+				if (stream.position % 4) {
+					const bits_left = 4 - (stream.position % 4);
+					stream.read(bits_left);
+				}
+
+				packets.push(new Packet(version, type, value));
 			}
-
-			const view = new DataView(value_stream.bytes());
-			const value = view.getUint32(0, true);
-
-			// Flush any padded zeros
-			stream.read(stream.position % 8);
-
-			packets.push(new Packet(version, type, value));
+		} catch (e) {
+			console.error(e);
 		}
 
 		return packets;
