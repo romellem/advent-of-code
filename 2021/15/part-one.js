@@ -1,37 +1,12 @@
 const { input } = require('./input');
 const { InfiniteGrid } = require('./infinite-grid');
-const jsnx = require('jsnetworkx');
 
-let grid = new InfiniteGrid({
+const grid = new InfiniteGrid({
 	load: input,
 	parseAs: Number,
 });
 
-function createDirectedGraphFromGrid() {
-	const G = new jsnx.DiGraph();
+const path = grid.getShortestWeightedPath(0, 0, grid.max_x, grid.max_y, { include_from: false });
+const path_sum = path.reduce((sum, cell_id) => sum + grid.grid.get(cell_id), 0);
 
-	for (let [id, vvv] of grid) {
-		let [x, y] = InfiniteGrid.toCoords(id);
-		for (let [n_id, { coord, value }] of grid.neighbors(x, y)) {
-			G.addEdge(id, InfiniteGrid.toId(...coord), { weight: value });
-		}
-	}
-
-	return G;
-}
-
-function getShortestPathToTarget(digraph) {
-	return jsnx.dijkstraPath(digraph, {
-		// From `0,0 with Torch equipped`, to our `target, also with the torch equipped`
-		source: `0,0`,
-		target: `${grid.max_x},${grid.max_y}`,
-	});
-}
-
-const path = getShortestPathToTarget(createDirectedGraphFromGrid());
-const sum = path.map((p) => grid.grid.get(p)).reduce((a, b) => a + b);
-const without_upper_left = sum - grid.get(0, 0);
-
-console.log(without_upper_left);
-
-// );
+console.log(path_sum);

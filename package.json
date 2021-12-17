@@ -22,6 +22,7 @@
     "fs-extra": "^10.0.0",
     "generatorics": "^1.1.0",
     "get-divisors": "^1.0.0",
+    "heap": "^0.2.7",
     "jimp": "^0.16.1",
     "jsnetworkx": "^0.3.4",
     "lodash": "^4.17.21",
