@@ -47,21 +47,40 @@ export class Bits {
 						should_continue = stream.readBit();
 						value_stream.write(stream.read(4), 4);
 					} while (should_continue);
+
+					const value_bits = [...value_stream.reader()].join('');
+					const value = parseInt(value_bits, 2);
+
+					// Flush any padded zeros
+					if (stream.position % 4) {
+						const bits_left = 4 - (stream.position % 4);
+						stream.read(bits_left);
+					}
+
+					packets.push(new Packet(version, type, value));
+				} else {
+					/**
+					 * Operator packet
+					 *
+					 * An operator packet can use one of two modes indicated by
+					 * the bit immediately after the packet header; this is called the _length type ID_.
+					 * - If the length type ID is 0, then the next 15 bits are a
+					 *    number that represents the total length in bits of the sub-packets
+					 *    contained by this packet.
+					 * - If the length type ID is 1, then the next 11 bits are a
+					 *   number that represents the number of sub-packets immediately
+					 *   contained by this packet.
+					 */
+					const length_type = stream.readBit();
+					if (length_type === 0) {
+						const sub_packet_bit_length = stream.read(15);
+					} else {
+						const sub_packet_count = stream.read(11);
+					}
 				}
-
-				const value_bits = [...value_stream.reader()].join('');
-				const value = parseInt(value_bits, 2);
-
-				// Flush any padded zeros
-				if (stream.position % 4) {
-					const bits_left = 4 - (stream.position % 4);
-					stream.read(bits_left);
-				}
-
-				packets.push(new Packet(version, type, value));
 			}
 		} catch (e) {
-			console.error(e);
+			console.error('ERROR READING STREAM', e);
 		}
 
 		return packets;
@@ -73,5 +92,7 @@ export class Packet {
 		this.version = version;
 		this.type = type;
 		this.value = value;
+
+		this.subpackets = [];
 	}
 }

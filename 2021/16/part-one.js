@@ -15,7 +15,7 @@ function parseHexAs4Bits(input_str) {
 	return out;
 }
 
-// console.log([...parseHexAs4Bits('8A004A801A8002F478').reader()].join(''));
+console.log([...parseHexAs4Bits('60552F1006').reader()].join(''));
 
-let thing = new Bits('D2FE28');
-console.log(thing.packets);
+// let thing = new Bits('D2FE28');
+// console.log(thing.packets);
