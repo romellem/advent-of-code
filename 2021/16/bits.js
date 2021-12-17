@@ -27,7 +27,8 @@ export function parseHexAs4Bits(input_str) {
 
 export function parseOutPackets(stream, packets = [], condition = null, depth = 0) {
 	if (!condition) {
-		condition = () => stream.position + 11 < stream.length;
+		// Minimum amount to read is a LITERAL value of 11 bits, so check against that.
+		condition = () => stream.position + 3 + 3 + 5 < stream.length;
 	}
 
 	while (condition()) {
