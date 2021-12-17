@@ -136,4 +136,61 @@ export class Operator extends Packet {
 			yield* subpacket;
 		}
 	}
+
+	// @todo cache these return values
+	get value() {
+		switch (this.type) {
+			case OPS.SUM: {
+				let sum = 0;
+
+				for (let p of this.subpackets) {
+					sum += p.value;
+				}
+				return sum;
+			}
+			case OPS.PRODUCT: {
+				let prod = 1;
+
+				for (let p of this.subpackets) {
+					prod *= p.value;
+				}
+				return prod;
+			}
+			case OPS.MINIMUM: {
+				let min = this.subpackets[0].value;
+
+				for (let i = 1; i < this.subpackets.length; i++) {
+					let p = this.subpackets[i];
+					let v = p.value;
+					if (v < min) {
+						min = v;
+					}
+				}
+				return min;
+			}
+			case OPS.MAXIMUM: {
+				let max = this.subpackets[0].value;
+
+				for (let i = 1; i < this.subpackets.length; i++) {
+					let p = this.subpackets[i];
+					let v = p.value;
+					if (v > max) {
+						max = v;
+					}
+				}
+				return max;
+			}
+			case OPS.GREATER_THAN: {
+				return this.subpackets[0].value > this.subpackets[1].value ? 1 : 0;
+			}
+			case OPS.LESS_THAN: {
+				return this.subpackets[0].value < this.subpackets[1].value ? 1 : 0;
+			}
+			case OPS.EQUAL_TO: {
+				return this.subpackets[0].value === this.subpackets[1].value ? 1 : 0;
+			}
+			default:
+				throw 'Invalid Op';
+		}
+	}
 }
