@@ -16,7 +16,19 @@ function parseHexAs4Bits(input_str) {
 	return out;
 }
 
-function parseOutPackets(stream, packets = [], operator_length = { type, value }) {
+function parseNextPacket(stream, count_or_bits, use_count = true, packets = []) {
+	if (use_count) {
+	} else {
+		// Read next `count_or_bits` bits
+		const position = stream.position;
+		const end_location = position + count_or_bits;
+		while (stream.position < end_location) {}
+	}
+	const version = stream.read(3);
+	const type = stream.read(3);
+}
+
+function parseOutPackets(stream, packets = []) {
 	while (stream.position < stream.length) {
 		/**
 		 * The first three bits encode the packet version,
@@ -56,8 +68,23 @@ function parseOutPackets(stream, packets = [], operator_length = { type, value }
 			 *   number that represents the number of sub-packets immediately
 			 *   contained by this packet.
 			 */
-			operator_length.type = stream.readBit();
-			operator_length.value = length_type === 0 ? stream.read(15) : stream.read(11);
+			const length_type = stream.readBit();
+			const read_bits = length_type === 0;
+
+			const length_value = read_bits ? stream.read(15) : stream.read(11);
+
+			const end_position = stream.position + length_value;
+
+			let packet = new Operator(version, type);
+			packets.push(packet);
+
+			const condition = read_bits
+				? () => stream.position < end_position
+				: () => packet.length < length_value;
+
+			while (condition()) {
+				parseNextPacket(stream, packet.subpackets);
+			}
 		}
 	}
 
@@ -143,10 +170,14 @@ export class Bits {
 
 		return packets;
 	}
+
+	packetsIterator() {
+		for (let packet of)
+	}
 }
 
 class Packet {
-	constructor(version, type, value) {
+	constructor(version, type) {
 		this.version = version;
 		this.type = type;
 	}
@@ -157,10 +188,26 @@ class Literal extends Packet {
 		super(version, type);
 		this.value = value;
 	}
+
+	*[Symbol.iterator]() {
+		yield this.version;
+	}
 }
 
 class Operator extends Packet {
 	constructor(version, type) {
 		super(version, type);
+		this.subpackets = [];
+	}
+
+	get length() {
+		return this.subpackets.length;
+	}
+
+	*[Symbol.iterator]() {
+		yield this.version;
+		for (let subpacket of this.subpackets) {
+			yield* subpacket;
+		}
 	}
 }
