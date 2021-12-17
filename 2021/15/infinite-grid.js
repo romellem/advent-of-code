@@ -1,3 +1,5 @@
+const Heap = require('heap');
+
 /**
  * @typedef {String} GridId - Two numbers separated by a comma.
  * @example "10,5"
@@ -115,7 +117,11 @@ class InfiniteGrid {
 		for (let [key, coord] of neighbors_lookup) {
 			let [cx, cy] = coord;
 			if (this.inBounds(cx, cy)) {
-				neighboring_cells.set(key, { coord, value: this.get(cx, cy) });
+				neighboring_cells.set(key, {
+					id: InfiniteGrid.toId(cx, cy),
+					coord,
+					value: this.get(cx, cy),
+				});
 			}
 		}
 
@@ -173,11 +179,13 @@ class InfiniteGrid {
 		return x >= this.min_x && x <= this.max_x && y >= this.min_y && y <= this.max_y;
 	}
 
-	clone() {
+	clone({ empty = false } = {}) {
 		const infinite_grid_clone = new InfiniteGrid();
 		const new_map = new Map();
-		for (let [key, val] of this.grid) {
-			new_map.set(key, typeof val === 'object' ? JSON.parse(JSON.stringify(val)) : val);
+		if (!empty) {
+			for (let [key, val] of this.grid) {
+				new_map.set(key, typeof val === 'object' ? JSON.parse(JSON.stringify(val)) : val);
+			}
 		}
 		infinite_grid_clone.defaultFactory = this.defaultFactory.bind(this);
 		infinite_grid_clone.string_map = JSON.parse(JSON.stringify(this.string_map));
@@ -188,6 +196,76 @@ class InfiniteGrid {
 		infinite_grid_clone.min_y = this.min_y;
 
 		return infinite_grid_clone;
+	}
+
+	sum() {
+		let sum = 0;
+		for (let value of this.grid.values()) {
+			sum += value;
+		}
+
+		return sum;
+	}
+
+	resize() {
+		this.max_x = -Infinity;
+		this.min_x = Infinity;
+		this.max_y = -Infinity;
+		this.min_y = Infinity;
+
+		for (let id of this.grid.keys()) {
+			let [x, y] = InfiniteGrid.toCoords(id);
+			if (x < this.min_x) this.min_x = x;
+			if (x > this.max_x) this.max_x = x;
+			if (y < this.min_y) this.min_y = y;
+			if (y > this.max_y) this.max_y = y;
+		}
+	}
+
+	buildDijkstrasFrontier(from_x, from_y) {
+		const from_id = InfiniteGrid.toId(from_x, from_y);
+
+		// Sort our frontier by its priority, so we pick nodes to visit that have the lowest cost.
+		const frontier = new Heap((node_a, node_b) => node_a.priority - node_b.priority);
+		frontier.push({ id: from_id, priority: 0 });
+
+		const came_from = new Map([[from_id, null]]);
+		const cost_so_far = new Map([[from_id, 0]]);
+		while (!frontier.empty()) {
+			const current = frontier.pop();
+
+			const [current_x, current_y] = InfiniteGrid.toCoords(current.id);
+
+			for (let next of this.neighbors(current_x, current_y).values()) {
+				const new_cost = cost_so_far.get(current.id) + next.value;
+				if (!cost_so_far.has(next.id) || new_cost < cost_so_far.get(next.id)) {
+					cost_so_far.set(next.id, new_cost);
+					frontier.push({ id: next.id, priority: new_cost });
+					came_from.set(next.id, current.id);
+				}
+			}
+		}
+
+		return came_from;
+	}
+
+	getShortestWeightedPath(from_x, from_y, to_x, to_y, { include_from = true } = {}) {
+		const from_id = InfiniteGrid.toId(from_x, from_y);
+		const to_id = InfiniteGrid.toId(to_x, to_y);
+		const came_from = this.buildDijkstrasFrontier(from_x, from_y);
+		let current = to_id;
+
+		let path = [];
+		while (current !== from_id) {
+			path.push(current);
+			current = came_from.get(current);
+		}
+
+		if (include_from) {
+			path.push(from_id);
+		}
+		path.reverse();
+		return path;
 	}
 
 	toGrid() {
@@ -202,15 +280,6 @@ class InfiniteGrid {
 		}
 
 		return grid;
-	}
-
-	sum() {
-		let sum = 0;
-		for (let value of this.grid.values()) {
-			sum += value;
-		}
-
-		return sum;
 	}
 
 	toString() {
