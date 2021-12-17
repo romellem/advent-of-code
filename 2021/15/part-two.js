@@ -29,25 +29,28 @@ function concatGrids(...grids) {
 			if (rows[j] === undefined) {
 				rows[j] = '';
 			}
+			// Concat individual rows across
 			rows[j] += inner_rows[j];
 		}
 	}
 
+	// Finally join all rows together
 	return rows.join('\n');
 }
 
 /**
- * If I have a grid `a`, and if I "increase that grid by 1" gives me `b`, then `c`, etc.,
- * then expanding a grid to be 3x3 gives me a total grid that looks like
+ * If I have a grid `a`, and if I "increase that grid by 1" to give me `b`, and increasing
+ * `b` by 1 gives me `c`, etc., then expanding a grid to be 3x3 gives me a
+ * new grid that looks like:
  *
  *     a b c
  *     b c d
  *     c d e
  *
- * You can see that grids `b` are copied "diagonally," and similarly for `c` and `d`.
+ * You can see that subgrid `b` is copied "diagonally," and similarly for `c` and `d`.
  *
  * So I don't have to make unique grids for each cell. In this 3x3 expanded grid, I only have
- * 5 unique grids among 9 cells.
+ * 5 unique grids [a, b, c, d, e ] among the 9 cells.
  */
 function buildGridOutDiagonally(grid, copies = 5) {
 	let row_of_grids = [grid];
@@ -71,7 +74,10 @@ function buildGridOutDiagonally(grid, copies = 5) {
 		rows.push(row_of_grids);
 	}
 
-	// Now concatenate all rows to create giant wide strings, then join on '\n' to create a GIANT grid of numbers.
+	/**
+	 * Now concatenate all rows to create wide "1 col" row strings,
+	 * then join on '\n' to create a GIANT grid we can load into a new grid.
+	 */
 	const giant_grid_input = rows.map((row) => concatGrids(...row)).join('\n');
 
 	// Load this new input to create our new larger grid to pathfind on
