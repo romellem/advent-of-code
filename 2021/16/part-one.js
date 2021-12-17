@@ -10,6 +10,10 @@ const HEX_TO_DEC = '0123456789ABCDEF'
 	.split('')
 	.reduce((obj, char) => ((obj[char] = parseInt(char, 16)), obj), {});
 
+// for (let [char, value] of Object.entries(HEX_TO_DEC)) {
+// 	console.log(char, value.toString(2).padStart(4, '0'));
+// }
+
 function parseHexAs4Bits(input_str) {
 	// Sizing the buffer is an optimizaiton, BitOutputStream will resize if it needs to
 	const out = new BitOutputStream(Math.ceil(input_str.length / 2));
@@ -22,7 +26,7 @@ function parseHexAs4Bits(input_str) {
 
 function parseOutPackets(stream, packets = [], condition = null, depth = 0) {
 	if (!condition) {
-		condition = () => stream.position < stream.length;
+		condition = () => stream.position + 6 < stream.length;
 	}
 
 	while (condition()) {
@@ -33,9 +37,9 @@ function parseOutPackets(stream, packets = [], condition = null, depth = 0) {
 			 */
 			const version = stream.read(3);
 			const type = stream.read(3);
-			let value_stream;
+
 			if (type === LITERAL) {
-				value_stream = new BitOutputStream();
+				const value_stream = new BitOutputStream();
 				let should_continue;
 				do {
 					should_continue = stream.readBit();
@@ -45,13 +49,13 @@ function parseOutPackets(stream, packets = [], condition = null, depth = 0) {
 				const value_bits = [...value_stream.reader()].join('');
 				const value = parseInt(value_bits, 2);
 
-				// Flush any padded zeros
-				if (stream.position % 4) {
-					const bits_left = 4 - (stream.position % 4);
-					if (stream.position + bits_left < stream.length) {
-						stream.read(bits_left);
-					}
-				}
+				// // Flush any padded zeros
+				// if (stream.position % 4) {
+				// 	const bits_left = 4 - (stream.position % 4);
+				// 	if (stream.position + bits_left < stream.length) {
+				// 		stream.read(bits_left);
+				// 	}
+				// }
 
 				packets.push(new Literal(version, type, value));
 			} else {
@@ -77,11 +81,11 @@ function parseOutPackets(stream, packets = [], condition = null, depth = 0) {
 				let packet = new Operator(version, type);
 				packets.push(packet);
 
-				const condition = read_bits
+				const newCondition = read_bits
 					? () => stream.position < end_position
 					: () => packet.length < length_value;
 
-				parseOutPackets(stream, packet.subpackets, condition, depth + 1);
+				parseOutPackets(stream, packet.subpackets, newCondition, depth + 1);
 			}
 		} catch (e) {
 			console.warn(++q, 'Error');
@@ -120,6 +124,7 @@ class Operator extends Packet {
 	constructor(version, type) {
 		super(version, type);
 		this.subpackets = [];
+		this.subpackets.parent = this;
 	}
 
 	get length() {
@@ -134,27 +139,26 @@ class Operator extends Packet {
 	}
 }
 
-console.log(HEX_TO_DEC);
+// const [input_str, expected_sum] = [...sampleInputPartOne][1];
 
-const [input_str, expected_sum] = [...sampleInputPartOne][1];
+// const data = parseHexAs4Bits(input_str);
+// console.log([...data.reader()].join(''));
 
+// let top_packets = [];
+// let data_stream = data.reader();
+// const packets = parseOutPackets(data_stream, top_packets);
+
+// console.log([...packetsIter(top_packets)].reduce((a, b) => a + b, 0));
+// console.log('Expected:', expected_sum, '\n\n');
+
+// for (let [input_str, expected_sum] of sampleInputPartOne) {
+const input_str = input;
 const data = parseHexAs4Bits(input_str);
-console.log([...data.reader()].join(''));
 
 let top_packets = [];
 let data_stream = data.reader();
 const packets = parseOutPackets(data_stream, top_packets);
 
 console.log([...packetsIter(top_packets)].reduce((a, b) => a + b, 0));
-console.log('Expected:', expected_sum, '\n\n');
-
-// for (let [input_str, expected_sum] of sampleInputPartOne) {
-// 	const data = parseHexAs4Bits(input_str);
-
-// 	let top_packets = [];
-// 	let data_stream = data.reader();
-// 	const packets = parseOutPackets(data_stream, top_packets);
-
-// 	console.log([...packetsIter(top_packets)].reduce((a, b) => a + b, 0));
-// 	console.log('Expected:', expected_sum, '\n\n');
+// console.log('Expected:', expected_sum, '\n\n');
 // }
