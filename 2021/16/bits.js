@@ -1,6 +1,15 @@
 import { BitOutputStream } from '@thi.ng/bitstream';
 
-export const OP_LITERAL = 4;
+export const OPS = {
+	SUM: 0,
+	PRODUCT: 1,
+	MINIMUM: 2,
+	MAXIMUM: 3,
+	LITERAL: 4,
+	GREATER_THAN: 5,
+	LESS_THAN: 6,
+	EQUAL_TO: 7,
+};
 
 export const HEX_TO_DEC = '0123456789ABCDEF'
 	.split('')
@@ -30,7 +39,7 @@ export function parseOutPackets(stream, packets = [], condition = null, depth = 
 			const version = stream.read(3);
 			const type = stream.read(3);
 
-			if (type === OP_LITERAL) {
+			if (type === OPS.LITERAL) {
 				const value_stream = new BitOutputStream();
 				let should_continue;
 				do {
