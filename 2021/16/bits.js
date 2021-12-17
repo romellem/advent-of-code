@@ -116,7 +116,7 @@ export class Literal extends Packet {
 	}
 
 	*[Symbol.iterator]() {
-		yield this.version;
+		yield this;
 	}
 }
 
@@ -131,7 +131,7 @@ export class Operator extends Packet {
 	}
 
 	*[Symbol.iterator]() {
-		yield this.version;
+		yield this;
 		for (let subpacket of this.subpackets) {
 			yield* subpacket;
 		}
