@@ -223,6 +223,7 @@ class InfiniteGrid {
 	buildDijkstrasFrontier(from_x, from_y) {
 		const from_id = InfiniteGrid.toId(from_x, from_y);
 
+		// Sort our frontier by its priority, so we pick nodes to visit that have the lowest cost.
 		const frontier = new Heap((node_a, node_b) => node_a.priority - node_b.priority);
 		frontier.push({ id: from_id, priority: 0 });
 
