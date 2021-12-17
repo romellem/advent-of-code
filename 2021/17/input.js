@@ -2,7 +2,10 @@ const path = require('path');
 const fs = require('fs');
 
 const parseFile = (relative_file) => {
-	const raw_input = fs.readFileSync(path.join(__dirname, 'input.txt'), 'utf8').toString().trim();
+	const raw_input = fs
+		.readFileSync(path.join(__dirname, relative_file), 'utf8')
+		.toString()
+		.trim();
 	// @example "target area: x=56..76, y=-162..-134"
 	let [, x1, x2, y1, y2] = /target area: x=(-?\d+)\.\.(-?\d+), y=(-?\d+)\.\.(-?\d+)/.exec(
 		raw_input
