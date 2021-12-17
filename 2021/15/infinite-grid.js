@@ -179,11 +179,13 @@ class InfiniteGrid {
 		return x >= this.min_x && x <= this.max_x && y >= this.min_y && y <= this.max_y;
 	}
 
-	clone() {
+	clone({ empty = false } = {}) {
 		const infinite_grid_clone = new InfiniteGrid();
 		const new_map = new Map();
-		for (let [key, val] of this.grid) {
-			new_map.set(key, typeof val === 'object' ? JSON.parse(JSON.stringify(val)) : val);
+		if (!empty) {
+			for (let [key, val] of this.grid) {
+				new_map.set(key, typeof val === 'object' ? JSON.parse(JSON.stringify(val)) : val);
+			}
 		}
 		infinite_grid_clone.defaultFactory = this.defaultFactory.bind(this);
 		infinite_grid_clone.string_map = JSON.parse(JSON.stringify(this.string_map));

@@ -7,14 +7,14 @@ let grid = new InfiniteGrid({
 });
 
 function increaseGrid(grid) {
-	let new_grid = new InfiniteGrid();
+	let new_grid = grid.clone({ empty: true });
 	for (let [id, value] of grid) {
 		let new_vale = value + 1;
 		if (new_vale > 9) {
 			new_vale = 1;
 		}
 
-		new_grid.set(...InfiniteGrid.toCoords(id), new_vale);
+		new_grid.grid.set(id, new_vale);
 	}
 
 	return new_grid;
