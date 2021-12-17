@@ -1,12 +1,12 @@
-import { BitInputStream, BitOutputStream } from '@thi.ng/bitstream';
+import { BitOutputStream } from '@thi.ng/bitstream';
 
-const LITERAL = 4;
+export const OP_LITERAL = 4;
 
-const HEX_TO_DEC = '0123456789ABCDEF'
+export const HEX_TO_DEC = '0123456789ABCDEF'
 	.split('')
 	.reduce((obj, char) => ((obj[char] = parseInt(char, 16)), obj), {});
 
-function parseHexAs4Bits(input_str) {
+export function parseHexAs4Bits(input_str) {
 	// Sizing the buffer is an optimizaiton, BitOutputStream will resize if it needs to
 	const out = new BitOutputStream(Math.ceil(input_str.length / 2));
 	for (let char of input_str) {
@@ -16,83 +16,91 @@ function parseHexAs4Bits(input_str) {
 	return out;
 }
 
-function parseOutPackets(stream, packets = []) {
-	while (stream.position < stream.length) {
-		/**
-		 * The first three bits encode the packet version,
-		 * and the next three bits encode the packet type ID.
-		 */
-		const version = stream.read(3);
-		const type = stream.read(3);
-		let value_stream;
-		if (type === LITERAL) {
-			value_stream = new BitOutputStream();
-			let should_continue;
-			do {
-				should_continue = stream.readBit();
-				value_stream.write(stream.read(4), 4);
-			} while (should_continue);
+export function parseOutPackets(stream, packets = [], condition = null, depth = 0) {
+	if (!condition) {
+		condition = () => stream.position + 11 < stream.length;
+	}
 
-			const value_bits = [...value_stream.reader()].join('');
-			const value = parseInt(value_bits, 2);
-
-			// Flush any padded zeros
-			if (stream.position % 4) {
-				const bits_left = 4 - (stream.position % 4);
-				stream.read(bits_left);
-			}
-
-			packets.push(new Literal(version, type, value));
-		} else {
+	while (condition()) {
+		try {
 			/**
-			 * Operator packet
-			 *
-			 * An operator packet can use one of two modes indicated by
-			 * the bit immediately after the packet header; this is called the _length type ID_.
-			 * - If the length type ID is 0, then the next 15 bits are a
-			 *   number that represents the total length in bits of the sub-packets
-			 *   contained by this packet.
-			 * - If the length type ID is 1, then the next 11 bits are a
-			 *   number that represents the number of sub-packets immediately
-			 *   contained by this packet.
+			 * The first three bits encode the packet version,
+			 * and the next three bits encode the packet type ID.
 			 */
-			const length_type = stream.readBit();
-			const read_bits = length_type === 0;
+			const version = stream.read(3);
+			const type = stream.read(3);
 
-			const length_value = read_bits ? stream.read(15) : stream.read(11);
+			if (type === OP_LITERAL) {
+				const value_stream = new BitOutputStream();
+				let should_continue;
+				do {
+					should_continue = stream.readBit();
+					value_stream.write(stream.read(4), 4);
+				} while (should_continue);
 
-			const end_position = stream.position + length_value;
+				const value_bits = [...value_stream.reader()].join('');
+				const value = parseInt(value_bits, 2);
 
-			let packet = new Operator(version, type);
-			packets.push(packet);
+				packets.push(new Literal(version, type, value));
+			} else {
+				/**
+				 * Operator packet
+				 *
+				 * An operator packet can use one of two modes indicated by
+				 * the bit immediately after the packet header; this is called the _length type ID_.
+				 * - If the length type ID is 0, then the next 15 bits are a
+				 *   number that represents the total length in bits of the sub-packets
+				 *   contained by this packet.
+				 * - If the length type ID is 1, then the next 11 bits are a
+				 *   number that represents the number of sub-packets immediately
+				 *   contained by this packet.
+				 */
+				const length_type = stream.readBit();
+				const will_read_bits = length_type === 0;
 
-			const condition = read_bits
-				? () => stream.position < end_position
-				: () => packet.length < length_value;
+				const length_value = will_read_bits ? stream.read(15) : stream.read(11);
 
-			while (condition()) {
-				parseNextPacket(stream, packet.subpackets);
+				const end_position = stream.position + length_value;
+
+				let packet = new Operator(version, type);
+				packets.push(packet);
+
+				// We have different conditions to continue reading subpackets depending on length type
+				const newCondition = will_read_bits
+					? () => stream.position < end_position
+					: () => packet.length < length_value;
+
+				// `depth` was just used for debugging, but it's not needed
+				parseOutPackets(stream, packet.subpackets, newCondition, depth + 1);
 			}
+		} catch (e) {
+			/**
+			 * Reading beyond the length of the stream throws an error, typically
+			 * due to `0` padding at the end of our binrary stream. When this happens,
+			 * it can safely be ignored and our packets can be returned.
+			 */
+			console.warn('error');
+			return packets;
 		}
 	}
 
 	return packets;
 }
 
-function* packetsIter(packets) {
+export function* packetsIter(packets) {
 	for (let packet of packets) {
 		yield* packet;
 	}
 }
 
-class Packet {
+export class Packet {
 	constructor(version, type) {
 		this.version = version;
 		this.type = type;
 	}
 }
 
-class Literal extends Packet {
+export class Literal extends Packet {
 	constructor(version, type, value) {
 		super(version, type);
 		this.value = value;
@@ -103,7 +111,7 @@ class Literal extends Packet {
 	}
 }
 
-class Operator extends Packet {
+export class Operator extends Packet {
 	constructor(version, type) {
 		super(version, type);
 		this.subpackets = [];
