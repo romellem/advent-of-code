@@ -1,5 +1,5 @@
-// import { input } from './input.js';
-const input = '8A004A801A8002F478';
+import { input, sampleInputPartOne } from './input.js';
+// const input = '8A004A801A8002F478';
 import { BitInputStream, BitOutputStream } from '@thi.ng/bitstream';
 
 const LITERAL = 4;
@@ -20,7 +20,7 @@ function parseHexAs4Bits(input_str) {
 	return out;
 }
 
-function parseOutPackets(stream, packets = [], condition) {
+function parseOutPackets(stream, packets = [], condition = null, depth = 0) {
 	if (!condition) {
 		condition = () => stream.position < stream.length;
 	}
@@ -48,7 +48,9 @@ function parseOutPackets(stream, packets = [], condition) {
 				// Flush any padded zeros
 				if (stream.position % 4) {
 					const bits_left = 4 - (stream.position % 4);
-					stream.read(bits_left);
+					if (stream.position + bits_left < stream.length) {
+						stream.read(bits_left);
+					}
 				}
 
 				packets.push(new Literal(version, type, value));
@@ -79,10 +81,11 @@ function parseOutPackets(stream, packets = [], condition) {
 					? () => stream.position < end_position
 					: () => packet.length < length_value;
 
-				parseOutPackets(stream, packet.subpackets, condition);
+				parseOutPackets(stream, packet.subpackets, condition, depth + 1);
 			}
 		} catch (e) {
 			console.warn(++q, 'Error');
+			return packets;
 		}
 	}
 
@@ -131,14 +134,27 @@ class Operator extends Packet {
 	}
 }
 
-// try {
-const data = parseHexAs4Bits(input);
+console.log(HEX_TO_DEC);
+
+const [input_str, expected_sum] = [...sampleInputPartOne][1];
+
+const data = parseHexAs4Bits(input_str);
+console.log([...data.reader()].join(''));
 
 let top_packets = [];
 let data_stream = data.reader();
 const packets = parseOutPackets(data_stream, top_packets);
 
 console.log([...packetsIter(top_packets)].reduce((a, b) => a + b, 0));
-// } catch (e) {
-// 	console.log(e);
+console.log('Expected:', expected_sum, '\n\n');
+
+// for (let [input_str, expected_sum] of sampleInputPartOne) {
+// 	const data = parseHexAs4Bits(input_str);
+
+// 	let top_packets = [];
+// 	let data_stream = data.reader();
+// 	const packets = parseOutPackets(data_stream, top_packets);
+
+// 	console.log([...packetsIter(top_packets)].reduce((a, b) => a + b, 0));
+// 	console.log('Expected:', expected_sum, '\n\n');
 // }
