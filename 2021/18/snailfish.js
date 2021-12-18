@@ -131,7 +131,27 @@ function reduce(pair) {
 	return pair;
 }
 
+function magnitude(tokens) {
+	while (tokens.includes(CLS)) {
+		let close_index = tokens.indexOf(CLS);
+		let open_index = tokens.lastIndexOf(OPN, close_index);
+
+		//   0   1   2   3   4
+		// ['[', 8, ',', 9, ']']
+		let a = tokens[open_index + 1];
+		let b = tokens[close_index - 1];
+
+		// The magnitude of a pair is 3 times the magnitude of its left element plus 2 times the magnitude of its right element.
+		const inner_magnitude = 3 * a + 2 * b;
+
+		tokens.splice(open_index, 5, inner_magnitude);
+	}
+
+	return tokens[0];
+}
+
 module.exports = {
 	add,
 	reduce,
+	magnitude,
 };

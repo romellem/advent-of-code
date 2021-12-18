@@ -1,5 +1,5 @@
 const { input } = require('./input');
-const { add, reduce } = require('./snailfish');
+const { add, reduce, magnitude } = require('./snailfish');
 
 let accumulator = input.shift();
 while (input.length > 0) {
@@ -9,4 +9,8 @@ while (input.length > 0) {
 	reduce(accumulator);
 }
 
-console.log(accumulator.join(''));
+const mag = magnitude(accumulator);
+
+console.log(mag);
+
+// 3900 too low
