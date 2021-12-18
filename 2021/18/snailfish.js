@@ -44,13 +44,17 @@ function nextIndexOfDigit(pair, from_index) {
 }
 
 function reduce(pair) {
-	let depth = 0;
+	let depth;
+	let did_reduce;
+	let explode_index;
+	let split_index;
 
-	let explode_index = null;
-	let split_index = null;
-
-	let did_reduce = false;
 	do {
+		depth = 0;
+		did_reduce = false;
+		explode_index = null;
+		split_index = null;
+
 		for (let index = 0; index < pair.length; index++) {
 			let token = pair[index];
 
