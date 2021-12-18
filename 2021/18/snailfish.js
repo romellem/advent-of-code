@@ -103,7 +103,7 @@ function reduce(pair) {
 				}
 
 				let a_left_digit_index = lastIndexOfDigit(pair, explode_index);
-				let b_right_digit_index = nextIndexOfDigit(pair, explode_index);
+				let b_right_digit_index = nextIndexOfDigit(pair, explode_index + 3);
 				if (a_left_digit_index > -1) {
 					pair[a_left_digit_index] += a;
 				}
