@@ -12,7 +12,7 @@ function add(...pairs) {
 		}
 
 		// Push pairs to keep from reparsing out digits
-		new_pair_tokens.push(...pair);
+		new_pair_tokens.push(...pairs[i]);
 	}
 	new_pair_tokens.push(CLS);
 
@@ -66,7 +66,7 @@ function reduce(pair) {
 				break;
 			}
 
-			if (typeof token === 'number' && number >= 10) {
+			if (typeof token === 'number' && token >= 10) {
 				split_index = index;
 				break;
 			}
@@ -89,7 +89,7 @@ function reduce(pair) {
 					console.error(
 						JSON.stringify(
 							{
-								pair,
+								pair: pair.join(''),
 								explode_index,
 								a,
 								b,
@@ -104,11 +104,11 @@ function reduce(pair) {
 
 				let a_left_digit_index = lastIndexOfDigit(pair, explode_index);
 				let b_right_digit_index = nextIndexOfDigit(pair, explode_index);
-				if (a_nexta_left_digit_index_left > -1) {
-					pairs[a_left_digit_index] += a;
+				if (a_left_digit_index > -1) {
+					pair[a_left_digit_index] += a;
 				}
 				if (b_right_digit_index > -1) {
-					pairs[b_right_digit_index] += b;
+					pair[b_right_digit_index] += b;
 				}
 
 				// Remove the pair (5 tokens) and replace with digit 0
