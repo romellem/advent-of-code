@@ -14,3 +14,4 @@ const mag = magnitude(accumulator);
 console.log(mag);
 
 // 3900 too low
+// 3990 too low
