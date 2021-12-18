@@ -1,6 +1,21 @@
+const red = (s) => require('util').format('\x1b[31m%s\x1b[0m', s);
+const green = (s) => require('util').format('\x1b[32m%s\x1b[0m', s);
+const yellow = (s) => require('util').format('\x1b[33m%s\x1b[0m', s);
+const blue = (s) => require('util').format('\x1b[34m%s\x1b[0m', s);
+const magenta = (s) => require('util').format('\x1b[35m%s\x1b[0m', s);
+const cyan = (s) => require('util').format('\x1b[36m%s\x1b[0m', s);
+
 const OPN = '[';
 const CLS = ']';
 const SEP = ',';
+
+const depthStr = (tokens) => {
+	let depth = 0;
+	let tokens_but_depth = tokens.map((c) =>
+		c === OPN ? green(++depth) : c === CLS ? magenta(--depth) : depth
+	);
+	return '    ' + tokens_but_depth.join('');
+};
 
 function add(...pairs) {
 	let new_pair_tokens = [OPN];
@@ -49,6 +64,7 @@ function reduce(pair) {
 	let explode_index;
 	let split_index;
 
+	let q = 1;
 	do {
 		depth = 0;
 		did_reduce = false;
@@ -77,6 +93,13 @@ function reduce(pair) {
 		}
 
 		if (explode_index !== null || split_index !== null) {
+			console.log(
+				yellow(String(q++).padEnd(3)),
+				pair
+					.map((c, i) => (i === explode_index ? red(c) : i === split_index ? cyan(c) : c))
+					.join('')
+			);
+			console.log(depthStr(pair) + '\n');
 			did_reduce = true;
 
 			if (explode_index !== null) {
@@ -89,9 +112,6 @@ function reduce(pair) {
 				// "Exploding pairs will always consist of two regular numbers"
 				// But just in case, check this. If not, I did something wrong
 				if (typeof a !== 'number' || typeof b !== 'number') {
-					const red = (s) => require('util').format('\x1b[31m%s\x1b[0m', s);
-					const green = (s) => require('util').format('\x1b[32m%s\x1b[0m', s);
-
 					console.error(`Oh no, found an exploding pair that isn't two digits!`);
 					console.error(
 						'pair:',
@@ -125,6 +145,8 @@ function reduce(pair) {
 				// Splice in new pair
 				pair.splice(split_index, 1, OPN, a, SEP, b, CLS);
 			}
+		} else {
+			console.log(yellow('' + q++), pair.join(''));
 		}
 	} while (did_reduce);
 
