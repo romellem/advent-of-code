@@ -85,20 +85,19 @@ function reduce(pair) {
 				// "Exploding pairs will always consist of two regular numbers"
 				// But just in case, check this. If not, I did something wrong
 				if (typeof a !== 'number' || typeof b !== 'number') {
+					const red = (s) => require('util').format('\x1b[31m%s\x1b[0m', s);
+					const green = (s) => require('util').format('\x1b[32m%s\x1b[0m', s);
+
 					console.error(`Oh no, found an exploding pair that isn't two digits!`);
 					console.error(
-						JSON.stringify(
-							{
-								pair: pair.join(''),
-								explode_index,
-								a,
-								b,
-								depth,
-							},
-							null,
-							'  '
-						)
+						'pair:',
+						pair.map((c, i) => (i === explode_index ? red(c) : c)).join('')
 					);
+					console.error('explode_index:', explode_index);
+					console.error('a:', green(a));
+					console.error('b:', green(b));
+					console.error('depth:', depth);
+
 					process.exit(1);
 				}
 
