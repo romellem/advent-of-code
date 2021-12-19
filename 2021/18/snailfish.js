@@ -64,7 +64,6 @@ function reduce(pair, debug = false) {
 	let explode_index;
 	let split_index;
 
-	let q = 1;
 	do {
 		depth = 0;
 		did_reduce = false;
@@ -80,29 +79,21 @@ function reduce(pair, debug = false) {
 				depth--;
 			}
 
+			// If we are nested inside 4 pairs, we are at a depth of 5
 			if (depth === 5) {
-				// Nested inside 4 pairs
 				explode_index = index;
+
+				// We immediately stop searching as soon as we find a pair that explodes
 				break;
 			}
 
-			if (typeof token === 'number' && token >= 10 && split_index === null) {
+			// We take the first split we find. Only is used if we aren't also expoding.
+			if (split_index === null && typeof token === 'number' && token >= 10) {
 				split_index = index;
-				// break;
 			}
 		}
 
 		if (explode_index !== null || split_index !== null) {
-			debug &&
-				console.log(
-					yellow(String(q++).padEnd(3)),
-					pair
-						.map((c, i) =>
-							i === explode_index ? red(c) : i === split_index ? cyan(c) : c
-						)
-						.join('')
-				);
-			debug && console.log(depthStr(pair) + '\n');
 			did_reduce = true;
 
 			if (explode_index !== null) {
