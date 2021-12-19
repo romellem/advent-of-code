@@ -58,7 +58,7 @@ function nextIndexOfDigit(pair, from_index) {
 	return -1;
 }
 
-function reduce(pair) {
+function reduce(pair, debug = false) {
 	let depth;
 	let did_reduce;
 	let explode_index;
@@ -86,20 +86,23 @@ function reduce(pair) {
 				break;
 			}
 
-			if (typeof token === 'number' && token >= 10) {
+			if (typeof token === 'number' && token >= 10 && split_index === null) {
 				split_index = index;
-				break;
+				// break;
 			}
 		}
 
 		if (explode_index !== null || split_index !== null) {
-			console.log(
-				yellow(String(q++).padEnd(3)),
-				pair
-					.map((c, i) => (i === explode_index ? red(c) : i === split_index ? cyan(c) : c))
-					.join('')
-			);
-			console.log(depthStr(pair) + '\n');
+			debug &&
+				console.log(
+					yellow(String(q++).padEnd(3)),
+					pair
+						.map((c, i) =>
+							i === explode_index ? red(c) : i === split_index ? cyan(c) : c
+						)
+						.join('')
+				);
+			debug && console.log(depthStr(pair) + '\n');
 			did_reduce = true;
 
 			if (explode_index !== null) {
@@ -146,7 +149,7 @@ function reduce(pair) {
 				pair.splice(split_index, 1, OPN, a, SEP, b, CLS);
 			}
 		} else {
-			console.log(yellow('' + q++), pair.join(''));
+			debug && console.log(yellow(q++ + ' '), pair.join(''));
 		}
 	} while (did_reduce);
 

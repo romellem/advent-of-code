@@ -12,7 +12,10 @@ const input = fs
 	.toString()
 	.trim()
 	.split('\n')
-	.map((line) => splitLineWithNumbers(line));
+	.map((line) => {
+		console.log(`Splitting "${line}"`);
+		return splitLineWithNumbers(line);
+	});
 
 module.exports = {
 	input,
