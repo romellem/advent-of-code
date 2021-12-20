@@ -9,14 +9,6 @@ const OPN = '[';
 const CLS = ']';
 const SEP = ',';
 
-const depthStr = (tokens) => {
-	let depth = 0;
-	let tokens_but_depth = tokens.map((c) =>
-		c === OPN ? green(++depth) : c === CLS ? magenta(--depth) : depth
-	);
-	return '    ' + tokens_but_depth.join('');
-};
-
 function add(...pairs) {
 	let new_pair_tokens = [OPN];
 
@@ -139,8 +131,6 @@ function reduce(pair, debug = false) {
 				// Splice in new pair
 				pair.splice(split_index, 1, OPN, a, SEP, b, CLS);
 			}
-		} else {
-			debug && console.log(yellow(q++ + ' '), pair.join(''));
 		}
 	} while (did_reduce);
 
