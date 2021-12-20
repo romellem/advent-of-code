@@ -1,9 +1,5 @@
 const red = (s) => require('util').format('\x1b[31m%s\x1b[0m', s);
 const green = (s) => require('util').format('\x1b[32m%s\x1b[0m', s);
-const yellow = (s) => require('util').format('\x1b[33m%s\x1b[0m', s);
-const blue = (s) => require('util').format('\x1b[34m%s\x1b[0m', s);
-const magenta = (s) => require('util').format('\x1b[35m%s\x1b[0m', s);
-const cyan = (s) => require('util').format('\x1b[36m%s\x1b[0m', s);
 
 const OPN = '[';
 const CLS = ']';
@@ -50,7 +46,7 @@ function nextIndexOfDigit(pair, from_index) {
 	return -1;
 }
 
-function reduce(pair, debug = false) {
+function reduce(pair) {
 	let depth;
 	let did_reduce;
 	let explode_index;
@@ -113,6 +109,15 @@ function reduce(pair, debug = false) {
 
 				let a_left_digit_index = lastIndexOfDigit(pair, explode_index);
 				let b_right_digit_index = nextIndexOfDigit(pair, explode_index + 3);
+
+				/**
+				 * The pair's left value is added to the first regular number
+				 * to the left of the exploding pair (if any), and the pair's
+				 * right value is added to the first regular number to the right
+				 * of the exploding pair (if any).
+				 *
+				 * These conditionals are that "if any" part of the instructions.
+				 */
 				if (a_left_digit_index > -1) {
 					pair[a_left_digit_index] += a;
 				}
@@ -128,7 +133,7 @@ function reduce(pair, debug = false) {
 				let a = Math.floor(digit_to_explode / 2);
 				let b = Math.ceil(digit_to_explode / 2);
 
-				// Splice in new pair
+				// Delete the digit and replace with a new pair: `(e.g. `[a, b]`)
 				pair.splice(split_index, 1, OPN, a, SEP, b, CLS);
 			}
 		}
