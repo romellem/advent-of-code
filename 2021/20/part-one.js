@@ -9,13 +9,15 @@ function sliceFrom(grid, coord, location) {
 	}
 
 	for (let [x, y] of slices[location]) {
+		// Getting points beyond the edges of the grid just returns the value from the `defaultFactory`.
+		// Also helpfully, this extends the min/max bounds of the grid.
 		values += grid.get(coord[0] + x, coord[1] + y);
 	}
 
 	return values;
 }
 
-const grid = new InfiniteGrid({
+let grid = new InfiniteGrid({
 	defaultFactory: (x, y) => 0,
 	load: input,
 	parseAs: Number,
@@ -26,18 +28,20 @@ const grid = new InfiniteGrid({
 });
 
 function enhance(grid, newDefaultFactory) {
+	// Apply enhancements to a new grid, so it can happen "all at once"
 	let new_grid = grid.clone();
 
+	// Grab our edges before we start slicing, since the slices make the grid grow.
 	const top = grid.min_y;
 	const bottom = grid.max_y;
 	const left = grid.min_x;
 	const right = grid.max_x;
 
-	// Duplicate all points since slicing the grid grows it, so we'd never end
-	const prefix_values = [...grid];
+	// Similarly, duplicate all points since slicing the grid and loop over that fixed set
+	const grid_ids = [...grid.keys()];
 
 	// First, do all visible pixels
-	for (let [id, value] of prefix_values) {
+	for (let id of grid_ids) {
 		const coord = InfiniteGrid.toCoords(id);
 		let grid_slice = sliceFrom(grid, coord, 'center');
 		let sliced_decimal = parseInt(grid_slice, 2);
@@ -87,9 +91,12 @@ function enhance(grid, newDefaultFactory) {
 	}
 
 	/**
-	 * Finally, this is specific to my input, but enhancement `0` is to turn on.
-	 * Since our image is infinite, that means that after 1 tick, _all_ outside infinite
-	 * pixels are turned on. So flip the default factory to 1.
+	 * Finally, this is specific to my input (my I'm guessing it is like this for everyone),
+	 * but enhancement `0` (aka, a 3x3 slice of all 0s) says to turn on (`#`). Since our image is infinite,
+	 * that means that after 1 tick, _all_ outside infinite pixels are turned on.
+	 *
+	 * Similarly, the enhancement for 511 (aka a 3x3 slice of all 1s) says to turn off (`.`).
+	 * So I pass in a few function to toggle between for each pair of iterations.
 	 */
 	new_grid.defaultFactory = newDefaultFactory;
 
@@ -100,8 +107,6 @@ const grid1 = enhance(grid, (x, y) => 1);
 const grid2 = enhance(grid1, (x, y) => 0);
 
 console.log(grid2.sum());
-
-// ↖ ↗ ↘ ↙   ← → ↑ ↓
 
 // ↘↓↓↓↙
 // →###←

@@ -301,6 +301,18 @@ class InfiniteGrid {
 	*[Symbol.iterator]() {
 		yield* this.grid.entries();
 	}
+
+	entries() {
+		return this.grid.entries();
+	}
+
+	values() {
+		return this.grid.values();
+	}
+
+	keys() {
+		return this.grid.keys();
+	}
 }
 
 module.exports = {
