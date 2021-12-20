@@ -158,7 +158,7 @@ The final sum `[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]` is found a
 
 To check whether it's the right answer, the snailfish teacher only checks the _magnitude_ of the final sum. The magnitude of a pair is 3 times the magnitude of its left element plus 2 times the magnitude of its right element. The magnitude of a regular number is just that number.
 
-For example, the magnitude of `[9,1]` is <code>3\*9 + 2\*1 = <b>29</b></code>; the magnitude of `[1,9]` is <code>3\*1 + 2\*9 = <b>21</b></code>. Magnitude calculations are recursive: the magnitude of `[[9,1],[1,9]]` is <code>3*29 + 2*21 = <b>129</b></code>.
+For example, the magnitude of `[9,1]` is <code>3\*9 + 2\*1 = <b>29</b></code>; the magnitude of `[1,9]` is <code>3\*1 + 2\*9 = <b>21</b></code>. Magnitude calculations are recursive: the magnitude of `[[9,1],[1,9]]` is <code>3\*29 + 2\*21 = <b>129</b></code>.
 
 Here are a few more magnitude examples:
 
