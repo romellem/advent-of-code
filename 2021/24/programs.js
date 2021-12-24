@@ -1,33 +1,26 @@
 // 9:14
 function part1(input) {
-	w = input;
-
 	x = 1;
-	y = w + 5; // 9 = 6 - 14
+	y = input + 5; // 9 = 6 - 14
 	z = y; // z = 6-14
 }
 
 // 9:382
 function part2(input) {
-	w = input;
-
 	x = 1;
-	y = w + 9; // Y = 10 - 18
+	y = input + 9; // Y = 10 - 18
 	z = z * 26 + y; // 166 - 382
 }
 
 // 9:9945
 function part3(input) {
-	w = input;
-
 	x = 1;
-	y = w + 4; // 5 - 13
+	y = input + 4; // 5 - 13
 	z = z * 26 + y; // 4321 - 9945
 }
 
 // 2:6
 function part4(input) {
-	// inp w
 	w = input;
 
 	x = z % 26; // 5 - 13 (since z is a `multiple of 26 plus y`) (theoretically 0-25)
@@ -79,50 +72,15 @@ function part7(input) {
 function part8(input) {
 	w = input;
 
-	// mul x 0
-	x = z % 26;
+	x = (z % 26) - 12;
 
-	// div z 26
 	z = Math.trunc(z / 26);
 
-	// add x -12
-	x += -12;
+	x = x === w ? 0 : 1;
+	z = z * (25 * x + 1);
+	y = (w + 12) * x;
 
-	// eql x w
-	x = x === w ? 1 : 0;
-
-	// eql x 0
-	x = x === 0 ? 1 : 0;
-
-	// mul y 0
-	y *= 0;
-
-	// add y 25
-	y += 25;
-
-	// mul y x
-	y *= x;
-
-	// add y 1
-	y += 1;
-
-	// mul z y
-	z *= y;
-
-	// mul y 0
-	y *= 0;
-
-	// add y w
-	y += w;
-
-	// add y 12
-	y += 12;
-
-	// mul y x
-	y *= x;
-
-	// add z y
-	z += y;
+	z = z + y;
 }
 
 function part9(input) {
