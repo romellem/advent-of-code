@@ -1,38 +1,44 @@
+// 0: z = (i0 + 5) // 6 - 14
+// 1: z = (i0 + 5) * 26 + (i1 + 9)
+// 2: z = [(i0 + 5) * 26 + (i1 + 9)] * 26 + (i2 + 4)
+//
+
 // 9:14
-function part1(input) {
+function part0(input) {
 	x = 1;
 	y = input + 5; // 9 = 6 - 14
 	z = y; // z = 6-14
 }
 
 // 9:382
-function part2(input) {
+function part1(input) {
 	x = 1;
 	y = input + 9; // Y = 10 - 18
 	z = z * 26 + y; // 166 - 382
 }
 
 // 9:9945
-function part3(input) {
+function part2(input) {
 	x = 1;
 	y = input + 4; // 5 - 13
 	z = z * 26 + y; // 4321 - 9945
 }
 
 // 2:6
-function part4(input) {
+function part3(input) {
 	w = input;
 
 	x = z % 26; // 5 - 13 (since z is a `multiple of 26 plus y`) (theoretically 0-25)
 	x = x - 12; // -7 - 1 (-12 - 13)
 	x = x === w ? 0 : 1; // Only true if input is `1`
 
-	y = w + 4 + x; // 6 - 13
-	z = y;
+	z = z * (25 * x + 1);
+	y = (w + 4) * x;
+	z = z + y;
 }
 
 // 9:(6*26)+19=175
-function part5(input) {
+function part4(input) {
 	w = input;
 
 	x = 1;
@@ -40,7 +46,7 @@ function part5(input) {
 	z = z * 26 + y; // 167 - 357
 }
 
-function part6(input) {
+function part5(input) {
 	w = input;
 
 	z = Math.trunc(z / 26); // 6 - 13 (since z was `(6-13)*26 + (11-19)`, it effectively rounds off the (11-19) addition)
@@ -53,7 +59,7 @@ function part6(input) {
 	z = z + y; // [(6-13) * 26] + (15-23)
 }
 
-function part7(input) {
+function part6(input) {
 	w = input;
 
 	x = (z % 26) - 9; // 6 - 14
@@ -69,7 +75,7 @@ function part7(input) {
 	z = z + y; // [(6-13) * (1 or 26)] + (15-19) or 0
 }
 
-function part8(input) {
+function part7(input) {
 	w = input;
 
 	x = (z % 26) - 12;
@@ -83,7 +89,7 @@ function part8(input) {
 	z = z + y;
 }
 
-function part9(input) {
+function part8(input) {
 	// inp w
 	w = input;
 
@@ -139,7 +145,7 @@ function part9(input) {
 	z += y;
 }
 
-function part10(input) {
+function part9(input) {
 	// inp w
 	w = input;
 
@@ -195,7 +201,7 @@ function part10(input) {
 	z += y;
 }
 
-function part11(input) {
+function part10(input) {
 	// inp w
 	w = input;
 
@@ -251,7 +257,7 @@ function part11(input) {
 	z += y;
 }
 
-function part12(input) {
+function part11(input) {
 	// inp w
 	w = input;
 
@@ -307,7 +313,7 @@ function part12(input) {
 	z += y;
 }
 
-function part13(input) {
+function part12(input) {
 	w = input;
 
 	x = (z % 26) - 16; // -16 - 9
@@ -337,7 +343,7 @@ function part13(input) {
 	z += y;
 }
 
-function part14(input) {
+function part13(input) {
 	// inp w
 	w = input;
 
