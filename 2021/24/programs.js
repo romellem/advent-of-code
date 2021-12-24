@@ -27,11 +27,7 @@ function part4(input) {
 	w = input;
 
 	x = z % 26; // 5 - 13 (since z is a `multiple of 26 plus y`) (theoretically 0-25)
-	z = 0;
-
-	// add x -12
 	x = x - 12; // -7 - 1 (-12 - 13)
-
 	x = x === w ? 0 : 1; // Only true if input is `1`
 
 	y = w + 4 + x; // 6 - 13
@@ -39,59 +35,11 @@ function part4(input) {
 }
 
 function part5(input) {
-	// inp w
 	w = input;
 
-	// mul x 0
-	x *= 0;
-
-	// add x z
-	x += z;
-
-	// mod x 26
-	x %= 26;
-
-	// div z 1
-	z = Math.trunc(z / 1);
-
-	// add x 11
-	x += 11;
-
-	// eql x w
-	x = x === w ? 1 : 0;
-
-	// eql x 0
-	x = x === 0 ? 1 : 0;
-
-	// mul y 0
-	y *= 0;
-
-	// add y 25
-	y += 25;
-
-	// mul y x
-	y *= x;
-
-	// add y 1
-	y += 1;
-
-	// mul z y
-	z *= y;
-
-	// mul y 0
-	y *= 0;
-
-	// add y w
-	y += w;
-
-	// add y 10
-	y += 10;
-
-	// mul y x
-	y *= x;
-
-	// add z y
-	z += y;
+	x = 1;
+	y = w + 10; // Y = 11 - 19
+	z = z * 26 + y; // 167 - 357
 }
 
 function part6(input) {
