@@ -64,50 +64,19 @@ function part7(input) {
 	// inp w
 	w = input;
 
-	// mul x 0
-	x = z % 26;
+	x = (z % 26) - 9; // 6 - 14
 
-	// div z 26
-	z = Math.trunc(z / 26);
+	z = Math.trunc(z / 26); // 6 - 13
 
-	// add x -9
-	x += -9;
+	x = x === w ? 0 : 1; // Could be true if input is 6-9
 
-	// eql x w
-	x = x === w ? 1 : 0;
+	y = 25 * x + 1; // 1 or 26
 
-	// eql x 0
-	x = x === 0 ? 1 : 0;
+	z *= y; // (6-13) * (1 or 26)
 
-	// mul y 0
-	y *= 0;
+	y = (w + 14) * x;
 
-	// add y 25
-	y += 25;
-
-	// mul y x
-	y *= x;
-
-	// add y 1
-	y += 1;
-
-	// mul z y
-	z *= y;
-
-	// mul y 0
-	y *= 0;
-
-	// add y w
-	y += w;
-
-	// add y 14
-	y += 14;
-
-	// mul y x
-	y *= x;
-
-	// add z y
-	z += y;
+	z = z + y;
 }
 
 function part8(input) {
