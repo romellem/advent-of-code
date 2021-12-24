@@ -2,64 +2,21 @@ function part1(input) {
 	w = input;
 
 	x = 1;
-	y = w + 5;
-	z = y;
+	y = w + 5; // 9 = 6 - 14
+	z = y; // z = 6-14
 }
 
 function part2(input) {
 	// inp w
 	w = input;
-
-	// mul x 0
-	x *= 0;
-
-	// add x z
-	x += z;
-
-	// mod x 26
-	x %= 26;
-
-	// div z 1
-	z = Math.trunc(z / 1);
-
-	// add x 13
-	x += 13;
-
-	// eql x w
-	x = x === w ? 1 : 0;
-
-	// eql x 0
-	x = x === 0 ? 1 : 0;
-
-	// mul y 0
-	y *= 0;
-
-	// add y 25
-	y += 25;
-
-	// mul y x
-	y *= x;
-
-	// add y 1
-	y += 1;
+	x = 1;
 
 	// mul z y
-	z *= y;
+	z = z * 26; // 156 - 364
 
-	// mul y 0
-	y *= 0;
+	y = w + 9; // Y = 10 - 18
 
-	// add y w
-	y += w;
-
-	// add y 9
-	y += 9;
-
-	// mul y x
-	y *= x;
-
-	// add z y
-	z += y;
+	z = z + y; // 166 - 382
 }
 
 function part3(input) {

@@ -48,7 +48,7 @@ let current_func = [];
 let program = [];
 for (let line of input) {
 	if (current_func.length && line.startsWith('inp')) {
-		program.push(`function part${program.length + 1}() {
+		program.push(`function part${program.length + 1}(input) {
 ${current_func.join('\n\n')}
 }`);
 		current_func = [];
