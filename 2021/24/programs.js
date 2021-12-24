@@ -7,72 +7,19 @@ function part1(input) {
 }
 
 function part2(input) {
-	// inp w
 	w = input;
+
 	x = 1;
-
-	// mul z y
-	z = z * 26; // 156 - 364
-
 	y = w + 9; // Y = 10 - 18
-
-	z = z + y; // 166 - 382
+	z = z * 26 + y; // 166 - 382
 }
 
 function part3(input) {
-	// inp w
 	w = input;
 
-	// mul x 0
-	x *= 0;
-
-	// add x z
-	x += z;
-
-	// mod x 26
-	x %= 26;
-
-	// div z 1
-	z = Math.trunc(z / 1);
-
-	// add x 12
-	x += 12;
-
-	// eql x w
-	x = x === w ? 1 : 0;
-
-	// eql x 0
-	x = x === 0 ? 1 : 0;
-
-	// mul y 0
-	y *= 0;
-
-	// add y 25
-	y += 25;
-
-	// mul y x
-	y *= x;
-
-	// add y 1
-	y += 1;
-
-	// mul z y
-	z *= y;
-
-	// mul y 0
-	y *= 0;
-
-	// add y w
-	y += w;
-
-	// add y 4
-	y += 4;
-
-	// mul y x
-	y *= x;
-
-	// add z y
-	z += y;
+	x = 1;
+	y = w + 4; // 5 - 13
+	z = z * 26 + y; // 4321 - 9945
 }
 
 function part4(input) {
