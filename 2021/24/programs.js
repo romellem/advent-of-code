@@ -61,7 +61,6 @@ function part6(input) {
 }
 
 function part7(input) {
-	// inp w
 	w = input;
 
 	x = (z % 26) - 9; // 6 - 14
@@ -71,26 +70,17 @@ function part7(input) {
 	x = x === w ? 0 : 1; // Could be true if input is 6-9
 
 	y = 25 * x + 1; // 1 or 26
+	z = z * y; // (6-13) * (1 or 26)
 
-	z *= y; // (6-13) * (1 or 26)
-
-	y = (w + 14) * x;
-
-	z = z + y;
+	y = (w + 14) * x; // (15-19) or 0
+	z = z + y; // [(6-13) * (1 or 26)] + (15-19) or 0
 }
 
 function part8(input) {
-	// inp w
 	w = input;
 
 	// mul x 0
-	x *= 0;
-
-	// add x z
-	x += z;
-
-	// mod x 26
-	x %= 26;
+	x = z % 26;
 
 	// div z 26
 	z = Math.trunc(z / 26);

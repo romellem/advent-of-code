@@ -1,0 +1,4 @@
+{
+	"description": "This inner package.json is to allow ESM `import` statement within the JS files for this puzzle without renaming the file to '.mjs' or whatever.",
+	"type": "module"
+}
