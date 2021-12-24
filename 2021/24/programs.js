@@ -4,7 +4,7 @@
 // 3: x = i2 == 9 && i3 == 1 ? 0 : 1, z = z, otherwise z = z * 26 + (i3 + 4)
 // 4: z = [[(i0 + 5) * 26 + (i1 + 9)] * 26 + (i2 + 4)] * 26 + (i4 + 10)
 // 5: z = [[(i0 + 5) * 26 + (i1 + 9)] * 26 + (i2 + 4)] * 26 + (i5 + 14)
-// 6:
+// 6: z = [[(i0 + 5) * 26 + (i1 + 9)] * 26 + (i2 + 4)] + (i6 + 14) // i6 == 9, (i2 + 27)
 
 // 9:14
 function part0(input) {
@@ -45,6 +45,7 @@ function part4(input) {
 	z = z * 26 + y; // 167 - 357
 }
 
+// 4
 function part5(input) {
 	z = Math.trunc(z / 26);
 	x = (z % 26) - 13; // (6 - 13) - 13 = -7 - 0
@@ -56,10 +57,11 @@ function part5(input) {
 	z = z + y; // [n * 26] + (15-23)
 }
 
+// 9 (whatever values is here, minus 1 above)
 function part6(input) {
-	x = (z % 26) - 9; // 6 - 14
+	x = (z % 26) - 9; // (i5 + 5)
 
-	z = Math.trunc(z / 26); // 6 - 13
+	z = Math.trunc(z / 26); // [(i0 + 5) * 26 + (i1 + 9)] * 26 + (i2 + 4)
 
 	x = x === input ? 0 : 1; // Could be true if input is 6-9
 
@@ -85,59 +87,15 @@ function part7(input) {
 }
 
 function part8(input) {
-	// inp w
-	w = input;
+	x = (z % 26) + 14;
 
-	// mul x 0
-	x *= 0;
+	x = x === input ? 0 : 1; // Never be true, x = 1
 
-	// add x z
-	x += z;
+	z = z * (25 * x + 1); // z * 26
 
-	// mod x 26
-	x %= 26;
+	y = (input + 14) * x; // (input + 14)
 
-	// div z 1
-	z = Math.trunc(z / 1);
-
-	// add x 14
-	x += 14;
-
-	// eql x w
-	x = x === w ? 1 : 0;
-
-	// eql x 0
-	x = x === 0 ? 1 : 0;
-
-	// mul y 0
-	y *= 0;
-
-	// add y 25
-	y += 25;
-
-	// mul y x
-	y *= x;
-
-	// add y 1
-	y += 1;
-
-	// mul z y
-	z *= y;
-
-	// mul y 0
-	y *= 0;
-
-	// add y w
-	y += w;
-
-	// add y 14
-	y += 14;
-
-	// mul y x
-	y *= x;
-
-	// add z y
-	z += y;
+	z = z + y;
 }
 
 function part9(input) {
