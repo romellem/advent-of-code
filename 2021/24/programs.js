@@ -1,7 +1,8 @@
 // 0: z = (i0 + 5) // 6 - 14
 // 1: z = (i0 + 5) * 26 + (i1 + 9)
 // 2: z = [(i0 + 5) * 26 + (i1 + 9)] * 26 + (i2 + 4)
-//
+// 3: x = i2 == 9 && i3 == 1 ? 0 : 1, z = z, otherwise z = z * 26 + (i3 + 4)
+// 4: z = [[(i0 + 5) * 26 + (i1 + 9)] * 26 + (i2 + 4)] * 26 + (i4 + 10)
 
 // 9:14
 function part0(input) {
@@ -24,25 +25,21 @@ function part2(input) {
 	z = z * 26 + y; // 4321 - 9945
 }
 
-// 2:6
+// 1
 function part3(input) {
-	w = input;
-
 	x = z % 26; // 5 - 13 (since z is a `multiple of 26 plus y`) (theoretically 0-25)
-	x = x - 12; // -7 - 1 (-12 - 13)
-	x = x === w ? 0 : 1; // Only true if input is `1`
+	x = x - 12; // -7 - 1 (technically -12 - 13)
+	x = x === input ? 0 : 1; // Only true if input is `1`
 
-	z = z * (25 * x + 1);
-	y = (w + 4) * x;
+	z = z * (25 * x + 1); //
+	y = (input + 4) * x;
 	z = z + y;
 }
 
 // 9:(6*26)+19=175
 function part4(input) {
-	w = input;
-
 	x = 1;
-	y = w + 10; // Y = 11 - 19
+	y = input + 10; // Y = 11 - 19
 	z = z * 26 + y; // 167 - 357
 }
 
