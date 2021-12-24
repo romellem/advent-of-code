@@ -451,54 +451,14 @@ function part14(input) {
 	// inp w
 	w = input;
 
-	// mul x 0
-	x *= 0;
-
-	// add x z
-	x += z;
-
-	// mod x 26
-	x %= 26;
-
-	// div z 26
+	x = (z % 26) - 2; // -2 - 24
 	z = Math.trunc(z / 26);
 
-	// add x -2
-	x += -2;
+	x = x === w ? 0 : 1;
 
-	// eql x w
-	x = x === w ? 1 : 0;
+	z = z * (25 * x + 1); // z * (26 or 0)
 
-	// eql x 0
-	x = x === 0 ? 1 : 0;
+	y = (w + 15) * x; // 0 or 15-24
 
-	// mul y 0
-	y *= 0;
-
-	// add y 25
-	y += 25;
-
-	// mul y x
-	y *= x;
-
-	// add y 1
-	y += 1;
-
-	// mul z y
-	z *= y;
-
-	// mul y 0
-	y *= 0;
-
-	// add y w
-	y += w;
-
-	// add y 15
-	y += 15;
-
-	// mul y x
-	y *= x;
-
-	// add z y
-	z += y;
+	z = z + y;
 }
