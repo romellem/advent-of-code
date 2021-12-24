@@ -1,4 +1,4 @@
-function part1() {
+function part1(input) {
 	w = input;
 
 	x = 1;
@@ -6,7 +6,7 @@ function part1() {
 	z = y;
 }
 
-function part2() {
+function part2(input) {
 	// inp w
 	w = input;
 
@@ -62,7 +62,7 @@ function part2() {
 	z += y;
 }
 
-function part3() {
+function part3(input) {
 	// inp w
 	w = input;
 
@@ -118,7 +118,7 @@ function part3() {
 	z += y;
 }
 
-function part4() {
+function part4(input) {
 	// inp w
 	w = input;
 
@@ -174,7 +174,7 @@ function part4() {
 	z += y;
 }
 
-function part5() {
+function part5(input) {
 	// inp w
 	w = input;
 
@@ -230,7 +230,7 @@ function part5() {
 	z += y;
 }
 
-function part6() {
+function part6(input) {
 	// inp w
 	w = input;
 
@@ -286,7 +286,7 @@ function part6() {
 	z += y;
 }
 
-function part7() {
+function part7(input) {
 	// inp w
 	w = input;
 
@@ -342,7 +342,7 @@ function part7() {
 	z += y;
 }
 
-function part8() {
+function part8(input) {
 	// inp w
 	w = input;
 
@@ -398,7 +398,7 @@ function part8() {
 	z += y;
 }
 
-function part9() {
+function part9(input) {
 	// inp w
 	w = input;
 
@@ -454,7 +454,7 @@ function part9() {
 	z += y;
 }
 
-function part10() {
+function part10(input) {
 	// inp w
 	w = input;
 
@@ -510,7 +510,7 @@ function part10() {
 	z += y;
 }
 
-function part11() {
+function part11(input) {
 	// inp w
 	w = input;
 
@@ -566,7 +566,7 @@ function part11() {
 	z += y;
 }
 
-function part12() {
+function part12(input) {
 	// inp w
 	w = input;
 
@@ -622,7 +622,7 @@ function part12() {
 	z += y;
 }
 
-function part13() {
+function part13(input) {
 	// inp w
 	w = input;
 
