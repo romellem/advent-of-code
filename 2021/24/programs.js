@@ -43,59 +43,16 @@ function part5(input) {
 }
 
 function part6(input) {
-	// inp w
 	w = input;
 
-	// mul x 0
-	x *= 0;
+	z = Math.trunc(z / 26); // 6 - 13 (since z was `(6-13)*26 + (11-19)`, it effectively rounds off the (11-19) addition)
+	x = (z % 26) - 13; // (11 - 19) - 13 = -2 - 6
+	x = x === w ? 0 : 1; // If input is 1-6, this could be true
 
-	// add x z
-	x += z;
+	z = z * (25 * x + 1); // (6-13) * (26 or 1)
+	y = (w + 14) * x; // 0 or (15-23)
 
-	// mod x 26
-	x %= 26;
-
-	// div z 26
-	z = Math.trunc(z / 26);
-
-	// add x -13
-	x += -13;
-
-	// eql x w
-	x = x === w ? 1 : 0;
-
-	// eql x 0
-	x = x === 0 ? 1 : 0;
-
-	// mul y 0
-	y *= 0;
-
-	// add y 25
-	y += 25;
-
-	// mul y x
-	y *= x;
-
-	// add y 1
-	y += 1;
-
-	// mul z y
-	z *= y;
-
-	// mul y 0
-	y *= 0;
-
-	// add y w
-	y += w;
-
-	// add y 14
-	y += 14;
-
-	// mul y x
-	y *= x;
-
-	// add z y
-	z += y;
+	z = z + y; //
 }
 
 function part7(input) {
