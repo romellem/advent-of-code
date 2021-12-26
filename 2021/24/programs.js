@@ -5,7 +5,7 @@
 // 4: z = [[(i0 + 5) * 26 + (i1 + 9)] * 26 + (i2 + 4)] * 26 + (i4 + 10)
 // 5: z = [[(i0 + 5) * 26 + (i1 + 9)] * 26 + (i2 + 4)] * 26 + (i5 + 14)
 // 6: z = [[(i0 + 5) * 26 + (i1 + 9)] * 26 + (i2 + 4)] + (i6 + 14) // i6 == 9, (i2 + 27)
-// 7:
+// 7: x = (i2 + i6 + 6), z = [[(i0 + 5) * 26 + (i1 + 9)] + (0 or 1),
 
 // 9:14
 function part0(input) {
@@ -58,7 +58,7 @@ function part5(input) {
 	z = z + y; // [n * 26] + (15-23)
 }
 
-// 9 (whatever values is here, minus 1 above)
+// 9 (whatever values is here, minus 1 above (currently 4, so 8 here would be 3 above))
 function part6(input) {
 	x = (z % 26) - 9; // (i5 + 5)
 
@@ -78,7 +78,7 @@ function part7(input) {
 
 	z = Math.trunc(z / 26);
 
-	x = x === input ? 0 : 1;
+	x = x === input ? 0 : 1; // Only true if 8 or 9
 	z = z * (25 * x + 1);
 	y = (input + 12) * x;
 

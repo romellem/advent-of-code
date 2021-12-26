@@ -7,6 +7,7 @@ function tick(input, x_inc, truncate_z, y_inc) {
 	// mod x 26
 	// ... // ** add x 10 **
 	x = (z % 26) + x_inc;
+
 	if (truncate_z) {
 		// div z 26
 		z = Math.trunc(z / 26);
@@ -16,7 +17,7 @@ function tick(input, x_inc, truncate_z, y_inc) {
 
 	// eql x w
 	// eql x 0
-	if (x === input) {
+	if ((z % 26) + x_inc === input) {
 		x = 0;
 	} else {
 		x = 1;
@@ -38,4 +39,40 @@ function tick(input, x_inc, truncate_z, y_inc) {
 	// ** add y 5  **
 	y = (input + y_inc) * x;
 	z = z + y;
+}
+
+function tick2(input, x_inc, truncate_z, y_inc) {
+	if (truncate_z) {
+		z = Math.trunc(z / 26);
+	}
+
+	if ((z % 26) + x_inc === input) {
+		x = 0;
+		y = 0;
+	} else {
+		z = 26 * z + input + y_inc;
+		y = input + y_inc;
+	}
+}
+
+let w = (x = y = z = 0);
+
+// prettier-ignore
+for (let args of [
+	{ truncate_z: false, x_inc:  10, y_inc:  5 },
+	{ truncate_z: false, x_inc:  13, y_inc:  9 },
+	{ truncate_z: false, x_inc:  12, y_inc:  4 },
+	{ truncate_z: true,  x_inc: -12, y_inc:  4 },
+	{ truncate_z: false, x_inc:  11, y_inc: 10 },
+	{ truncate_z: true,  x_inc: -13, y_inc: 14 },
+	{ truncate_z: true,  x_inc:  -9, y_inc: 14 },
+	{ truncate_z: true,  x_inc: -12, y_inc: 12 },
+	{ truncate_z: false, x_inc:  14, y_inc: 14 },
+	{ truncate_z: true,  x_inc:  -9, y_inc: 14 },
+	{ truncate_z: false, x_inc:  15, y_inc:  5 },
+	{ truncate_z: false, x_inc:  11, y_inc: 10 },
+	{ truncate_z: true,  x_inc: -16, y_inc:  8 },
+	{ truncate_z: true,  x_inc:  -2, y_inc: 15 },
+]) {
+	tick2(args);
 }
