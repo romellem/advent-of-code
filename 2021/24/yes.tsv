@@ -1,0 +1,18 @@
+inp w	inp w	inp w	inp w	inp w	inp w	inp w	inp w	inp w	inp w	inp w	inp w	inp w	inp w
+mul x 0	mul x 0	mul x 0	mul x 0	mul x 0	mul x 0	mul x 0	mul x 0	mul x 0	mul x 0	mul x 0	mul x 0	mul x 0	mul x 0
+add x z	add x z	add x z	add x z	add x z	add x z	add x z	add x z	add x z	add x z	add x z	add x z	add x z	add x z
+mod x 26	mod x 26	mod x 26	mod x 26	mod x 26	mod x 26	mod x 26	mod x 26	mod x 26	mod x 26	mod x 26	mod x 26	mod x 26	mod x 26
+div z 1	div z 1	div z 1	div z 26	div z 1	div z 26	div z 26	div z 26	div z 1	div z 26	div z 1	div z 1	div z 26	div z 26
+add x 10	add x 13	add x 12	add x -12	add x 11	add x -13	add x -9	add x -12	add x 14	add x -9	add x 15	add x 11	add x -16	add x -2
+eql x w	eql x w	eql x w	eql x w	eql x w	eql x w	eql x w	eql x w	eql x w	eql x w	eql x w	eql x w	eql x w	eql x w
+eql x 0	eql x 0	eql x 0	eql x 0	eql x 0	eql x 0	eql x 0	eql x 0	eql x 0	eql x 0	eql x 0	eql x 0	eql x 0	eql x 0
+mul y 0	mul y 0	mul y 0	mul y 0	mul y 0	mul y 0	mul y 0	mul y 0	mul y 0	mul y 0	mul y 0	mul y 0	mul y 0	mul y 0
+add y 25	add y 25	add y 25	add y 25	add y 25	add y 25	add y 25	add y 25	add y 25	add y 25	add y 25	add y 25	add y 25	add y 25
+mul y x	mul y x	mul y x	mul y x	mul y x	mul y x	mul y x	mul y x	mul y x	mul y x	mul y x	mul y x	mul y x	mul y x
+add y 1	add y 1	add y 1	add y 1	add y 1	add y 1	add y 1	add y 1	add y 1	add y 1	add y 1	add y 1	add y 1	add y 1
+mul z y	mul z y	mul z y	mul z y	mul z y	mul z y	mul z y	mul z y	mul z y	mul z y	mul z y	mul z y	mul z y	mul z y
+mul y 0	mul y 0	mul y 0	mul y 0	mul y 0	mul y 0	mul y 0	mul y 0	mul y 0	mul y 0	mul y 0	mul y 0	mul y 0	mul y 0
+add y w	add y w	add y w	add y w	add y w	add y w	add y w	add y w	add y w	add y w	add y w	add y w	add y w	add y w
+add y 5	add y 9	add y 4	add y 4	add y 10	add y 14	add y 14	add y 12	add y 14	add y 14	add y 5	add y 10	add y 8	add y 15
+mul y x	mul y x	mul y x	mul y x	mul y x	mul y x	mul y x	mul y x	mul y x	mul y x	mul y x	mul y x	mul y x	mul y x
+add z y	add z y	add z y	add z y	add z y	add z y	add z y	add z y	add z y	add z y	add z y	add z y	add z y	add z y
