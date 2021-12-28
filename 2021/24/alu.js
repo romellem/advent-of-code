@@ -7,6 +7,7 @@ export class ALU {
 			y: 0,
 			z: 0,
 		};
+		this.steps = [];
 
 		this.input = Array.isArray(input)
 			? [...input]
@@ -24,6 +25,7 @@ export class ALU {
 
 	// inp a - Read an input value and write it to variable a.
 	inp(register) {
+		this.steps.push({ ...this.registers });
 		this.registers[register] = this.input.shift();
 	}
 	// add a b - Add the value of a to the value of b, then store the result in variable a.
@@ -54,9 +56,12 @@ export class ALU {
 
 			this[op](...args);
 		}
+
+		this.steps.push({ ...this.registers });
 	}
 
 	reset() {
 		this.input = [...this.input_copy];
+		this.steps = [];
 	}
 }
