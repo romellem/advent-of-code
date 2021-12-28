@@ -67,8 +67,8 @@ for (let args of [
 	{ truncate_z: true,  x_inc: -13, y_inc: 14, input: 2 }, // (5 + 10) - 13 = 2
 	{ truncate_z: true,  x_inc:  -9, y_inc: 14, input: 7 }, // (2 + 14) - 9 = 7
 	{ truncate_z: true,  x_inc: -12, y_inc: 12, input: 9 }, // (7 + 14) - 12 = 9
-	{ truncate_z: false, x_inc:  14, y_inc: 14, input: 000 },
-	{ truncate_z: true,  x_inc:  -9, y_inc: 14, input: 000 },
+	{ truncate_z: false, x_inc:  14, y_inc: 14, input: 4 }, // 4
+	{ truncate_z: true,  x_inc:  -9, y_inc: 14, input: 9 }, // (4 + 14) - 9 = 9
 	{ truncate_z: false, x_inc:  15, y_inc:  5, input: 000 },
 	{ truncate_z: false, x_inc:  11, y_inc: 10, input: 000 },
 	{ truncate_z: true,  x_inc: -16, y_inc:  8, input: 000 },
