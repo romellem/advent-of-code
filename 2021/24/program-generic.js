@@ -59,14 +59,14 @@ let w = (x = y = z = 0);
 
 // prettier-ignore
 for (let args of [
-	{ truncate_z: false, x_inc:  10, y_inc:  5, input: 000 },
-	{ truncate_z: false, x_inc:  13, y_inc:  9, input: 000 },
+	{ truncate_z: false, x_inc:  10, y_inc:  5, input: 9 }, // (prev_input + prev_y_inc) + x_inc = someValidInput?
+	{ truncate_z: false, x_inc:  13, y_inc:  9, input: 9 },
 	{ truncate_z: false, x_inc:  12, y_inc:  4, input: 9 },
-	{ truncate_z: true,  x_inc: -12, y_inc:  4, input: 1 },
-	{ truncate_z: false, x_inc:  11, y_inc: 10, input: 000 },
-	{ truncate_z: true,  x_inc: -13, y_inc: 14, input: 000 },
-	{ truncate_z: true,  x_inc:  -9, y_inc: 14, input: 000 },
-	{ truncate_z: true,  x_inc: -12, y_inc: 12, input: 000 },
+	{ truncate_z: true,  x_inc: -12, y_inc:  4, input: 1 }, // (9 + 4) - 12 = 1
+	{ truncate_z: false, x_inc:  11, y_inc: 10, input: 9 },
+	{ truncate_z: true,  x_inc: -13, y_inc: 14, input: 6 }, // (prev_input + 10) - 13 = someValidInput? = 5
+	{ truncate_z: true,  x_inc:  -9, y_inc: 14, input: 7 }, // (6 + 14) - 9 = someValidInput? = 7
+	{ truncate_z: true,  x_inc: -12, y_inc: 12, input: 000 }, // (6 + 10) - 9 = someValidInput? = 7
 	{ truncate_z: false, x_inc:  14, y_inc: 14, input: 000 },
 	{ truncate_z: true,  x_inc:  -9, y_inc: 14, input: 000 },
 	{ truncate_z: false, x_inc:  15, y_inc:  5, input: 000 },
