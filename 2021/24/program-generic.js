@@ -94,7 +94,7 @@ let w = (x = y = z = 0);
 14, 18;
 14, 18, 13;
 14, 18;
-14, 18, 15;
+14, 18, 19;
 14, 18;
 14;
 18;
@@ -103,6 +103,7 @@ let w = (x = y = z = 0);
 11;
 
 // 99915292496939 gives me 0 at the end, but it says it is _too low_
+// 99919692496939 is correct!
 
 // prettier-ignore
 for (let args of [
@@ -110,8 +111,8 @@ for (let args of [
 	/*  2 */ { truncate_z: false, x_inc:  13, y_inc:  9, input: 9 }, // push 9 + 9 = 18
 	/*  3 */ { truncate_z: false, x_inc:  12, y_inc:  4, input: 9 }, // push 4 + 9 = 13
 	/*  4 */ { truncate_z: true,  x_inc: -12, y_inc:  4, input: 1 }, // pop 13 - 12 = 1
-	/*  5 */ { truncate_z: false, x_inc:  11, y_inc: 10, input: 5 }, // push 10 + 5 = 15
-	/*  6 */ { truncate_z: true,  x_inc: -13, y_inc: 14, input: 2 }, // pop 15 - 13 = 2
+	/*  5 */ { truncate_z: false, x_inc:  11, y_inc: 10, input: 9 }, // push 10 + 9 = 19
+	/*  6 */ { truncate_z: true,  x_inc: -13, y_inc: 14, input: 6 }, // pop 19 - 13 = 6
 	/*  7 */ { truncate_z: true,  x_inc:  -9, y_inc: 14, input: 9 }, // pop 18 - 9 = 9
 	/*  8 */ { truncate_z: true,  x_inc: -12, y_inc: 12, input: 2 }, // pop 14 - 12 = 2
 	/*  9 */ { truncate_z: false, x_inc:  14, y_inc: 14, input: 4 }, // push 14 + 4 = 18
