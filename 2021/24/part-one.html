@@ -26,7 +26,7 @@
 			<li id="y">y: <span></span></li>
 			<li id="z">z: <span></span></li>
 		</ul>
-		<ol id="steps" style="font-family: monospace"></ol>
+		<ol id="steps" style="font-family: monospace" start="0"></ol>
 		<hr />
 		<pre id="winners-ele"></pre>
 		<script>
@@ -59,14 +59,14 @@
 				const { ALU } = await import('./alu.js');
 				const winners = new Set();
 
-				steps_ele.innerHTML = '';
 				input_ele.addEventListener('input', () => {
+					steps_ele.innerHTML = '';
 					const input_str = input_ele.value;
 					if (input_str.length === 14) {
 						const alu = new ALU(instructions_arr, input_str);
 						alu.run();
 						const maxes = regsMax(alu.steps);
-						console.log(maxes);
+
 						for (let li of alu.steps.map((regs) => {
 							const li_ele = document.createElement('li');
 							li_ele.innerHTML = regsToString(regs, maxes);
