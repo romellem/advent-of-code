@@ -124,3 +124,31 @@ for (let args of [
 ]) {
 	tick2(args);
 }
+
+13;
+13, 10;
+13, 10, 13;
+13, 10;
+13, 10, 14;
+13, 10;
+13;
+
+// prettier-ignore
+for (let args of [
+	/*  1 */ { truncate_z: false, x_inc:  10, y_inc:  5, input: 8 }, // push 5 + 8 = 13
+	/*  2 */ { truncate_z: false, x_inc:  13, y_inc:  9, input: 1 }, // push 9 + 1 = 10
+	/*  3 */ { truncate_z: false, x_inc:  12, y_inc:  4, input: 9 }, // push 4 + 9 = 13
+	/*  4 */ { truncate_z: true,  x_inc: -12, y_inc:  4, input: 1 }, // pop 13 - 12 = 1
+	/*  5 */ { truncate_z: false, x_inc:  11, y_inc: 10, input: 4 }, // push 10 + 4 = 14
+	/*  6 */ { truncate_z: true,  x_inc: -13, y_inc: 14, input: 1 }, // pop 14 - 13 = 1
+	/*  7 */ { truncate_z: true,  x_inc:  -9, y_inc: 14, input: 1 }, // pop 10 - 9 = 9
+	/*  8 */ { truncate_z: true,  x_inc: -12, y_inc: 12, input: 2 }, // pop 13 - 12 = 1
+	/*  9 */ { truncate_z: false, x_inc:  14, y_inc: 14, input: 1 }, // push 14 + 1 = 15
+	/* 10 */ { truncate_z: true,  x_inc:  -9, y_inc: 14, input: 6 }, // pop 15 - 9
+	/* 11 */ { truncate_z: false, x_inc:  15, y_inc:  5, input: 1 }, // push 5 + 1 = 6
+	/* 12 */ { truncate_z: false, x_inc:  11, y_inc: 10, input: 7 }, // push 10 + 7 = 17
+	/* 13 */ { truncate_z: true,  x_inc: -16, y_inc:  8, input: 1 }, // pop 17 - 16
+	/* 14 */ { truncate_z: true,  x_inc:  -2, y_inc: 15, input: 4 }, // pop 6 - 2
+]) {
+	tick2(args);
+}
