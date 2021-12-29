@@ -60,9 +60,9 @@
 				const winners = new Set();
 
 				input_ele.addEventListener('input', () => {
-					steps_ele.innerHTML = '';
 					const input_str = input_ele.value;
 					if (input_str.length === 14) {
+						steps_ele.innerHTML = '';
 						const alu = new ALU(instructions_arr, input_str);
 						alu.run();
 						const maxes = regsMax(alu.steps);
