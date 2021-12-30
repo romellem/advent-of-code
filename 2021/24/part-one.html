@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<style>
+			input:invalid {
+				border: 2px dashed red;
+			}
+			input:invalid:focus {
+				background-color: pink;
+			}
+
+			input {
+				width: 200px;
+			}
+		</style>
+	</head>
+	<body>
+		<label>Input: <input id="num" placeholder="Enter 14 digit number" minlength="14" /></label>
+		<ul>
+			<li id="w">w: <span></span></li>
+			<li id="x">x: <span></span></li>
+			<li id="y">y: <span></span></li>
+			<li id="z">z: <span></span></li>
+		</ul>
+		<ol id="steps" style="font-family: monospace" start="0"></ol>
+		<hr />
+		<pre id="winners-ele"></pre>
+		<script>
+			const input_ele = document.getElementById('num');
+			const winners_ele = document.getElementById('winners-ele');
+			const steps_ele = document.getElementById('steps');
+			const regsMax = (steps) =>
+				steps.reduce(
+					(acc, cur) => {
+						for (let r in cur) {
+							if (String(cur[r]).length > acc[r]) {
+								acc[r] = String(cur[r]).length;
+							}
+						}
+						return acc;
+					},
+					{ w: 0, x: 0, y: 0, z: 0 }
+				);
+			const regsToString = (regs, maxes) =>
+				`w: ${String(regs.w).padStart(maxes.w)}, x: ${String(regs.x).padStart(
+					maxes.x
+				)}, y: ${String(regs.y).padStart(maxes.y)}, <b>z: ${String(regs.z).padStart(
+					maxes.z
+				)}</b>`;
+			(async () => {
+				const instructions_arr = await fetch('/input.txt')
+					.then((response) => response.text())
+					.then((raw_input) => raw_input.trim().split('\n'));
+
+				const { ALU } = await import('./alu.js');
+				const winners = new Set();
+
+				input_ele.addEventListener('input', () => {
+					const input_str = input_ele.value;
+					if (input_str.length === 14) {
+						steps_ele.innerHTML = '';
+						const alu = new ALU(instructions_arr, input_str);
+						alu.run();
+						const maxes = regsMax(alu.steps);
+
+						for (let li of alu.steps.map((regs) => {
+							const li_ele = document.createElement('li');
+							li_ele.innerHTML = regsToString(regs, maxes);
+							li_ele.style.whiteSpace = 'pre-wrap';
+							return li_ele;
+						})) {
+							steps_ele.appendChild(li);
+						}
+						for (let register of ['w', 'x', 'y', 'z']) {
+							let output = document.querySelector(`#${register} > span`);
+							output.innerText = alu.registers[register];
+							if (register === 'z') {
+								if (alu.registers.z === 0) {
+									winners.add(input_str);
+									// Can sort by string since they are all the same length
+									winners_ele.value = [...winners].sort().join('\n');
+									output.innerText += ' ✅';
+								} else {
+									output.innerText += ' ‼️';
+								}
+							}
+						}
+					}
+				});
+			})();
+		</script>
+	</body>
+</html>
