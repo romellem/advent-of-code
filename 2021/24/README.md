@@ -1,11 +1,10 @@
 # Answers
 
-| Part 1 | Part 2 |
-| ------ | ------ |
-|  ` ` | ` ` |
+|      Part 1      |      Part 2      |
+| ---------------- | ---------------- |
+| `99919692496939` | `81914111161714` |
 
 ## --- Day 24: Arithmetic Logic Unit ---
---------------------------------------
 
 [Magic smoke](https://en.wikipedia.org/wiki/Magic_smoke) starts leaking from the submarine's [arithmetic logic unit](https://en.wikipedia.org/wiki/Arithmetic_logic_unit) (ALU). Without the ability to perform basic arithmetic and logic functions, the submarine can't produce cool patterns with its Christmas lights!
 
@@ -68,3 +67,9 @@ Then, after MONAD has finished running all of its instructions, it will indicate
 MONAD imposes additional, mysterious restrictions on model numbers, and legend says the last copy of the MONAD documentation was eaten by a [tanuki](https://en.wikipedia.org/wiki/Japanese_raccoon_dog). You'll need to _figure out what MONAD does_ some other way.
 
 To enable as many submarine features as possible, find the largest valid fourteen-digit model number that contains no `0` digits. _What is the largest model number accepted by MONAD?_
+
+## --- Part Two ---
+
+As the submarine starts booting up things like the [Retro Encabulator](https://www.youtube.com/watch?v=RXJKdh1KZ0w), you realize that maybe you don't need all these submarine features after all.
+
+_What is the smallest model number accepted by MONAD?_
