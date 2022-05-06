@@ -1,6 +1,6 @@
 class RegexNode {
 	constructor(x, y) {
-		this.id = RegexNode.toId(`${x},${y}`);
+		this.id = RegexNode.toId(x, y);
 		this.coords = { x, y };
 
 		this.N = undefined;
@@ -86,7 +86,9 @@ class RegexMap {
 	build(path) {
 		let stack = [];
 
+		let i = 0;
 		for (let char of path) {
+			console.log(++i);
 			if (char === '^' || char === '$') {
 				continue;
 			}
@@ -94,8 +96,7 @@ class RegexMap {
 			if (char === '(') {
 				stack.push(this.atNode);
 			} else if (char === ')') {
-				stack.pop();
-				this.atNode = stack[stack.length - 1];
+				this.atNode = stack.pop();
 			} else if (char === '|') {
 				this.atNode = stack[stack.length - 1];
 			} else {
