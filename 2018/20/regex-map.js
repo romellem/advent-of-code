@@ -1,12 +1,16 @@
 class RegexNode {
 	constructor(x, y) {
-		this.id = `${x},${y}`;
-		this.coord = { x, y };
+		this.id = RegexNode.toId(`${x},${y}`);
+		this.coords = { x, y };
 
 		this.N = undefined;
 		this.S = undefined;
 		this.E = undefined;
 		this.W = undefined;
+	}
+
+	static toId(x, y) {
+		return `${x},${y}`;
 	}
 
 	idToCoord() {
@@ -41,37 +45,105 @@ class RegexNode {
 
 class RegexMap {
 	constructor() {
-		this.center = new RegexNode(0, 0);
+		this.atNode = new RegexNode(0, 0);
+		this.nodes = new Map([[this.atNode.id, this.atNode]]);
 	}
 
 	connect(from, to, dir) {
 		from.connect(to, dir);
 	}
 
+	N() {
+		let { x, y } = this.atNode.coords;
+		return this.move(x, y - 1, 'N');
+	}
+	S() {
+		let { x, y } = this.atNode.coords;
+		return this.move(x, y + 1, 'S');
+	}
+	E() {
+		let { x, y } = this.atNode.coords;
+		return this.move(x + 1, y, 'E');
+	}
+	W() {
+		let { x, y } = this.atNode.coords;
+		return this.move(x - 1, y, 'W');
+	}
+
+	move(x, y, dir) {
+		const nodeId = RegexNode.toId(x, y);
+		if (!this.nodes.has(nodeId)) {
+			let node = new RegexNode(x, y);
+			this.nodes.set(node.id, node);
+		}
+
+		const connectingNode = this.nodes.get(nodeId);
+		this.atNode.connect(connectingNode, dir);
+		this.atNode = connectingNode;
+		return this.atNode;
+	}
+
 	build(path) {
-		let origins = [{ x: 0, y: 0 }];
 		let stack = [];
-		let nodes = new Map();
-		nodes.set(this.center.id, this.center);
 
 		for (let char of path) {
 			if (char === '^' || char === '$') {
 				continue;
 			}
 
-			for (let origin of origins) {
-				if (char === '(') {
-					stack.push(atNode);
-					origins.push(atNode);
-					break;
-				} else if (char === ')') {
-					atNode = stack.pop();
-				} else if (char === '|') {
-					atNode = stack[stack.length - 1];
-				} else {
-					// Move in a direction
-				}
+			if (char === '(') {
+				stack.push(this.atNode);
+			} else if (char === ')') {
+				stack.pop();
+				this.atNode = stack[stack.length - 1];
+			} else if (char === '|') {
+				this.atNode = stack[stack.length - 1];
+			} else {
+				// Move in a direction
+				this[char]();
 			}
 		}
 	}
+
+	print() {
+		let min_x = Number.MAX_SAFE_INTEGER,
+			max_x = Number.MIN_SAFE_INTEGER,
+			min_y = Number.MAX_SAFE_INTEGER,
+			max_y = Number.MIN_SAFE_INTEGER;
+
+		for (let node of this.nodes) {
+			let { x, y } = node.coords;
+			if (x > max_x) max_x = x;
+			if (x < min_x) min_x = x;
+			if (y > max_y) max_y = y;
+			if (y < min_y) min_y = y;
+		}
+
+		if (min_x < 0) {
+			max_x += Math.abs(min_x);
+			min_x = 0;
+		} else if (min_x > 0) {
+			max_x -= Math.abs(min_x);
+			min_x = 0;
+		}
+
+		if (min_y < 0) {
+			max_y += Math.abs(min_y);
+			min_y = 0;
+		} else if (min_y > 0) {
+			max_y -= Math.abs(min_y);
+			min_y = 0;
+		}
+
+		const rows = Array(max_y)
+			.fill()
+			.map((_) => Array(max_x).fill('#'));
+
+		console.log(rows.map((row) => row.join('')).join('\n'));
+	}
 }
+
+module.exports = {
+	RegexMap,
+	RegexNode,
+};
