@@ -86,9 +86,7 @@ class RegexMap {
 	build(path) {
 		let stack = [];
 
-		let i = 0;
 		for (let char of path) {
-			console.log(++i);
 			if (char === '^' || char === '$') {
 				continue;
 			}
@@ -112,7 +110,7 @@ class RegexMap {
 			min_y = Number.MAX_SAFE_INTEGER,
 			max_y = Number.MIN_SAFE_INTEGER;
 
-		for (let node of this.nodes) {
+		for (let node of this.nodes.values()) {
 			let { x, y } = node.coords;
 			if (x > max_x) max_x = x;
 			if (x < min_x) min_x = x;
@@ -120,25 +118,52 @@ class RegexMap {
 			if (y < min_y) min_y = y;
 		}
 
+		let xd, yd;
 		if (min_x < 0) {
-			max_x += Math.abs(min_x);
+			xd = Math.abs(min_x);
+			max_x += xd;
 			min_x = 0;
 		} else if (min_x > 0) {
-			max_x -= Math.abs(min_x);
+			xd = -min_x;
+			max_x += xd;
 			min_x = 0;
 		}
 
 		if (min_y < 0) {
+			yd = Math.abs(min_y);
 			max_y += Math.abs(min_y);
 			min_y = 0;
 		} else if (min_y > 0) {
-			max_y -= Math.abs(min_y);
+			yd = -min_y;
+			max_y += yd;
 			min_y = 0;
 		}
 
-		const rows = Array(max_y)
+		// Pad `1 + 1` for borders on every side, plus another 1 for 0-index
+		// (if `max_y = 9`, we have 10 rows, so need `9 + 3 = 12` rows total for border)
+		// Times 2 since we need rows and cols for the doors.
+		const rows = Array(max_y * 2 + 3)
 			.fill()
-			.map((_) => Array(max_x).fill('#'));
+			.map((_) => Array(max_x * 2 + 3).fill('#'));
+
+		for (let node of this.nodes.values()) {
+			let { x, y } = node.coords;
+			let xp = (x + xd) * 2 + 1;
+			let yp = (y + yd) * 2 + 1;
+			rows[yp][xp] = node.id === '0,0' ? 'X' : '.';
+			if (node.N) {
+				rows[yp - 1][xp] = '-';
+			}
+			if (node.S) {
+				rows[yp + 1][xp] = '-';
+			}
+			if (node.W) {
+				rows[yp][xp - 1] = '|';
+			}
+			if (node.E) {
+				rows[yp][xp + 1] = '|';
+			}
+		}
 
 		console.log(rows.map((row) => row.join('')).join('\n'));
 	}
