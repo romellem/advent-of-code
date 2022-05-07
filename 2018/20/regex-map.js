@@ -182,29 +182,41 @@ class RegexMap {
 			.fill()
 			.map((_) => Array(max_x * 2 + 3).fill('#'));
 
-		console.log(optionalPath.get('0,0'));
-
 		for (let node of this.nodes.values()) {
 			let { x, y } = node.coords;
 			let xp = (x + xd) * 2 + 1;
 			let yp = (y + yd) * 2 + 1;
-			let char =
-				optionalPath && optionalPath.has(RegexNode.toId(x, y))
-					? optionalPath.get(RegexNode.toId(x, y)).char
-					: '.';
-			rows[yp][xp] = node.id === '0,0' ? 'X' : char;
+			rows[yp][xp] = node.id === '0,0' ? 'X' : '.';
 
 			if (node.N) {
-				rows[yp - 1][xp] = char === '^' ? '^' : '-';
+				rows[yp - 1][xp] = '-';
 			}
 			if (node.S) {
-				rows[yp + 1][xp] = char === 'v' ? 'v' : '-';
+				rows[yp + 1][xp] = '-';
 			}
 			if (node.W) {
-				rows[yp][xp - 1] = char === '<' ? '<' : '|';
+				rows[yp][xp - 1] = '|';
 			}
 			if (node.E) {
-				rows[yp][xp + 1] = char === '>' ? '>' : '|';
+				rows[yp][xp + 1] = '|';
+			}
+		}
+
+		if (optionalPath) {
+			let pathArr = [...optionalPath.values()].reverse();
+			for (let i = 0; i < pathArr.length; i++) {
+				let { node, char } = pathArr[i];
+
+				let { x, y } = node.coords;
+				let xp = (x + xd) * 2 + 1;
+				let yp = (y + yd) * 2 + 1;
+				let xo = char === '<' ? -1 : char === '>' ? 1 : 0;
+				let yo = char === '^' ? -1 : char === 'v' ? 1 : 0;
+				rows[yp + yo][xp + xo] = char;
+
+				if (node.id !== '0,0') {
+					rows[yp][xp] = char;
+				}
 			}
 		}
 
