@@ -104,6 +104,32 @@ class RegexMap {
 		}
 	}
 
+	buildFrontierFrom(from_x, from_y) {
+		const from_id = RegexNode.toId(from_x, from_y);
+
+		const frontier = [];
+		frontier.push(this.nodes.get(from_id));
+
+		const paths = new Map([[from_id, { cameFrom: null, cost: 0 }]]);
+		while (frontier.length > 0) {
+			const current = frontier.pop();
+
+			const neighbors = [current.N, current.E, current.S, current.W].filter((v) => v);
+
+			for (let neighbor of neighbors) {
+				if (!paths.has(neighbor.id)) {
+					frontier.push(neighbor);
+					paths.set(neighbor.id, {
+						cameFrom: current,
+						cost: paths.get(current.id).cost + 1,
+					});
+				}
+			}
+		}
+
+		return paths;
+	}
+
 	print() {
 		let min_x = Number.MAX_SAFE_INTEGER,
 			max_x = Number.MIN_SAFE_INTEGER,

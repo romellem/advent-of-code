@@ -1,8 +1,8 @@
 # Answers
 
-|   Part 1   | Part 2  |
-|------------|---------|
-| ` ` | ` ` |
+| Part 1 | Part 2 |
+|--------|--------|
+| `3675` | `7953` |
 
 ## --- Day 20: A Regular Map ---
 
@@ -150,3 +150,9 @@ Here are a few more examples:
     
 
 _What is the largest number of doors you would be required to pass through to reach a room?_ That is, find the room for which the shortest path from your starting location to that room would require passing through the most doors; what is the fewest doors you can pass through to reach it?
+
+## --- Part Two ---
+
+Okay, so the facility is _big_.
+
+_How many rooms have a shortest path from your current location that pass through at least `1000` doors?_
