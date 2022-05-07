@@ -41,6 +41,13 @@ class RegexNode {
 				break;
 		}
 	}
+
+	dirTo(node) {
+		if (this.N === node) return 'N';
+		if (this.E === node) return 'E';
+		if (this.S === node) return 'S';
+		if (this.W === node) return 'W';
+	}
 }
 
 class RegexMap {
@@ -130,7 +137,10 @@ class RegexMap {
 		return paths;
 	}
 
-	print() {
+	/**
+	 * @param {Map<string, {node: RegexNode, char: string}>} optionalPath
+	 */
+	print(optionalPath) {
 		let min_x = Number.MAX_SAFE_INTEGER,
 			max_x = Number.MIN_SAFE_INTEGER,
 			min_y = Number.MAX_SAFE_INTEGER,
@@ -172,22 +182,29 @@ class RegexMap {
 			.fill()
 			.map((_) => Array(max_x * 2 + 3).fill('#'));
 
+		console.log(optionalPath.get('0,0'));
+
 		for (let node of this.nodes.values()) {
 			let { x, y } = node.coords;
 			let xp = (x + xd) * 2 + 1;
 			let yp = (y + yd) * 2 + 1;
-			rows[yp][xp] = node.id === '0,0' ? 'X' : '.';
+			let char =
+				optionalPath && optionalPath.has(RegexNode.toId(x, y))
+					? optionalPath.get(RegexNode.toId(x, y)).char
+					: '.';
+			rows[yp][xp] = node.id === '0,0' ? 'X' : char;
+
 			if (node.N) {
-				rows[yp - 1][xp] = '-';
+				rows[yp - 1][xp] = char === '^' ? '^' : '-';
 			}
 			if (node.S) {
-				rows[yp + 1][xp] = '-';
+				rows[yp + 1][xp] = char === 'v' ? 'v' : '-';
 			}
 			if (node.W) {
-				rows[yp][xp - 1] = '|';
+				rows[yp][xp - 1] = char === '<' ? '<' : '|';
 			}
 			if (node.E) {
-				rows[yp][xp + 1] = '|';
+				rows[yp][xp + 1] = char === '>' ? '>' : '|';
 			}
 		}
 
