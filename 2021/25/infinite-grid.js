@@ -129,18 +129,18 @@ class InfiniteGrid {
 			if (this.inBounds(new_x) && !this.inBounds(undefined, new_y)) {
 				if (direction === 'N') {
 					// Wrap to bottom
-					return [this.get(new_x, this.max_y), coord];
+					return [this.get(new_x, this.max_y), [new_x, this.max_y]];
 				} else {
 					// Wrap to top
-					return [this.get(new_x, this.min_y), coord];
+					return [this.get(new_x, this.min_y), [new_x, this.min_y]];
 				}
 			} else if (!this.inBounds(new_x) && this.inBounds(undefined, new_y)) {
 				if (direction === 'E') {
 					// Wrap to left
-					return [this.get(this.min_x, new_y), coord];
+					return [this.get(this.min_x, new_y), [this.min_x, new_y]];
 				} else {
 					// Wrap to right
-					return [this.get(this.max_x, new_y), coord];
+					return [this.get(this.max_x, new_y), [this.max_x, new_y]];
 				}
 			}
 		}
