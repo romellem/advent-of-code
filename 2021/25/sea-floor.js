@@ -27,10 +27,6 @@ class SeaFloor {
 
 		let new_grid = this.grid.clone();
 		for (let [cell, [x, y]] of this.grid.findAll(direction)) {
-			if (y === this.grid.max_y) {
-				// console.log('stop');
-			}
-
 			const [neighbor_value, neighbor_coord] = this.grid.getNeighbor(x, y, direction, {
 				wrap_around: true,
 			});
