@@ -60,6 +60,31 @@ class InfiniteGrid {
 		return two_dimensional_string.split('\n').map((row) => row.split(''));
 	}
 
+	static moveInDirection(x, y, direction) {
+		switch (direction) {
+			case 'N':
+				return [x, y - 1];
+			case 'W':
+				return [x - 1, y];
+			case 'E':
+				return [x + 1, y];
+			case 'S':
+				return [x, y + 1];
+			case 'NW':
+				return [x - 1, y - 1];
+			case 'NE':
+				return [x + 1, y - 1];
+			case 'SW':
+				return [x - 1, y + 1];
+			case 'SE':
+				return [x + 1, y + 1];
+			default:
+				throw new Error(
+					'Invalid direction for moveInDirection. Valid directions are N, W, E, S, NW, NE, SW, SE'
+				);
+		}
+	}
+
 	reset() {
 		this.grid = new Map();
 		this.max_x = -Infinity;
@@ -86,38 +111,39 @@ class InfiniteGrid {
 		}
 	}
 
-	static moveInDirection(x, y, direction) {
-		switch (direction) {
-			case 'N':
-				return [x, y - 1];
-			case 'W':
-				return [x - 1, y];
-			case 'E':
-				return [x + 1, y];
-			case 'S':
-				return [x, y + 1];
-			case 'NW':
-				return [x - 1, y - 1];
-			case 'NE':
-				return [x + 1, y - 1];
-			case 'SW':
-				return [x - 1, y + 1];
-			case 'SE':
-				return [x + 1, y + 1];
-			default:
-				throw new Error(
-					'Invalid direction for moveInDirection. Valid directions are N, W, E, S, NW, NE, SW, SE'
-				);
-		}
-	}
-
+	/**
+	 * @todo The "wrap around" only really makes sense in a rectangular grid.
+	 * Try to code in the cases where we have some cols/rows that are larger than others.
+	 */
 	getNeighbor(x, y, direction, { wrap_around = false } = {}) {
 		if (!this.inBounds(x, y)) {
-			return undefined;
+			return;
 		}
 
-		let [new_x, new_y] = InfiniteGrid.moveInDirection(x, y, direction);
-		// if ()
+		const coord = InfiniteGrid.moveInDirection(x, y, direction);
+		const [new_x, new_y] = coord;
+
+		if (this.inBounds(new_x, new_y)) {
+			return [this.get(new_x, new_y), coord];
+		} else if (wrap_around) {
+			if (this.inBounds(new_x) && !this.inBounds(undefined, new_y)) {
+				if (direction === 'N') {
+					// Wrap to bottom
+					return [this.get(new_x, this.max_y), coord];
+				} else {
+					// Wrap to top
+					return [this.get(new_x, this.min_y), coord];
+				}
+			} else if (!this.inBounds(new_x) && this.inBounds(undefined, new_y)) {
+				if (direction === 'E') {
+					// Wrap to left
+					return [this.get(this.min_x, new_y), coord];
+				} else {
+					// Wrap to right
+					return [this.get(this.max_x, new_y), coord];
+				}
+			}
+		}
 	}
 
 	/**
