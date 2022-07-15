@@ -9,6 +9,7 @@ class SeaFloor {
 		this.raw_input = input;
 		this.grid = new InfiniteGrid({
 			load: this.raw_input,
+			defaultFactory: () => '.',
 			parseAs: (value) => {
 				if (value === EAST) {
 					return 'E';
@@ -24,18 +25,20 @@ class SeaFloor {
 	halfStep(direction) {
 		let some_cell_has_moved = false;
 
-		let new_grid = this.grid.clone({ empty: true });
+		let new_grid = this.grid.clone();
 		for (let [cell, [x, y]] of this.grid.findAll(direction)) {
 			const [neighbor_value, neighbor_coord] = this.grid.getNeighbor(x, y, direction, {
 				wrap_around: true,
 			});
 
+			if (y === this.grid.max_y) {
+				// console.log('stop');
+			}
+
 			if (neighbor_value === EMPTY) {
 				some_cell_has_moved = true;
 				new_grid.set(x, y, EMPTY);
 				new_grid.set(...neighbor_coord, cell);
-			} else {
-				new_grid.set(x, y, cell);
 			}
 		}
 
