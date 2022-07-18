@@ -1,4 +1,4 @@
-const { input } = require('./input.js');
+const { sampleInput: input } = require('./input.js');
 const grid = input.split('\n').map((row) => row.split(''));
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -13,7 +13,7 @@ grid_b.name = 'grid_b';
 grid_c.name = 'grid_c';
 grid_d.name = 'grid_d';
 
-const grids = [grid_a, grid_b, grid_c, grid_d];
+const grids = [grid_a, grid_b /*, grid_c, grid_d*/];
 
 let neighborCoord = { x: null, y: null };
 function updateNeighborCoord(x, y, direction, grid) {
@@ -27,6 +27,10 @@ function updateNeighborCoord(x, y, direction, grid) {
 	neighborCoord.y = ny;
 
 	return neighborCoord;
+}
+
+function print(grid) {
+	console.log(grid.map((row) => row.join('')).join('\n'));
 }
 
 let halfCount = 0;
@@ -44,6 +48,7 @@ function step() {
 				if (cell === direction) {
 					// Try to move
 					updateNeighborCoord(x, y, cell, grid);
+					// console.log(`${cell}: ${x},${y} -> ${neighborCoord.x},${neighborCoord.y}`);
 					const neighbor = grid[neighborCoord.y][neighborCoord.x];
 					if (neighbor === '.') {
 						something_moved = true;
@@ -52,17 +57,25 @@ function step() {
 					} else {
 						new_grid[y][x] = cell;
 					}
-				} else {
+				} else if (cell !== '.') {
 					new_grid[y][x] = cell;
 				}
 			}
 		}
+
+		console.log(halfCount / 2);
+		print(new_grid);
+		console.log('----------\n');
 	}
 
 	return something_moved;
 }
 
 function run() {
+	console.log(halfCount / 2);
+	print(grids[halfCount % grids.length]);
+	console.log('----------\n');
+
 	let moved;
 	do {
 		moved = step();

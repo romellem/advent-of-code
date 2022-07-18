@@ -8,4 +8,13 @@ const input = fs
 
 module.exports = {
 	input,
+	sampleInput: `v...>>.vv>
+.vv>>.vv..
+>>.>v>...v
+>>v>>.>.v.
+v>v.vv.v..
+>.>>..v...
+.vv..>.>v.
+v.v..>>v.v
+....v..v.>`
 };
