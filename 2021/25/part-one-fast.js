@@ -5,7 +5,8 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 
 const grid_a = grid;
 const grid_b = clone(grid);
-const grids = [grid_a, grid_b];
+const grid_c = clone(grid);
+const grids = [grid_a, grid_b, grid_c];
 
 let neighborCoord = { x: null, y: null };
 function updateNeighborCoord(x, y, direction, grid) {
@@ -34,6 +35,7 @@ function step() {
 
 		const grid = grids[halfCount++ % grids.length];
 		const new_grid = grids[halfCount % grids.length];
+		const previous_grid = grids[(halfCount + 1) % grids.length];
 
 		for (let y = 0; y < grid.length; y++) {
 			for (let x = 0; x < grid[y].length; x++) {
@@ -53,12 +55,9 @@ function step() {
 				} else if (cell !== '.') {
 					new_grid[y][x] = cell;
 				}
-			}
-		}
 
-		for (let y = 0; y < grid.length; y++) {
-			for (let x = 0; x < grid[y].length; x++) {
-				grid[y][x] = new_grid[y][x];
+				// Keep the previous grid up to date with the instantaneous changes in the new_grid
+				previous_grid[y][x] = new_grid[y][x];
 			}
 		}
 
