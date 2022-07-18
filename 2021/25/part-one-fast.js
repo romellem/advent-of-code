@@ -1,19 +1,11 @@
-const { sampleInput: input } = require('./input.js');
+const { input } = require('./input.js');
 const grid = input.split('\n').map((row) => row.split(''));
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
 const grid_a = grid;
 const grid_b = clone(grid);
-const grid_c = clone(grid);
-const grid_d = clone(grid);
-
-grid_a.name = 'grid_a';
-grid_b.name = 'grid_b';
-grid_c.name = 'grid_c';
-// grid_d.name = 'grid_d';
-
-const grids = [grid_a, grid_b, grid_c /*, grid_d*/];
+const grids = [grid_a, grid_b];
 
 let neighborCoord = { x: null, y: null };
 function updateNeighborCoord(x, y, direction, grid) {
@@ -39,8 +31,7 @@ function step() {
 	let something_moved = false;
 	for (let d = 0; d < directions.length; d++) {
 		let direction = directions[d];
-		const previous_grid =
-			halfCount === 0 ? grids[grids.length - 1] : grids[(halfCount - 1) % grids.length];
+
 		const grid = grids[halfCount++ % grids.length];
 		const new_grid = grids[halfCount % grids.length];
 
@@ -48,11 +39,9 @@ function step() {
 			for (let x = 0; x < grid[y].length; x++) {
 				let cell = grid[y][x];
 
-				previous_grid[y][x] = cell;
 				if (cell === direction) {
 					// Try to move
 					updateNeighborCoord(x, y, cell, grid);
-					// console.log(`${cell}: ${x},${y} -> ${neighborCoord.x},${neighborCoord.y}`);
 					const neighbor = grid[neighborCoord.y][neighborCoord.x];
 					if (neighbor === '.') {
 						something_moved = true;
@@ -67,18 +56,24 @@ function step() {
 			}
 		}
 
-		console.log(halfCount / 2);
-		print(new_grid);
-		console.log('----------\n');
+		for (let y = 0; y < grid.length; y++) {
+			for (let x = 0; x < grid[y].length; x++) {
+				grid[y][x] = new_grid[y][x];
+			}
+		}
+
+		// console.log(halfCount / 2);
+		// print(new_grid);
+		// console.log('----------\n');
 	}
 
 	return something_moved;
 }
 
 function run() {
-	console.log(halfCount / 2);
-	print(grids[halfCount % grids.length]);
-	console.log('----------\n');
+	// console.log(halfCount / 2);
+	// print(grids[halfCount % grids.length]);
+	// console.log('----------\n');
 
 	let moved;
 	do {
