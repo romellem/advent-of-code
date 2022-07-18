@@ -11,9 +11,9 @@ const grid_d = clone(grid);
 grid_a.name = 'grid_a';
 grid_b.name = 'grid_b';
 grid_c.name = 'grid_c';
-grid_d.name = 'grid_d';
+// grid_d.name = 'grid_d';
 
-const grids = [grid_a, grid_b /*, grid_c, grid_d*/];
+const grids = [grid_a, grid_b, grid_c /*, grid_d*/];
 
 let neighborCoord = { x: null, y: null };
 function updateNeighborCoord(x, y, direction, grid) {
@@ -39,12 +39,16 @@ function step() {
 	let something_moved = false;
 	for (let d = 0; d < directions.length; d++) {
 		let direction = directions[d];
+		const previous_grid =
+			halfCount === 0 ? grids[grids.length - 1] : grids[(halfCount - 1) % grids.length];
 		const grid = grids[halfCount++ % grids.length];
 		const new_grid = grids[halfCount % grids.length];
 
 		for (let y = 0; y < grid.length; y++) {
 			for (let x = 0; x < grid[y].length; x++) {
 				let cell = grid[y][x];
+
+				previous_grid[y][x] = cell;
 				if (cell === direction) {
 					// Try to move
 					updateNeighborCoord(x, y, cell, grid);
