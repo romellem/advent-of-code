@@ -1,37 +1,87 @@
 const Jimp = require('jimp');
 const fs = require('fs-extra');
 
-const RED_500 = Jimp.cssColorToHex('#FF206E');
-const RED_400 = Jimp.cssColorToHex('#FF0A60');
-const RED_300 = Jimp.cssColorToHex('#F50056');
-const RED_200 = Jimp.cssColorToHex('#E0004F');
-const RED_100 = Jimp.cssColorToHex('#CC0047');
+const RED_0 = Jimp.cssColorToHex('hsl(339, 100%, 56%)');
+const RED_1 = Jimp.cssColorToHex('hsl(339, 100%, 55%)');
+const RED_2 = Jimp.cssColorToHex('hsl(339, 100%, 54%)');
+const RED_3 = Jimp.cssColorToHex('hsl(339, 100%, 53%)');
+const RED_4 = Jimp.cssColorToHex('hsl(339, 100%, 52%)');
+const RED_5 = Jimp.cssColorToHex('hsl(339, 100%, 51%)');
+const RED_6 = Jimp.cssColorToHex('hsl(339, 100%, 50%)');
+const RED_7 = Jimp.cssColorToHex('hsl(339, 100%, 49%)');
+const RED_8 = Jimp.cssColorToHex('hsl(339, 100%, 48%)');
+const RED_9 = Jimp.cssColorToHex('hsl(339, 100%, 47%)');
+const RED_10 = Jimp.cssColorToHex('hsl(339, 100%, 46%)');
+const RED_11 = Jimp.cssColorToHex('hsl(339, 100%, 45%)');
+const RED_12 = Jimp.cssColorToHex('hsl(339, 100%, 44%)');
+const RED_13 = Jimp.cssColorToHex('hsl(339, 100%, 43%)');
+const RED_14 = Jimp.cssColorToHex('hsl(339, 100%, 42%)');
+const RED_15 = Jimp.cssColorToHex('hsl(339, 100%, 41%)');
+const RED_16 = Jimp.cssColorToHex('hsl(339, 100%, 40%)');
 
-const YELLOW_500 = Jimp.cssColorToHex('#FBFF12');
-const YELLOW_400 = Jimp.cssColorToHex('#FBFF0A');
-const YELLOW_300 = Jimp.cssColorToHex('#F1F500');
-const YELLOW_200 = Jimp.cssColorToHex('#DDE000');
-const YELLOW_100 = Jimp.cssColorToHex('#C9CC00');
+const YELLOW_0 = Jimp.cssColorToHex('hsl(61, 100%, 56%)');
+const YELLOW_1 = Jimp.cssColorToHex('hsl(61, 100%, 55%)');
+const YELLOW_2 = Jimp.cssColorToHex('hsl(61, 100%, 54%)');
+const YELLOW_3 = Jimp.cssColorToHex('hsl(61, 100%, 53%)');
+const YELLOW_4 = Jimp.cssColorToHex('hsl(61, 100%, 52%)');
+const YELLOW_5 = Jimp.cssColorToHex('hsl(61, 100%, 51%)');
+const YELLOW_6 = Jimp.cssColorToHex('hsl(61, 100%, 50%)');
+const YELLOW_7 = Jimp.cssColorToHex('hsl(61, 100%, 49%)');
+const YELLOW_8 = Jimp.cssColorToHex('hsl(61, 100%, 48%)');
+const YELLOW_9 = Jimp.cssColorToHex('hsl(61, 100%, 47%)');
+const YELLOW_10 = Jimp.cssColorToHex('hsl(61, 100%, 46%)');
+const YELLOW_11 = Jimp.cssColorToHex('hsl(61, 100%, 45%)');
+const YELLOW_12 = Jimp.cssColorToHex('hsl(61, 100%, 44%)');
+const YELLOW_13 = Jimp.cssColorToHex('hsl(61, 100%, 43%)');
+const YELLOW_14 = Jimp.cssColorToHex('hsl(61, 100%, 42%)');
+const YELLOW_15 = Jimp.cssColorToHex('hsl(61, 100%, 41%)');
+const YELLOW_16 = Jimp.cssColorToHex('hsl(61, 100%, 40%)');
 
 const BLACK_100 = Jimp.cssColorToHex('#0C0F0A');
 
 const NEXT_COLOR = new Map([
-	[RED_500, RED_400],
-	[RED_400, RED_300],
-	[RED_300, RED_200],
-	[RED_200, RED_100],
-	[RED_100, RED_100],
-	[YELLOW_500, YELLOW_400],
-	[YELLOW_400, YELLOW_300],
-	[YELLOW_300, YELLOW_200],
-	[YELLOW_200, YELLOW_100],
-	[YELLOW_100, YELLOW_100],
+	[RED_0, RED_1],
+	[RED_1, RED_2],
+	[RED_2, RED_3],
+	[RED_3, RED_4],
+	[RED_4, RED_5],
+	[RED_5, RED_6],
+	[RED_6, RED_7],
+	[RED_7, RED_8],
+	[RED_8, RED_9],
+	[RED_9, RED_10],
+	[RED_10, RED_11],
+	[RED_11, RED_12],
+	[RED_12, RED_13],
+	[RED_13, RED_14],
+	[RED_14, RED_15],
+	[RED_15, RED_16],
+	[RED_16, RED_16],
+	[YELLOW_0, YELLOW_1],
+	[YELLOW_1, YELLOW_2],
+	[YELLOW_2, YELLOW_3],
+	[YELLOW_3, YELLOW_4],
+	[YELLOW_4, YELLOW_5],
+	[YELLOW_5, YELLOW_6],
+	[YELLOW_6, YELLOW_7],
+	[YELLOW_7, YELLOW_8],
+	[YELLOW_8, YELLOW_9],
+	[YELLOW_9, YELLOW_10],
+	[YELLOW_10, YELLOW_11],
+	[YELLOW_11, YELLOW_12],
+	[YELLOW_12, YELLOW_13],
+	[YELLOW_13, YELLOW_14],
+	[YELLOW_14, YELLOW_15],
+	[YELLOW_15, YELLOW_16],
+	[YELLOW_16, YELLOW_16],
 	[BLACK_100, BLACK_100],
 ]);
 
+const NON_ENDING_COLOR = new Set([RED_16, YELLOW_16, BLACK_100]);
+
 const INITIAL_COLOR = new Map([
-	['>', RED_100],
-	['v', YELLOW_100],
+	['>', RED_0],
+	['v', YELLOW_0],
 	['.', BLACK_100],
 ]);
 
@@ -78,7 +128,7 @@ function getImageArray(imageGrid, moved) {
 			const coord = `${x},${y}`;
 			const cell = imageGrid[y][x];
 			if (moved.has(coord)) {
-				image[y][x] = moved.get(coord) === '>' ? RED_500 : YELLOW_500;
+				image[y][x] = moved.get(coord) === '>' ? RED_0 : YELLOW_0;
 			} else {
 				image[y][x] = NEXT_COLOR.get(cell);
 			}
@@ -92,8 +142,33 @@ async function writeImages(imageGrids) {
 	const frames_length = String(imageGrids.length).length;
 	fs.emptyDirSync('frames');
 
-	for (let i = 0; i < imageGrids.length; i++) {
-		const imageGrid = imageGrids[i];
+	const flushedImageFrames = [];
+
+	function hasNonEndingColor(frame) {
+		for (let y = 0; y < frame.length; y++) {
+			for (let x = 0; x < frame[y].length; x++) {
+				if (!NON_ENDING_COLOR.has(frame[y][x])) {
+					return true;
+				}
+			}
+		}
+	}
+
+	let nextFrame = clone(imageGrids[imageGrids.length - 1]);
+	do {
+		for (let y = 0; y < nextFrame.length; y++) {
+			for (let x = 0; x < nextFrame[y].length; x++) {
+				nextFrame[y][x] = NEXT_COLOR.get(nextFrame[y][x]);
+			}
+		}
+		flushedImageFrames.push(nextFrame);
+		nextFrame = clone(nextFrame);
+	} while (hasNonEndingColor(flushedImageFrames[flushedImageFrames.length - 1]));
+
+	const allImageGrids = [...imageGrids, ...flushedImageFrames];
+
+	for (let i = 0; i < allImageGrids.length; i++) {
+		const imageGrid = allImageGrids[i];
 		let image = await new Promise((resolve, reject) => {
 			new Jimp(imageGrid[0].length, imageGrid.length, '#FFFFFF', (err, image) =>
 				err ? reject(err) : resolve(image)
