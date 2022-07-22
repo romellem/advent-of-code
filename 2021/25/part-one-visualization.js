@@ -13,6 +13,28 @@ const YELLOW_300 = Jimp.cssColorToHex('#F1F500');
 const YELLOW_200 = Jimp.cssColorToHex('#DDE000');
 const YELLOW_100 = Jimp.cssColorToHex('#C9CC00');
 
+const BLACK_100 = Jimp.cssColorToHex('#0C0F0A');
+
+const NEXT_COLOR = new Map([
+	[RED_500, RED_400],
+	[RED_400, RED_300],
+	[RED_300, RED_200],
+	[RED_300, RED_100],
+	[RED_100, RED_100],
+	[YELLOW_500, YELLOW_400],
+	[YELLOW_400, YELLOW_300],
+	[YELLOW_300, YELLOW_200],
+	[YELLOW_300, YELLOW_100],
+	[YELLOW_100, YELLOW_100],
+	[BLACK_100, BLACK_100],
+]);
+
+const INITIAL_COLOR = new Map([
+	['>', RED_100],
+	['v', YELLOW_100],
+	['.', BLACK_100],
+]);
+
 const { input } = require('./input.js');
 const grid = input.split('\n').map((row) => row.split(''));
 
@@ -43,8 +65,31 @@ function print(grid) {
 
 let halfCount = 0;
 const directions = ['>', 'v'];
+
+function getImageArray(imageGrid, moved) {
+	// const image = await new Promise((resolve, reject) => {
+	// 	new Jimp(grid[0].length, grid.length, '#FFFFFF', (err, image) =>
+	// 		err ? reject(err) : resolve(image)
+	// 	);
+	// });
+	const image = clone(imageGrid);
+	for (let y = 0; y < imageGrid.length; y++) {
+		for (let x = 0; x < imageGrid[y].length; x++) {
+			const coord = `${x},${y}`;
+			const cell = imageGrid[y][x];
+			if (moved.has(coord)) {
+				image[y][x] = moved.get(coord) === '>' ? RED_500 : YELLOW_500;
+			} else {
+				image[y][x] = NEXT_COLOR.get(cell);
+			}
+		}
+	}
+
+	return image;
+}
+
 function step() {
-	let something_moved = false;
+	const moved = new Map();
 	for (let d = 0; d < directions.length; d++) {
 		let direction = directions[d];
 
@@ -61,9 +106,10 @@ function step() {
 					updateNeighborCoord(x, y, cell, grid);
 					const neighbor = grid[neighborCoord.y][neighborCoord.x];
 					if (neighbor === '.') {
-						something_moved = true;
 						new_grid[neighborCoord.y][neighborCoord.x] = cell;
 						new_grid[y][x] = '.';
+
+						moved.set(`${neighborCoord.x},${neighborCoord.y}`, cell);
 					} else {
 						new_grid[y][x] = cell;
 					}
@@ -81,18 +127,24 @@ function step() {
 		// console.log('----------\n');
 	}
 
-	return something_moved;
+	return moved;
 }
 
-function run() {
-	// console.log(halfCount / 2);
-	// print(grids[halfCount % grids.length]);
-	// console.log('----------\n');
+async function run() {
+	let lastImageGrid = clone(grids[0]);
+	for (let y = 0; y < lastImageGrid.length; y++) {
+		for (let x = 0; x < lastImageGrid[y].length; x++) {
+			lastImageGrid[y][x] = INITIAL_COLOR.get(lastImageGrid[y][x]);
+		}
+	}
+	let imageGrids = [lastImageGrid];
 
 	let moved;
 	do {
 		moved = step();
-	} while (moved);
+		let newImageGrid = getImageArray(imageGrids[imageGrids.length - 1], moved);
+		imageGrids.push(newImageGrid);
+	} while (moved.size);
 
 	return halfCount / 2;
 }
