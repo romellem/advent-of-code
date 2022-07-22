@@ -181,7 +181,7 @@ async function writeImages(imageGrids) {
 			}
 		}
 
-		image = image.scale(2, Jimp.RESIZE_NEAREST_NEIGHBOR);
+		image = image.scale(4, Jimp.RESIZE_NEAREST_NEIGHBOR);
 		const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
 
 		const fileName = `frames/frame_${i.toString().padStart(frames_length, '0')}.png`;
