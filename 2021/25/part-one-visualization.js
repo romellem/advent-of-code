@@ -19,12 +19,12 @@ const NEXT_COLOR = new Map([
 	[RED_500, RED_400],
 	[RED_400, RED_300],
 	[RED_300, RED_200],
-	[RED_300, RED_100],
+	[RED_200, RED_100],
 	[RED_100, RED_100],
 	[YELLOW_500, YELLOW_400],
 	[YELLOW_400, YELLOW_300],
 	[YELLOW_300, YELLOW_200],
-	[YELLOW_300, YELLOW_100],
+	[YELLOW_200, YELLOW_100],
 	[YELLOW_100, YELLOW_100],
 	[BLACK_100, BLACK_100],
 ]);
@@ -88,6 +88,32 @@ function getImageArray(imageGrid, moved) {
 	return image;
 }
 
+async function writeImages(imageGrids) {
+	const frames_length = String(imageGrids.length).length;
+	fs.emptyDirSync('frames');
+
+	for (let i = 0; i < imageGrids.length; i++) {
+		const imageGrid = imageGrids[i];
+		let image = await new Promise((resolve, reject) => {
+			new Jimp(imageGrid[0].length, imageGrid.length, '#FFFFFF', (err, image) =>
+				err ? reject(err) : resolve(image)
+			);
+		});
+
+		for (let y = 0; y < imageGrid.length; y++) {
+			for (let x = 0; x < imageGrid[y].length; x++) {
+				image.setPixelColor(imageGrid[y][x], x, y);
+			}
+		}
+
+		image = image.scale(2, Jimp.RESIZE_NEAREST_NEIGHBOR);
+		const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
+
+		const fileName = `frames/frame_${i.toString().padStart(frames_length, '0')}.png`;
+		fs.writeFileSync(fileName, buffer);
+	}
+}
+
 function step() {
 	const moved = new Map();
 	for (let d = 0; d < directions.length; d++) {
@@ -146,7 +172,9 @@ async function run() {
 		imageGrids.push(newImageGrid);
 	} while (moved.size);
 
+	await writeImages(imageGrids);
+
 	return halfCount / 2;
 }
 
-console.log(run());
+run().then((count) => console.log(count));
