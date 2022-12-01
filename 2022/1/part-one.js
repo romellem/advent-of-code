@@ -1,8 +1,12 @@
 const { input } = require('./input');
 
-let ans = 0;
-for (let i = 0; i < input.length; i++) {
-	//
-}
+const sumsSorted = input
+	.map((elf) => {
+		return elf
+			.split('\n')
+			.map((item) => parseInt(item, 10))
+			.reduce((sum, v) => sum + v, 0);
+	})
+	.sort((a, z) => z - a);
 
-console.log(ans);
+console.log(sumsSorted[0]);
