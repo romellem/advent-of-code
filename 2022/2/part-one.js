@@ -6,13 +6,13 @@ const rounds = input.map(([left_shape, right_shape]) => {
 	const diff = Math.abs(left - right);
 
 	if (left === right) {
-		// Draw
+		// Draw - A X, B Y, C Z
 		return right + 3;
 	} else if ((diff === 1 && right > left) || (right === 1 && left === 3)) {
-		// Win
+		// Win - A Y, B Z, C X
 		return right + 6;
 	} else {
-		// Lose
+		// Lose - A Z, B X, C Y
 		return right;
 	}
 });
