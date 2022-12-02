@@ -15,7 +15,7 @@ const input = fs
 	.toString()
 	.trim()
 	.split('\n')
-	.map((v) => v.split(' ').map((v) => SHAPES[v]));
+	.map((v) => v.split(' '));
 
 module.exports = {
 	input,

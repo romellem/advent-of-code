@@ -1,6 +1,8 @@
-const { input } = require('./input');
+const { input, SHAPES } = require('./input');
 
-const rounds = input.map(([left, right]) => {
+const rounds = input.map(([left_shape, right_shape]) => {
+	const left = SHAPES[left_shape];
+	const right = SHAPES[right_shape];
 	const diff = Math.abs(left - right);
 	if (left === right) {
 		return right + 3;
