@@ -2,16 +2,17 @@ const { input, SHAPES } = require('./input');
 
 const rounds = input.map(([left_shape, right_shape]) => {
 	const left = SHAPES[left_shape];
+
 	if (right_shape === 'X') {
 		// Lose
 		let right = left - 1 || 3;
 		return right;
 	} else if (right_shape === 'Y') {
-		// draw
+		// Draw
 		return left + 3;
 	} else {
-		// win
-		let right = (left + 1) % 3;
+		// Win
+		let right = (left + 1) % 3 || 3;
 		return right + 6;
 	}
 });
