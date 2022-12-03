@@ -6,7 +6,9 @@ const input = fs
 	.toString()
 	.trim()
 	.split('\n')
-	.map((v) => v);
+	.map((v) => {
+		return [v.slice(0, v.length / 2), v.slice(v.length / 2)];
+	});
 
 module.exports = {
 	input,
