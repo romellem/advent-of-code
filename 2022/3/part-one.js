@@ -7,7 +7,7 @@ const A_code = 'A'.charCodeAt(0);
 const charCodes = input.map((line) => {
 	const left = line.slice(0, line.length / 2);
 	const right = line.slice(line.length / 2);
-	// Or `_.intersection(left, right)`
+	// Or `_.intersection()`
 	const [same] = intersection(left, right);
 	if (/[a-z]/.test(same)) {
 		return same.charCodeAt(0) - a_code + 1;
