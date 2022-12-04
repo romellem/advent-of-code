@@ -1,15 +1,12 @@
 const { input } = require('./input');
-const _ = require('lodash');
+const { intersection, range } = require('./utils');
 
-let c = 0;
-for (let [a, b] of input) {
-	let ar = _.range(a[0], a[1] + 1);
-	let br = _.range(b[0], b[1] + 1);
-	let inter = _.intersection(ar, br);
-	// console.log(ar, br, all);
-	if (inter.length) {
-		c++;
-	}
-}
+const intersectingPairs = input.filter(([a, b]) => {
+	const a_range = range(...a);
+	const b_range = range(...b);
+	const overlapping = intersection(a_range, b_range);
 
-console.log(c);
+	return overlapping.length > 0;
+});
+
+console.log(intersectingPairs.length);
