@@ -1,18 +1,13 @@
 const { input } = require('./input');
-const _ = require('lodash');
+const { range } = require('./utils');
 
-let c = 0;
-for (let [a, b] of input) {
-	let ar = _.range(a[0], a[1] + 1);
-	let br = _.range(b[0], b[1] + 1);
-	let all = _.union(ar, br)
-		.sort((a, b) => a - b)
-		.join(',');
+const containedPairs = input.filter(([a, b]) => {
+	const a_range = range(...a);
+	const b_range = range(...b);
+	const max_size = Math.max(a_range.length, b_range.length);
 
-	// console.log(ar, br, all);
-	if (all === ar.join(',') || all === br.join(',')) {
-		c++;
-	}
-}
+	const uniques = [...new Set(a_range.concat(b_range))];
+	return uniques.length === max_size;
+});
 
-console.log(c);
+console.log(containedPairs.length);
