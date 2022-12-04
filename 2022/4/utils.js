@@ -25,7 +25,7 @@ const range = (from, to, inclusive = true) => {
 		[from, to] = [to, from];
 	}
 
-	const size = to - from + 1 + (inclusive ? 1 : 0);
+	const size = to - from + (inclusive ? 1 : 0);
 
 	return Array(size)
 		.fill()
