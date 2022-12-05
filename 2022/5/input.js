@@ -14,23 +14,29 @@ raw_stacks_lines.pop();
 
 const stacks = [];
 
-for (let line = 0; line < raw_stacks_lines.length; line++) {
-	const raw_stack_line = raw_stacks_lines[line];
-	for (let i = 0; i < raw_stack_line.length - CRATE_SIZE; i++) {
-		const start = i * (CRATE_SIZE + 1);
+for (let raw_stack_line of raw_stacks_lines) {
+	for (let i = 0; i < raw_stack_line.length; i += CRATE_SIZE + 1) {
+		const start = i;
 		const end = start + CRATE_SIZE;
 		const crate = raw_stack_line.substring(start, end);
 
-		if (!stacks[i]) {
-			stacks[i] = [];
+		const stack_index = i / (CRATE_SIZE + 1);
+		if (!stacks[stack_index]) {
+			stacks[stack_index] = [];
 		}
 		if (crate.trim()) {
 			// "[X]" -> "X"
-			stacks[i].push(crate.substring(1, 2));
+			stacks[stack_index].push(crate.substring(1, 2));
 		}
 	}
 }
-debugger;
+
+// Now the "top" item of the stack is the first item within all the arrays.
+// It's easier to have this at the end so we can `pop` them, so reverse all
+// our stacks
+for (let stack of stacks) {
+	stack.reverse();
+}
 
 module.exports = {
 	input: 1,
