@@ -38,6 +38,20 @@ for (let stack of stacks) {
 	stack.reverse();
 }
 
+// Now parse move instructions
+const instructions = raw_instructions.split('\n').map((line) => {
+	// e.g. `move 13 from 3 to 6`
+	let [, count, from, to] = /move (\d+) from (\d+) to (\d+)/.exec(line);
+	count = parseInt(count, 10);
+	from = parseInt(from, 10);
+	to = parseInt(to, 10);
+
+	return { count, from, to };
+});
+
 module.exports = {
-	input: 1,
+	input: {
+		stacks,
+		instructions,
+	},
 };
