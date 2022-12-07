@@ -4,11 +4,11 @@ const { input } = require('./input');
 class File {
 	constructor(name, size) {
 		this.name = name;
-		this.size = size;
+		this._size = size;
 	}
 
 	size() {
-		return this.size;
+		return this._size;
 	}
 }
 
@@ -28,10 +28,11 @@ class Dir {
 const rootDir = new Dir('/', null);
 let inLs = false;
 
-input.unshift();
+input.shift();
 
 let currentDir = rootDir;
 for (let line of input) {
+	console.log(line);
 	if (line.startsWith('$ cd')) {
 		inLs = false;
 		let [, dir] = /\$ cd (.+)$/.exec(line);
