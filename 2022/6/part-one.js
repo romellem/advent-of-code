@@ -1,8 +1,13 @@
 const { input } = require('./input');
 
-let data = [];
-for (let line of input) {
-	//
+let last4 = [];
+for (let i = 0; i < input.length; i++) {
+	last4.push(input[i]);
+	if (last4.length === 4) {
+		if ([...new Set(last4)].length === 4) {
+			console.log(i + 1);
+			break;
+		}
+		last4.shift();
+	}
 }
-
-console.log(data);
