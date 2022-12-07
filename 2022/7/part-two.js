@@ -21,7 +21,7 @@ class Dir {
 	}
 
 	size(ignore) {
-		if (ignore === this.name) {
+		if (ignore && ignore === this) {
 			return 0;
 		}
 
@@ -85,7 +85,7 @@ for (let v of walk(rootDir)) {
 
 let couldWork = null;
 for (let someDir of allDirs) {
-	const sizeWithout = rootDir.size(someDir.name);
+	const sizeWithout = rootDir.size(someDir);
 	if (70000000 - sizeWithout >= 30000000) {
 		if (!couldWork) {
 			couldWork = someDir;
