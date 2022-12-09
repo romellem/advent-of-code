@@ -1,11 +1,10 @@
 const { input } = require('./input');
 const { InfiniteGrid } = require('./infinite-grid');
-const { max } = require('lodash');
 
 const grid = new InfiniteGrid({
 	load: input,
 	parseAs: (cell) => {
-		return { value: parseInt(cell, 10), visible: undefined };
+		return { value: parseInt(cell, 10), score: undefined };
 	},
 });
 
