@@ -4,7 +4,7 @@ const { Filesystem } = require('./filesystem');
 const drive = new Filesystem(input);
 
 let smallDirsSum = 0;
-for (let item of Filesystem.walk(drive.rootDir)) {
+for (let item of drive) {
 	if (item.isDir) {
 		let size = item.size();
 		if (size <= 100000) {

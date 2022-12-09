@@ -32,6 +32,10 @@ class Filesystem {
 		this.build(instructions);
 	}
 
+	size(ignore) {
+		return this.rootDir.size(ignore);
+	}
+
 	build(instructions) {
 		let currentDir = this.rootDir;
 		for (let line of instructions) {
@@ -71,6 +75,10 @@ class Filesystem {
 				yield* Filesystem.walk(c);
 			}
 		}
+	}
+
+	*[Symbol.iterator]() {
+		yield* Filesystem.walk(this.rootDir);
 	}
 }
 
