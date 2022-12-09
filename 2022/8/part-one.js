@@ -1,12 +1,39 @@
 const { input } = require('./input');
-const { stacks, instructions } = input;
+const { InfiniteGrid } = require('./infinite-grid');
 
-for (let { count, from, to } of instructions) {
-	for (let c = 0; c < count; c++) {
-		let crate = stacks[from].pop();
-		stacks[to].push(crate);
+const grid = new InfiniteGrid({
+	load: input,
+	parseAs: (cell) => {
+		return { value: parseInt(cell, 10), visible: undefined };
+	},
+});
+
+let count = 0;
+// Naive O(n^2) way
+for (let [cell_id, cell] of grid) {
+	let [x, y] = InfiniteGrid.toCoords(cell_id);
+	let row = grid.getRow(x, y, true);
+	let col = grid.getCol(x, y, true);
+
+	const rowIndex = row.indexOf(cell);
+	const colIndex = col.indexOf(cell);
+
+	let left = row.slice(0, rowIndex);
+	let right = row.slice(rowIndex);
+	let top = col.slice(0, colIndex);
+	let down = col.slice(colIndex);
+
+	if (
+		left.every((v) => v.value < cell.value) ||
+		right.every((v) => v.value < cell.value) ||
+		top.every((v) => v.value < cell.value) ||
+		down.every((v) => v.value < cell.value)
+	) {
+		cell.visible = true;
+		count++;
+	} else {
+		cell.visible = false;
 	}
 }
 
-const top_crates = stacks.map((stack) => stack[stack.length - 1]).join('');
-console.log(top_crates);
+console.log(count); // 1025 (too low)
