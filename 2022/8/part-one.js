@@ -19,9 +19,9 @@ for (let [cell_id, cell] of grid) {
 	const colIndex = col.indexOf(cell);
 
 	let left = row.slice(0, rowIndex);
-	let right = row.slice(rowIndex);
+	let right = row.slice(rowIndex + 1);
 	let top = col.slice(0, colIndex);
-	let down = col.slice(colIndex);
+	let down = col.slice(colIndex + 1);
 
 	if (
 		left.every((v) => v.value < cell.value) ||
