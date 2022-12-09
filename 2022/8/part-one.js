@@ -36,4 +36,4 @@ for (let [cell_id, cell] of grid) {
 	}
 }
 
-console.log(count); // 1025 (too low)
+console.log(count);

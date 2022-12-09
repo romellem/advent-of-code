@@ -10,12 +10,17 @@ const grid = new InfiniteGrid({
 });
 
 function countTrees(slice, from) {
+	// We return `0` if `slice.length === 0`
 	let count = 0;
+
 	for (let cell of slice) {
+		// Always increment, you are looking at this tree!
+		count++;
+
 		if (cell.value >= from.value) {
+			// This tree is too tall, you can't see anything past. Break from loop
 			break;
 		}
-		count++;
 	}
 
 	return count;
@@ -41,15 +46,14 @@ for (let [cell_id, cell] of grid) {
 	left.reverse();
 	top.reverse();
 
-	let scenic_score = [
-		countTrees(left, cell.value),
-		countTrees(right, cell.value),
-		countTrees(top, cell.value),
-		countTrees(down, cell.value),
-	].reduce((a, b) => a * b, 1);
+	let scenic_score =
+		countTrees(left, cell) *
+		countTrees(right, cell) *
+		countTrees(top, cell) *
+		countTrees(down, cell);
 
 	cell.score = scenic_score;
 	max_score = Math.max(max_score, scenic_score);
 }
 
-console.log(max_score); // 5764801 (too high)
+console.log(max_score);
