@@ -12,7 +12,8 @@ const getPacketStartIndex = (count) => {
 	for (let i = 0; i < input.length; i++) {
 		window.push(input[i]);
 		if (window.length === count) {
-			if (Array.from(new Set(window)).length === count) {
+			const unique_chars = new Set(window);
+			if (unique_chars.size === count) {
 				return i + 1;
 			}
 			window.shift();
