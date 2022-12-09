@@ -1,5 +1,4 @@
 const { input } = require('./input');
-// const G = require('generatorics');
 
 class File {
 	constructor(name, size) {
