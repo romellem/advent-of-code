@@ -76,7 +76,7 @@ class InfiniteGrid {
 				return to_y > from_y ? 'SE' : 'NE';
 			} else {
 				// NW / SW
-				return to_y > from_y ? 'SW' : 'NE';
+				return to_y > from_y ? 'SW' : 'NW';
 			}
 		}
 	}
