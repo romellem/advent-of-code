@@ -60,6 +60,27 @@ class InfiniteGrid {
 		return two_dimensional_string.split('\n').map((row) => row.split(''));
 	}
 
+	static getDirFromTo(from_x, from_y, to_x, to_y) {
+		if (from_x === to_x && from_y === to_y) {
+			return '';
+		} else if (from_x === to_x) {
+			// N / S
+			return to_y > from_y ? 'S' : 'N';
+		} else if (from_y === to_y) {
+			// E / W
+			return to_x > from_x ? 'E' : 'W';
+		} else {
+			// Diagonal
+			if (to_x > from_x) {
+				// NE / SE
+				return to_y > from_y ? 'SE' : 'NE';
+			} else {
+				// NW / SW
+				return to_y > from_y ? 'SW' : 'NE';
+			}
+		}
+	}
+
 	static moveInDirection(x, y, direction) {
 		switch (direction) {
 			case 'N':
