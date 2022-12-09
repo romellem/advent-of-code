@@ -7,6 +7,21 @@ const input = fs
 	.trim()
 	.split('');
 
+const getPacketStartIndex = (count) => {
+	const window = [];
+	for (let i = 0; i < input.length; i++) {
+		window.push(input[i]);
+		if (window.length === count) {
+			if (Array.from(new Set(window)).length === count) {
+				return i + 1;
+			}
+			window.shift();
+		}
+	}
+
+	return -1;
+};
+
 module.exports = {
-	input,
+	getPacketStartIndex,
 };
