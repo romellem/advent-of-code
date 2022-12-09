@@ -4,7 +4,7 @@ const { InfiniteGrid } = require('./infinite-grid');
 const grid = new InfiniteGrid({
 	load: input,
 	parseAs: (cell) => {
-		return { value: parseInt(cell, 10), visible: undefined };
+		return { value: parseInt(cell, 10) };
 	},
 });
 
@@ -29,10 +29,8 @@ for (let [cell_id, cell] of grid) {
 		top.every((v) => v.value < cell.value) ||
 		down.every((v) => v.value < cell.value)
 	) {
-		cell.visible = true;
+		// Cell is visible
 		count++;
-	} else {
-		cell.visible = false;
 	}
 }
 

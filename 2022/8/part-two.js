@@ -4,7 +4,8 @@ const { InfiniteGrid } = require('./infinite-grid');
 const grid = new InfiniteGrid({
 	load: input,
 	parseAs: (cell) => {
-		return { value: parseInt(cell, 10), score: undefined };
+		// Use objects to get referential equality in `indexOf` calls
+		return { value: parseInt(cell, 10) };
 	},
 });
 
@@ -51,7 +52,6 @@ for (let [cell_id, cell] of grid) {
 		countTrees(top, cell) *
 		countTrees(down, cell);
 
-	cell.score = scenic_score;
 	max_score = Math.max(max_score, scenic_score);
 }
 
