@@ -6,8 +6,7 @@ let reg = {
 
 let frame = Array(6)
 	.fill()
-	.map((_) => Array(40).fill(' '));
-let values = new Map();
+	.map(() => Array(40).fill(' '));
 
 let cycle = 0;
 let instruction = null;
