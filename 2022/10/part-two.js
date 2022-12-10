@@ -26,7 +26,7 @@ do {
 
 	// cycle finishes
 	let pos = cycle % 40;
-	let char = pos === reg.x || pos === reg.x - 1 || pos === reg.x + 1 ? '#' : ' ';
+	let char = pos === reg.x || pos === reg.x - 1 || pos === reg.x + 1 ? '█' : ' ';
 	frame[Math.floor(cycle / 40)][pos] = char;
 
 	if (to_be_added !== null) {
