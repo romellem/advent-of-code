@@ -17,7 +17,7 @@ const input = fs
 
 			/**
 			 * Simplify cycles logic by inserting `noop` instructions
-			 * before every `addx` call so account for fact that
+			 * before every `addx` call to account for fact that
 			 * `addx` takes two cycles.
 			 */
 			return [{ op: 'noop' }, { op: 'addx', n }];

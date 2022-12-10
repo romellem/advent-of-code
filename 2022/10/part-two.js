@@ -1,41 +1,30 @@
 const { input } = require('./input');
 
-let reg = {
-	x: 1,
-};
+// The CPU has a single register, `X`, which starts with the value `1`.
+let register = 1;
 
-let frame = Array(6)
+// You count the pixels on the CRT: 40 wide and 6 high.
+const frame = Array(6)
 	.fill()
 	.map(() => Array(40).fill(' '));
 
-let cycle = 0;
-let instruction = null;
-let i = 0;
-do {
-	let to_be_added = null;
-	if (instruction === null) {
-		let [op, n] = input[i] || [];
-		if (op === 'addx') {
-			instruction = n;
-		}
-		i++;
-	} else {
-		to_be_added = instruction;
-		instruction = null;
+for (let cycle = 1; cycle <= input.length; cycle++) {
+	const cycle_index = cycle - 1;
+	const { op, n } = input[cycle_index];
+
+	// Middle of instruction executing, record our pixel
+	const frame_row = Math.floor(cycle_index / 40);
+	const position = cycle_index % 40;
+	const in_sprite = position >= register - 1 && position <= register + 1;
+	// Use different chars to make reading the ASCII easier
+	const char = in_sprite ? '█' : ' ';
+	frame[frame_row][position] = char;
+
+	if (op === 'addx') {
+		register += n;
 	}
+}
 
-	// cycle finishes
-	let pos = cycle % 40;
-	let char = pos === reg.x || pos === reg.x - 1 || pos === reg.x + 1 ? '█' : ' ';
-	frame[Math.floor(cycle / 40)][pos] = char;
+const screen = frame.map((r) => r.join('')).join('\n');
 
-	if (to_be_added !== null) {
-		reg.x += to_be_added;
-	}
-
-	cycle++;
-} while (i < input.length);
-
-let pic = frame.map((r) => r.join('')).join('\n');
-
-console.log(pic);
+console.log(screen);
