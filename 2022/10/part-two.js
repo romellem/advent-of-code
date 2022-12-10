@@ -6,27 +6,29 @@ let reg = {
 
 let frame = Array(6)
 	.fill()
-	.map((_) => Array(40).fill('.'));
+	.map((_) => Array(40).fill(' '));
 let values = new Map();
 
-let cycle = 1;
+let cycle = 0;
 let instruction = null;
 let i = 0;
 do {
 	let to_be_added = null;
-	if (instruction !== null) {
-		to_be_added = instruction;
-		instruction = null;
-	} else {
+	if (instruction === null) {
 		let [op, n] = input[i] || [];
 		if (op === 'addx') {
 			instruction = n;
 		}
 		i++;
+	} else {
+		to_be_added = instruction;
+		instruction = null;
 	}
 
 	// cycle finishes
-	values.set(cycle, reg.x * cycle);
+	let pos = cycle % 40;
+	let char = pos === reg.x || pos === reg.x - 1 || pos === reg.x + 1 ? '#' : ' ';
+	frame[Math.floor(cycle / 40)][pos] = char;
 
 	if (to_be_added !== null) {
 		reg.x += to_be_added;
@@ -35,13 +37,6 @@ do {
 	cycle++;
 } while (i < input.length);
 
-let sum = [
-	values.get(20),
-	values.get(60),
-	values.get(100),
-	values.get(140),
-	values.get(180),
-	values.get(220),
-].reduce((a, b) => a + b, 0);
+let pic = frame.map((r) => r.join('')).join('\n');
 
-console.log(sum);
+console.log(pic);
