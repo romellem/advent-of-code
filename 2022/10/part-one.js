@@ -6,25 +6,31 @@ let reg = {
 
 let values = new Map();
 
-let cycle = [];
+let cycle = 1;
+let instruction = null;
 let i = 0;
 do {
-	let [op, n] = input[i] || [];
-	if (op === 'addx') {
-		cycle[i + 1] = { n };
+	let to_be_added = null;
+	if (instruction !== null) {
+		to_be_added = instruction;
+		instruction = null;
+	} else {
+		let [op, n] = input[i] || [];
+		if (op === 'addx') {
+			instruction = n;
+		}
+		i++;
 	}
 
-	// cycle i finishes
-	if (i + 1 === 20 || (i >= 59 && (i + 1 - 20) % 40 === 0)) {
-		values.set(i + 1, reg.x * (i + 1));
+	// cycle finishes
+	values.set(cycle, reg.x * cycle);
+
+	if (to_be_added !== null) {
+		reg.x += to_be_added;
 	}
 
-	if (cycle[i]) {
-		reg.x += cycle[i].n;
-	}
-
-	i++;
-} while (i < input.length || cycle.slice(i).filter(Boolean).length);
+	cycle++;
+} while (i < input.length);
 
 let sum = [
 	values.get(20),
