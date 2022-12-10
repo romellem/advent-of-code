@@ -8,7 +8,14 @@ const input = fs
 	.split('\n')
 	.map((v) => {
 		let [op, n] = v.split(' ');
-		n = parseInt(n, 10);
+		if (op === 'addx') {
+			n = parseInt(n, 10);
+		}
+
+		if (Number.isNaN(n)) {
+			throw v;
+		}
+
 		return [op, n];
 	});
 

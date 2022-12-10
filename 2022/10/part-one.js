@@ -4,37 +4,35 @@ let reg = {
 	x: 1,
 };
 
-let cycle = new Map();
+let values = new Map();
 
-let stack = [];
-for (let i = 0; i < input.length; i++) {
-	let [op, n] = input[i];
+let cycle = [];
+let i = 0;
+do {
+	let [op, n] = input[i] || [];
 	if (op === 'addx') {
-		stack.push({ count: 2, n });
+		cycle[i + 1] = { n };
 	}
 
-	for (let j = 0; j < stack.length; j++) {
-		let s = stack[j];
-		s.count--;
-		if (!s.count) {
-			reg.x += s.n;
-			stack.splice(j, 1);
-			j--;
-		}
+	// cycle i finishes
+	if (i + 1 === 20 || (i >= 59 && (i + 1 - 20) % 40 === 0)) {
+		values.set(i + 1, reg.x * (i + 1));
 	}
 
-	if (i + 1 === 20 || (i > 59 && (i + 1 - 20) % 40 === 0)) {
-		cycle.set(i + 1, reg.x * (i + 1));
+	if (cycle[i]) {
+		reg.x += cycle[i].n;
 	}
-}
+
+	i++;
+} while (i < input.length || cycle.slice(i).filter(Boolean).length);
 
 let sum = [
-	cycle.get(20),
-	cycle.get(60),
-	cycle.get(100),
-	cycle.get(140),
-	cycle.get(180),
-	cycle.get(220),
+	values.get(20),
+	values.get(60),
+	values.get(100),
+	values.get(140),
+	values.get(180),
+	values.get(220),
 ].reduce((a, b) => a + b, 0);
 
 console.log(sum);
