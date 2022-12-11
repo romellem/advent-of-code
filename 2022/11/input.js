@@ -1,6 +1,15 @@
 const path = require('path');
 const fs = require('fs');
 
+let cache = require('./cache.json');
+function appendToCache(num, factors) {
+	let contents = fs.readFileSync(path.join(__dirname, 'cache.json'), 'utf8');
+	let json = JSON.parse(contents);
+	json[num] = factors;
+	Object.assign(cache, json);
+	fs.writeFileSync(path.join(__dirname, 'cache.json'), JSON.stringify(json, null, '  '));
+}
+
 function primeFactors(n) {
 	if (!n || n < 2) return [];
 
@@ -67,9 +76,15 @@ const input = fs
 					worryFnOpt = (oldSet) => {
 						let num = [...oldSet].reduce((a, b) => a * b, 1);
 						num += right;
-						process.stdout.write('Finding primes of ' + num + '... ');
+						process.stdout.write('Finding primes of ' + num + ' ... ');
 						console.time('prime');
-						let primes = primeFactors(num);
+						let primes;
+						if (cache[num]) {
+							primes = cache[num];
+						} else {
+							primes = primeFactors(num);
+							appendToCache(num, primes);
+						}
 						console.timeEnd('prime');
 						oldSet.clear();
 						for (let p of primes) {
