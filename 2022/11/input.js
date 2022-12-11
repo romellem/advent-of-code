@@ -67,7 +67,10 @@ const input = fs
 					worryFnOpt = (oldSet) => {
 						let num = [...oldSet].reduce((a, b) => a * b, 1);
 						num += right;
+						process.stdout.write('Finding primes of ' + num + '... ');
+						console.time('prime');
 						let primes = primeFactors(num);
+						console.timeEnd('prime');
 						oldSet.clear();
 						for (let p of primes) {
 							oldSet.add(p);
