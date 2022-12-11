@@ -26,10 +26,10 @@ const input = fs
 			} else if (i === 1) {
 				let [, items] = /Starting items: (.+)$/.exec(line);
 				items = items.split(', ').map((v) => parseInt(v, 10));
-				acc.items = new Set(items);
+				acc.items = items;
 			} else if (i === 2) {
 				let [, fn_str] = /Operation: new = (.+)$/.exec(line);
-				const worry = (old) => {
+				const worryFn = (old) => {
 					const scope = { old };
 					let result;
 					// The uncomon `with` statement!
@@ -38,7 +38,7 @@ const input = fs
 					}
 					return result;
 				};
-				acc.worry = worry;
+				acc.worryFn = worryFn;
 			} else if (i === 3) {
 				let [, divisible_by] = /Test: divisible by (\d+)/.exec(line);
 				divisible_by = parseInt(divisible_by, 10);
