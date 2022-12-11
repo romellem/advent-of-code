@@ -19,7 +19,7 @@ function primeFactors(n) {
 	return f;
 }
 
-// let cache = new Map();
+let cache = new Map();
 
 class Item {
 	constructor(worry) {
@@ -29,8 +29,18 @@ class Item {
 	}
 
 	reduceWorryToPrimeFactors() {
-		let composition = primeFactors(this.worry);
-		this.worry = [...new Set(composition)].reduce((a, b) => a * b, 1);
+		console.log(`Finding prime factors of ${this.worry.toLocaleString()}`);
+		console.time('prime');
+		if (!cache.has(this.worry)) {
+			let composition = primeFactors(this.worry);
+			cache.set(
+				this.worry,
+				[...new Set(composition)].reduce((a, b) => a * b, 1)
+			);
+		}
+		this.worry = cache.get(this.worry);
+
+		console.timeEnd('prime');
 	}
 }
 

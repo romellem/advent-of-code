@@ -5,6 +5,7 @@ let monkeys = input.map((config) => new Monkey(config));
 let game = new KeepAway(monkeys, false);
 
 for (let i = 0; i < 10000; i++) {
+	console.log(i);
 	game.playRound();
 }
 
