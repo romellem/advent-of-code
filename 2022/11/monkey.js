@@ -1,8 +1,10 @@
-let item_name = 'A'.charCodeAt(0);
+const G = require('generatorics');
+const item_gen = G.baseNAll('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+
 class Item {
 	constructor(worry) {
 		// For debugging
-		this.name = String.fromCharCode(item_name++);
+		this.name = item_gen.next().value.join('');
 		this.worry = worry;
 	}
 }
@@ -37,8 +39,9 @@ class KeepAway {
 	/**
 	 * @param {Monkey[]} monkeys Order of monkeys should match their `id`
 	 */
-	constructor(monkeys) {
+	constructor(monkeys, lower_worry_level = true) {
 		this.monkeys = monkeys;
+		this.lower_worry_level = lower_worry_level;
 	}
 
 	playRound() {
@@ -49,7 +52,10 @@ class KeepAway {
 			// for (let i = 0; i < items.length; i++) {
 			for (let item of items) {
 				item.worry = monkey.worryFn(item.worry);
-				item.worry = Math.trunc(item.worry / 3);
+
+				if (this.lower_worry_level) {
+					item.worry = Math.trunc(item.worry / 3);
+				}
 
 				let monkey_to_throw_to;
 
