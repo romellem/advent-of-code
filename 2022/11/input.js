@@ -1,6 +1,20 @@
 const path = require('path');
 const fs = require('fs');
 
+function primeFactors(n) {
+	if (!n || n < 2) return [];
+
+	var f = [];
+	for (var i = 2; i <= n; i++) {
+		while (n % i === 0) {
+			f.push(i);
+			n /= i;
+		}
+	}
+
+	return f;
+}
+
 const input = fs
 	.readFileSync(path.join(__dirname, 'input.txt'), 'utf8')
 	.toString()
@@ -39,6 +53,32 @@ const input = fs
 					return result;
 				};
 				acc.worryFn = worryFn;
+
+				// Part two, smarter parsing
+				let [, left, op, right] = /Operation: new = (\w+) ([\+\*]) (\w+)$/.exec(line);
+				let worryFnOpt;
+				if (left === 'old' && right === 'old') {
+					worryFnOpt = (oldSet) => oldSet;
+				} else if (op === '*') {
+					right = parseInt(right, 10);
+					worryFnOpt = (oldSet) => oldSet.add(right);
+				} else if (op === '+') {
+					right = parseInt(right, 10);
+					worryFnOpt = (oldSet) => {
+						let num = [...oldSet].reduce((a, b) => a * b, 1);
+						num += right;
+						let primes = primeFactors(num);
+						oldSet.clear();
+						for (let p of primes) {
+							oldSet.add(p);
+						}
+						return oldSet;
+					};
+				} else {
+					throw new Error(`Invalid line: ${line}`);
+				}
+
+				acc.worryFnOpt = worryFnOpt;
 			} else if (i === 3) {
 				let [, divisible_by] = /Test: divisible by (\d+)/.exec(line);
 				divisible_by = parseInt(divisible_by, 10);
