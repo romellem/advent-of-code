@@ -1,11 +1,36 @@
 const G = require('generatorics');
 const item_gen = G.baseNAll('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
+/**
+ * @see https://rosettacode.org/wiki/Prime_decomposition#JavaScript
+ * @license GFDL-1.2
+ */
+function primeFactors(n) {
+	if (!n || n < 2) return [];
+
+	var f = [];
+	for (var i = 2; i <= n; i++) {
+		while (n % i === 0) {
+			f.push(i);
+			n /= i;
+		}
+	}
+
+	return f;
+}
+
+// let cache = new Map();
+
 class Item {
 	constructor(worry) {
 		// For debugging
 		this.name = item_gen.next().value.join('');
 		this.worry = worry;
+	}
+
+	reduceWorryToPrimeFactors() {
+		let composition = primeFactors(this.worry);
+		this.worry = [...new Set(composition)].reduce((a, b) => a * b, 1);
 	}
 }
 
@@ -49,13 +74,15 @@ class KeepAway {
 			let { items, divisible_by, if_true, if_false } = monkey;
 
 			monkey.inspection_count += items.length;
-			// for (let i = 0; i < items.length; i++) {
+
 			for (let item of items) {
 				item.worry = monkey.worryFn(item.worry);
 
 				if (this.lower_worry_level) {
 					item.worry = Math.trunc(item.worry / 3);
 				}
+
+				item.reduceWorryToPrimeFactors();
 
 				let monkey_to_throw_to;
 

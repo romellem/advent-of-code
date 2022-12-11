@@ -10,4 +10,4 @@ for (let i = 0; i < 10000; i++) {
 
 let [monkey1, monkey2] = game.getSortedMonkeys();
 
-console.log(monkey1.inspection_count * monkey2.inspection_count);
+console.log(monkey1.inspection_count * monkey2.inspection_count); // 13804135045 too low
