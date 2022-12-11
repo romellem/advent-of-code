@@ -1,29 +1,6 @@
 const path = require('path');
 const fs = require('fs');
 
-let cache = require('./cache.json');
-function appendToCache(num, factors) {
-	let contents = fs.readFileSync(path.join(__dirname, 'cache.json'), 'utf8');
-	let json = JSON.parse(contents);
-	json[num] = factors;
-	Object.assign(cache, json);
-	fs.writeFileSync(path.join(__dirname, 'cache.json'), JSON.stringify(json, null, '  '));
-}
-
-function primeFactors(n) {
-	if (!n || n < 2) return [];
-
-	var f = [];
-	for (var i = 2; i <= n; i++) {
-		while (n % i === 0) {
-			f.push(i);
-			n /= i;
-		}
-	}
-
-	return f;
-}
-
 const input = fs
 	.readFileSync(path.join(__dirname, 'input.txt'), 'utf8')
 	.toString()
@@ -62,41 +39,6 @@ const input = fs
 					return result;
 				};
 				acc.worryFn = worryFn;
-
-				// Part two, smarter parsing
-				let [, left, op, right] = /Operation: new = (\w+) ([\+\*]) (\w+)$/.exec(line);
-				let worryFnOpt;
-				if (left === 'old' && right === 'old') {
-					worryFnOpt = (oldSet) => oldSet;
-				} else if (op === '*') {
-					right = parseInt(right, 10);
-					worryFnOpt = (oldSet) => oldSet.add(right);
-				} else if (op === '+') {
-					right = parseInt(right, 10);
-					worryFnOpt = (oldSet) => {
-						let num = [...oldSet].reduce((a, b) => a * b, 1);
-						num += right;
-						process.stdout.write('Finding primes of ' + num + ' ... ');
-						console.time('prime');
-						let primes;
-						if (cache[num]) {
-							primes = cache[num];
-						} else {
-							primes = primeFactors(num);
-							appendToCache(num, primes);
-						}
-						console.timeEnd('prime');
-						oldSet.clear();
-						for (let p of primes) {
-							oldSet.add(p);
-						}
-						return oldSet;
-					};
-				} else {
-					throw new Error(`Invalid line: ${line}`);
-				}
-
-				acc.worryFnOpt = worryFnOpt;
 			} else if (i === 3) {
 				let [, divisible_by] = /Test: divisible by (\d+)/.exec(line);
 				divisible_by = parseInt(divisible_by, 10);
