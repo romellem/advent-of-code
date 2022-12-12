@@ -324,17 +324,18 @@ class InfiniteGrid {
 		came_from.set(from_id, null);
 		while (frontier.length) {
 			const current_coord = frontier.shift();
+			console.log('front', frontier.length);
 			const current_val = this.get(...current_coord);
 			const neighbor_coords = this.neighbors(...current_coord).values();
 			for (let { id: next_id, coord: next_coord, value: next_cell } of neighbor_coords) {
-				if (Math.abs(next_cell - current_val) > 1 || came_from.has(next_id)) {
+				if (next_cell - current_val > 1 || came_from.has(next_id)) {
 					continue;
 				}
 
 				// Coord is walkable
 				frontier.push(next_coord);
 
-				came_from.set(next_id, current_coord);
+				came_from.set(next_id, InfiniteGrid.toId(...current_coord));
 			}
 		}
 
@@ -350,6 +351,7 @@ class InfiniteGrid {
 		let path = [];
 		while (current !== from_id) {
 			path.push(current);
+			console.log('path', path.length);
 			current = came_from.get(current);
 		}
 
