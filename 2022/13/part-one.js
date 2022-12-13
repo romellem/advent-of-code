@@ -1,9 +1,13 @@
 const { input } = require('./input');
 
-function compare(left, right) {
+const s = (v) => JSON.stringify(v);
+
+function compare(left, right, depth = 0) {
 	for (let i = 0; i < Math.max(left.length, right.length); i++) {
 		let li = left[i];
 		let ri = right[i];
+
+		// console.log('Compare'.padStart(8 + depth), s(li), 'vs', s(ri));
 
 		if (li === undefined) {
 			return true;
@@ -14,7 +18,7 @@ function compare(left, right) {
 		if (typeof li === 'number' && typeof ri === 'number') {
 			if (li < ri) {
 				return true;
-			} else if (ri > li) {
+			} else if (li > ri) {
 				return false;
 			} else {
 				// Same num, continue checking next val
@@ -23,18 +27,18 @@ function compare(left, right) {
 		}
 
 		if (Array.isArray(li) && Array.isArray(ri)) {
-			let substep = compare(li, ri);
+			let substep = compare(li, ri, depth + 1);
 			if (substep !== null) {
 				return substep;
 			}
 		}
 
 		if (Array.isArray(li) && !Array.isArray(ri)) {
-			return compare(li, [ri]);
+			return compare(li, [ri], depth + 1);
 		}
 
 		if (!Array.isArray(li) && Array.isArray(ri)) {
-			return compare([li], ri);
+			return compare([li], ri, depth + 1);
 		}
 	}
 
@@ -42,13 +46,17 @@ function compare(left, right) {
 	return null;
 }
 
-let sums = 0;
-for (let [left, right] of input) {
+let correct = [];
+for (let i = 0; i < input.length; i++) {
+	let [left, right] = input[i];
+	// console.log(`\n== Pair ${i + 1} ==`);
 	let result = compare(left, right);
 	if (result === true) {
-		sums += [left, right].flat(Infinity).reduce((a, b) => a + b, 0);
+		correct.push(i + 1);
 	} else if (result === null) {
-		console.log('oops', left, right);
+		console.log('oops', i, JSON.stringify(left), JSON.stringify(right));
+	} else {
+		// console.log('yeah');
 	}
 }
-console.log(sums);
+console.log(correct.reduce((a, b) => a + b, 0));
