@@ -28,16 +28,16 @@ const input = fs
 				items = items.split(', ').map((v) => parseInt(v, 10));
 				acc.items = items;
 			} else if (i === 2) {
-				let [, fn_str] = /Operation: new = (.+)$/.exec(line);
-				const worryFn = (old) => {
-					const scope = { old };
-					let result;
-					// The uncomon `with` statement!
-					with (scope) {
-						result = eval(fn_str);
-					}
-					return result;
+				// Part two, smarter parsing
+				let [, left, op, right] = /Operation: new = (\w+) ([\+\*]) (\w+)$/.exec(line);
+				const worryFn = (oldValue) => {
+					let leftVal = left === 'old' ? oldValue : parseInt(left, 10);
+					let rightVal = right === 'old' ? oldValue : parseInt(right, 10);
+
+					// Only two operations, `+` and `*`
+					return op === '+' ? leftVal + rightVal : leftVal * rightVal;
 				};
+
 				acc.worryFn = worryFn;
 			} else if (i === 3) {
 				let [, divisible_by] = /Test: divisible by (\d+)/.exec(line);
