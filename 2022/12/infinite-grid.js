@@ -249,16 +249,22 @@ class InfiniteGrid {
 	 * @param {Boolean} [as_coords] - When true, the 2nd element of each array element returned is an Array of `[x, y]` number values, otherwise are string IDs.
 	 * @returns {Array<[any,GridId|Coord]>} - Returns an Array, the first value matching the cell found, and the 2nd the coords or ID.
 	 */
-	findAll(value, as_coords = true) {
-		const found = [];
+	*find(value, as_coords = true) {
 		for (let [id, cell] of this.grid) {
 			const check = value instanceof RegExp ? value.test(cell) : value === cell;
 			if (check) {
-				found.push([cell, as_coords ? InfiniteGrid.toCoords(id) : id]);
+				yield [cell, as_coords ? InfiniteGrid.toCoords(id) : id];
 			}
 		}
+	}
 
-		return found;
+	/**
+	 * @param {RegExp|any} value
+	 * @param {Boolean} [as_coords] - When true, the 2nd element of each array element returned is an Array of `[x, y]` number values, otherwise are string IDs.
+	 * @returns {Array<[any,GridId|Coord]>} - Returns an Array, the first value matching the cell found, and the 2nd the coords or ID.
+	 */
+	findAll(value, as_coords = true) {
+		return [...this.find(value, as_coords)];
 	}
 
 	inBounds(x, y) {
@@ -324,7 +330,7 @@ class InfiniteGrid {
 		came_from.set(from_id, null);
 		while (frontier.length) {
 			const current_coord = frontier.shift();
-			console.log('front', frontier.length);
+			// console.log('front', frontier.length);
 			const current_val = this.get(...current_coord);
 			const neighbor_coords = this.neighbors(...current_coord).values();
 			for (let { id: next_id, coord: next_coord, value: next_cell } of neighbor_coords) {
@@ -349,10 +355,14 @@ class InfiniteGrid {
 		let current = to_id;
 
 		let path = [];
-		while (current !== from_id) {
+		while (current !== undefined && current !== from_id) {
 			path.push(current);
-			console.log('path', path.length);
+			// console.log('path', path.length);
 			current = came_from.get(current);
+		}
+
+		if (current === undefined) {
+			return [];
 		}
 
 		if (include_from) {
