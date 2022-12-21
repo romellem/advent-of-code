@@ -19,7 +19,7 @@ of manual tinkering.
 
 ## 2022 Puzzles List
 
-Completed: **11 / 25** (44%)
+Completed: **12 / 25** (48%)
 
 *  [✅ Day 1](2022/1/)
 *  [✅ Day 2](2022/2/)
@@ -32,6 +32,7 @@ Completed: **11 / 25** (44%)
 *  [✅ Day 9](2022/9/)
 *  [✅ Day 10](2022/10/)
 *  [✅ Day 11](2022/11/)
+*  [✅ Day 12](2022/12/)
 
 ## 2021 Puzzles List
 
