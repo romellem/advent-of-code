@@ -1,25 +1,101 @@
 const { input } = require('./input');
-const { InfiniteGrid } = require('./infinite-grid');
 
-const a = 'a'.charCodeAt(0);
-const S = 0;
-const E = 'z'.charCodeAt(0) - a + 1 + 1;
-const grid = new InfiniteGrid({
-	load: input,
-	parseAs: (char) => (char === 'S' ? S : char === 'E' ? E : char.charCodeAt(0) - a + 1),
-});
+let starts = [];
+let E;
+for (let y = 0; y < input.length; y++) {
+	for (let x = 0; x < input[y].length; x++) {
+		if (input[y][x] === 'S') {
+			S = { x, y };
 
-let starts = grid.findAll(1);
-let [end] = grid.findAll(E);
+			// Your current position (`S`) has elevation `a`
+			input[y][x] = 'a';
+		} else if (input[y][x] === 'E') {
+			E = { x, y };
 
-let min = Number.MAX_VALUE;
-for (let [, start] of starts) {
-	let qqq = grid.getShortestElevationPath(...start, ...end[1]);
-	if (qqq.length) {
-		min = Math.min(min, qqq.length - 1);
+			// And the location that should get the best signal (`E`) has elevation `z`
+			input[y][x] = 'z';
+		}
+		const cell = input[y][x];
+
+		if (cell === 'a') {
+			starts.push({ x, y });
+		}
+
+		// While we are looping, re-encode chars to ints, to make our elevation comparisons easier
+		input[y][x] = cell.charCodeAt(0);
 	}
 }
 
-// let qqq = grid.getShortestElevationPath(start_x, start_y, end_x, end_y);
+const toId = (x, y) => `${x},${y}`;
 
-console.log(min);
+function getNeighbors(x, y) {
+	return [
+		{ x: x, y: y - 1 },
+		{ x: x - 1, y: y },
+		{ x: x + 1, y: y },
+		{ x: x, y: y + 1 },
+	].filter((coord) => typeof input[coord.y]?.[coord.x] !== 'undefined');
+}
+
+function buildFrontier(from_x, from_y) {
+	const frontier = [];
+	frontier.push({ x: from_x, y: from_y });
+
+	const came_from = new Map();
+	came_from.set(toId(from_x, from_y), null);
+	while (frontier.length > 0) {
+		const current = frontier.shift();
+		const current_val = input[current.y][current.x];
+
+		let neighbors = getNeighbors(current.x, current.y);
+		for (let next of neighbors) {
+			const next_cell = input[next.y][next.x];
+			const next_id = toId(next.x, next.y);
+
+			if (next_cell - current_val > 1 || came_from.has(next_id)) {
+				continue;
+			}
+
+			// Coord is walkable
+			const current_id = toId(current.x, current.y);
+			frontier.push(next);
+			came_from.set(next_id, current_id);
+		}
+	}
+
+	return came_from;
+}
+
+function getShortestPath(from_x, from_y, to_x, to_y) {
+	const from_id = toId(from_x, from_y);
+	const to_id = toId(to_x, to_y);
+	const came_from = buildFrontier(from_x, from_y);
+	let current = to_id;
+
+	let path = [];
+	while (current !== undefined && current !== from_id) {
+		path.push(current);
+		current = came_from.get(current);
+	}
+
+	// An undefined `current` means it wasn't possible to have a path `from` -> `to`, return an empty path
+	if (current === undefined) {
+		return [];
+	}
+
+	// Finally, put `from` first, and `to` last
+	path.reverse();
+
+	// Note our path won't include the `from` position
+	return path;
+}
+
+let min_path_length = Number.MAX_VALUE;
+for (let start of starts) {
+	const path = getShortestPath(start.x, start.y, E.x, E.y);
+	if (path.length) {
+		min_path_length = Math.min(min_path_length, path.length);
+	}
+}
+
+console.log(min_path_length);
