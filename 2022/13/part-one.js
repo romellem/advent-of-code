@@ -1,10 +1,12 @@
 const { input } = require('./input');
 
 function compare(left, right, depth = 0) {
+	// Loop the upper bounds of left and right
 	for (let i = 0; i < Math.max(left.length, right.length); i++) {
 		let li = left[i];
 		let ri = right[i];
 
+		// Out of bounds checks
 		if (li === undefined) {
 			return true;
 		} else if (ri === undefined) {
@@ -22,8 +24,12 @@ function compare(left, right, depth = 0) {
 			}
 		}
 
+		// Recursion!
+
 		if (Array.isArray(li) && Array.isArray(ri)) {
 			let substep = compare(li, ri, depth + 1);
+
+			// A null result means to pop out of our recursive step onto the next item
 			if (substep !== null) {
 				return substep;
 			}
