@@ -10,5 +10,11 @@ const grid = new InfiniteGrid({
 });
 
 const game = new PlantSteps(grid);
+
+/**
+ * This runs fairly slow, around ~8s, because I don't have a good mechanism to just loop
+ * over the ELF cells in each tick, instead I loop over all cells and only operate on
+ * the ELF ones.
+ */
 const rounds = game.run({ pruneEveryNRounds: 0 });
 console.log(rounds);

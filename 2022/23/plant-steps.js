@@ -88,7 +88,14 @@ class PlantSteps {
 			some_elf_moved = true;
 			const elf_char = this.grid.get(...origin_coord);
 			this.grid.set(...InfiniteGrid.toCoords(dest_id), elf_char);
-			this.grid.delete(...origin_coord);
+
+			/**
+			 * Interestingly, if I'd `delete()` the `origin_coord`, I actually
+			 * get worse performance! I think its because deleting those values requires
+			 * a lot of resizing of my grid, which is slow. So setting the origin to
+			 * GROUND is actually faster.
+			 */
+			this.grid.set(...origin_coord, GROUND);
 		}
 
 		this.round++;
@@ -96,13 +103,10 @@ class PlantSteps {
 		return some_elf_moved;
 	}
 
-	run({ pruneEveryNRounds = 0 } = {}) {
+	run() {
 		let some_elf_moved;
 		do {
 			some_elf_moved = this.tickRound();
-			if (pruneEveryNRounds > 0 && this.rounds % pruneEveryNRounds === 0) {
-				this.grid.prune(GROUND);
-			}
 		} while (some_elf_moved);
 
 		return this.round;
