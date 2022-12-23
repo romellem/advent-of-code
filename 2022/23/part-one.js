@@ -1,14 +1,24 @@
 const { input } = require('./input');
 const { InfiniteGrid } = require('./infinite-grid');
 
+let debug = 'A'.charCodeAt(0);
+let debugs = [];
+const pushAndReturnVal = (val) => {
+	debugs.push(val);
+	return val;
+};
+
 const ELF = 1;
 const GROUND = 0;
 const grid = new InfiniteGrid({
 	load: input,
 	defaultFactory: () => GROUND,
-	parseAs: (cell) => (cell === '#' ? ELF : GROUND),
-	string_map: { [GROUND]: '.', [ELF]: '#' },
+	parseAs: (cell) => (cell === '#' ? pushAndReturnVal(debug++) : GROUND),
 });
+grid.string_map = {
+	[GROUND]: '.',
+	...debugs.reduce((obj, v) => ((obj[v] = String.fromCharCode(v)), obj), {}),
+};
 
 function neighborsMapIsEmpty(map) {
 	for (let { value } of map.values()) {
@@ -87,7 +97,8 @@ class PlantSteps {
 			if (origin_coord === null) {
 				continue;
 			}
-			this.grid.grid.set(dest_id, ELF);
+			const elf_char = this.grid.get(...origin_coord);
+			this.grid.set(...InfiniteGrid.toCoords(dest_id), elf_char);
 			this.grid.set(...origin_coord, GROUND);
 		}
 
@@ -98,7 +109,9 @@ class PlantSteps {
 
 const game = new PlantSteps(grid);
 for (let i = 0; i < 10; i++) {
+	// console.log(game.grid.toString());
 	game.tickRound();
+	// console.log(`\n== End of Round ${i + 1} ==\n`);
 }
 
 game.grid.prune(GROUND);
@@ -112,4 +125,32 @@ for (let y = 0; y < gridJSON.length; y++) {
 		}
 	}
 }
-console.log(count); // 2851 too low, 2856 too low
+console.log(count); // 2851 too low, 2856 too low, 4339 too high
+
+/*
+......#.....
+..........#.
+.#.#..#.....
+.....#......
+..#.....#..#
+#......##...
+....##......
+.#........#.
+...#.#..#...
+............
+...#..#..#..
+*/
+
+/*
+.......A.....
+..F.B.....E..
+.............
+.......D...H.
+.LI.CN.......
+.........G...
+.......O.J..K
+.....M.......
+..P.Q.....S..
+......R.V..T.
+....U........
+*/
