@@ -62,10 +62,7 @@ class PlantSteps {
 			const elf_neighbors = this.grid.neighbors(...coord, true);
 
 			if (!neighborsMapIsEmpty(elf_neighbors)) {
-				for (let i = 0; i < this.proposals.length; i++) {
-					const index = (i + this.round) % this.proposals.length;
-					const proposal = this.proposals[index];
-
+				for (let proposal of this.proposals) {
 					const proposal_elves_size = proposal.check.reduce((neighborSum, dir) => {
 						const dir_value = elf_neighbors.get(dir)?.value || GROUND;
 						return neighborSum + dir_value;
@@ -102,8 +99,8 @@ class PlantSteps {
 			this.grid.set(...origin_coord, GROUND);
 		}
 
-		this.round++;
-		this.round %= this.proposals.length;
+		let first = this.proposals.shift();
+		this.proposals.push(first);
 	}
 }
 
