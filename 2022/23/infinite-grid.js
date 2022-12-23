@@ -299,6 +299,26 @@ class InfiniteGrid {
 		return sum;
 	}
 
+	/**
+	 * Removes `value` from the grid and resizes the bounds
+	 * @param {unknown} value
+	 */
+	prune(value) {
+		const cells_to_copy = new Map();
+		for (let [id, cell] of this.grid) {
+			if (cell !== value) {
+				cells_to_copy.set(id, cell);
+			}
+		}
+
+		this.grid.clear();
+		for (let [id, cell] of cells_to_copy) {
+			this.grid.set(id, cell);
+		}
+
+		this.resize();
+	}
+
 	resize() {
 		this.max_x = -Infinity;
 		this.min_x = Infinity;

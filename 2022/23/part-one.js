@@ -101,5 +101,15 @@ for (let i = 0; i < 10; i++) {
 	game.tickRound();
 }
 
-const ground_cells = game.grid.findAll(GROUND, false);
-console.log(ground_cells.length); // 2851 too low
+game.grid.prune(GROUND);
+const gridJSON = game.grid.toJSON();
+let count = 0;
+for (let y = 0; y < gridJSON.length; y++) {
+	for (let x = 0; x < gridJSON[y].length; x++) {
+		let cell = gridJSON[y][x];
+		if (cell === GROUND) {
+			count++;
+		}
+	}
+}
+console.log(count); // 2851 too low, 2856 too low
