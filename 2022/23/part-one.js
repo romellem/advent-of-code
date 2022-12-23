@@ -32,36 +32,74 @@ class PlantSteps {
 		// 3. If there is no Elf in the W, NW, or SW adjacent positions, the Elf proposes moving west one step.
 		// 4. If there is no Elf in the E, NE, or SE adjacent positions, the Elf proposes moving east one step.
 		this.proposals = [
-			{ check: ['N', 'NE', 'NW'], move: 'N' },
-			{ check: ['S', 'SE', 'SW'], move: 'S' },
-			{ check: ['W', 'NW', 'SW'], move: 'W' },
-			{ check: ['E', 'NE', 'SE'], move: 'E' },
+			{ check: ['N', 'NE', 'NW'], moveInDir: 'N' },
+			{ check: ['S', 'SE', 'SW'], moveInDir: 'S' },
+			{ check: ['W', 'NW', 'SW'], moveInDir: 'W' },
+			{ check: ['E', 'NE', 'SE'], moveInDir: 'E' },
 		];
 		this.round = 0;
 	}
 
 	tickRound() {
+		// `null` values mean two elves tried to move to the same spot
+		const elf_movement_destinations = new Map();
 		for (let [id, cell] of this.grid) {
 			if (cell === GROUND) {
 				continue;
 			}
 
-			const elf_neighbors = new Map(
-				[...this.grid.neighbors(...InfiniteGrid.toCoords(id), true)].filter(
-					([, { value }]) => value
-				)
-			);
+			const coord = InfiniteGrid.toCoords(id);
+			const elf_neighbors = this.grid.neighbors(...coord, true);
 
-			if (elf_neighbors.size) {
+			if (!neighborsMapIsEmpty(elf_neighbors)) {
 				for (let i = 0; i < this.proposals.length; i++) {
 					const index = (i + this.round) % this.proposals.length;
 					const proposal = this.proposals[index];
-					const proposal_elves = proposal.check.map((dir) => elf_neighbors.get(dir));
+
+					const proposal_elves_size = proposal.check.reduce((neighborSum, dir) => {
+						const dir_value = elf_neighbors.get(dir)?.value || GROUND;
+						return neighborSum + dir_value;
+					}, 0);
+
+					if (!proposal_elves_size) {
+						// Try to move in this dir
+						const dest_coord = InfiniteGrid.moveInDirection(
+							...coord,
+							proposal.moveInDir
+						);
+						const dest_id = InfiniteGrid.toId(...dest_coord);
+						const already_taken = elf_movement_destinations.get(dest_id);
+
+						if (already_taken === undefined) {
+							// Not taken, place our elf there!
+							elf_movement_destinations.set(dest_id, coord);
+						} else {
+							// We already tried to move there, so null it out so noone moves there
+							elf_movement_destinations.set(dest_id, null);
+						}
+					}
 				}
 			}
+		}
+
+		// 2nd half, move the elves
+		for (let [dest_id, origin_coord] of elf_movement_destinations) {
+			if (origin_coord === null) {
+				continue;
+			}
+			this.grid.grid.set(dest_id, ELF);
+			this.grid.set(...origin_coord, GROUND);
 		}
 
 		this.round++;
 		this.round %= this.proposals.length;
 	}
 }
+
+const game = new PlantSteps(grid);
+for (let i = 0; i < 10; i++) {
+	game.tickRound();
+}
+
+const ground_cells = game.grid.findAll(GROUND, false);
+console.log(ground_cells.length); // 2851 too low
