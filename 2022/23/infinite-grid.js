@@ -244,6 +244,11 @@ class InfiniteGrid {
 		return this.grid.get(id);
 	}
 
+	delete(x, y) {
+		const id = InfiniteGrid.toId(x, y);
+		return this.grid.delete(id);
+	}
+
 	/**
 	 * @param {RegExp|any} value
 	 * @param {Boolean} [as_coords] - When true, the 2nd element of each array element returned is an Array of `[x, y]` number values, otherwise are string IDs.

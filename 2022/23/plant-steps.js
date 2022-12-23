@@ -10,6 +10,9 @@ function neighborsMapIsEmpty(map) {
 	return true;
 }
 
+const ELF = 1;
+const GROUND = 0;
+
 class PlantSteps {
 	/**
 	 * @param {InfiniteGrid} grid
@@ -85,17 +88,26 @@ class PlantSteps {
 			some_elf_moved = true;
 			const elf_char = this.grid.get(...origin_coord);
 			this.grid.set(...InfiniteGrid.toCoords(dest_id), elf_char);
-			this.grid.set(...origin_coord, GROUND);
+			this.grid.delete(...origin_coord);
 		}
 
 		this.round++;
 
 		return some_elf_moved;
 	}
-}
 
-const ELF = 1;
-const GROUND = 0;
+	run({ pruneEveryNRounds = 0 } = {}) {
+		let some_elf_moved;
+		do {
+			some_elf_moved = this.tickRound();
+			if (pruneEveryNRounds > 0 && this.rounds % pruneEveryNRounds === 0) {
+				this.grid.prune(GROUND);
+			}
+		} while (some_elf_moved);
+
+		return this.round;
+	}
+}
 
 module.exports = {
 	PlantSteps,
