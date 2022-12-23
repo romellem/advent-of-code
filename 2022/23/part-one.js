@@ -1,24 +1,14 @@
 const { input } = require('./input');
 const { InfiniteGrid } = require('./infinite-grid');
 
-let debug = 'A'.charCodeAt(0);
-let debugs = [];
-const pushAndReturnVal = (val) => {
-	debugs.push(val);
-	return val;
-};
-
 const ELF = 1;
 const GROUND = 0;
 const grid = new InfiniteGrid({
 	load: input,
 	defaultFactory: () => GROUND,
-	parseAs: (cell) => (cell === '#' ? pushAndReturnVal(debug++) : GROUND),
+	parseAs: (cell) => (cell === '#' ? ELF : GROUND),
+	string_map: { [GROUND]: '.', [ELF]: '#' },
 });
-grid.string_map = {
-	[GROUND]: '.',
-	...debugs.reduce((obj, v) => ((obj[v] = String.fromCharCode(v)), obj), {}),
-};
 
 function neighborsMapIsEmpty(map) {
 	for (let { value } of map.values()) {
@@ -62,7 +52,10 @@ class PlantSteps {
 			const elf_neighbors = this.grid.neighbors(...coord, true);
 
 			if (!neighborsMapIsEmpty(elf_neighbors)) {
-				for (let proposal of this.proposals) {
+				for (let i = 0; i < this.proposals.length; i++) {
+					const index = (i + this.round) % this.proposals.length;
+					const proposal = this.proposals[index];
+
 					const proposal_elves_size = proposal.check.reduce((neighborSum, dir) => {
 						const dir_value = elf_neighbors.get(dir)?.value || GROUND;
 						return neighborSum + dir_value;
@@ -84,6 +77,9 @@ class PlantSteps {
 							// We already tried to move there, so null it out so noone moves there
 							elf_movement_destinations.set(dest_id, null);
 						}
+
+						// We found a proposal, break our loop
+						break;
 					}
 				}
 			}
@@ -99,19 +95,21 @@ class PlantSteps {
 			this.grid.set(...origin_coord, GROUND);
 		}
 
-		let first = this.proposals.shift();
-		this.proposals.push(first);
+		this.round++;
+		this.round %= this.proposals.length;
 	}
 }
 
 const game = new PlantSteps(grid);
-for (let i = 0; i < 10; i++) {
+// console.log('== Initial State ==\n');
+for (let i = 0; i < 5; i++) {
 	// console.log(game.grid.toString());
 	game.tickRound();
 	// console.log(`\n== End of Round ${i + 1} ==\n`);
 }
 
 game.grid.prune(GROUND);
+console.log(game.grid.toString());
 const gridJSON = game.grid.toJSON();
 let count = 0;
 for (let y = 0; y < gridJSON.length; y++) {
@@ -122,32 +120,4 @@ for (let y = 0; y < gridJSON.length; y++) {
 		}
 	}
 }
-console.log(count); // 2851 too low, 2856 too low, 4339 too high
-
-/*
-......#.....
-..........#.
-.#.#..#.....
-.....#......
-..#.....#..#
-#......##...
-....##......
-.#........#.
-...#.#..#...
-............
-...#..#..#..
-*/
-
-/*
-.......A.....
-..F.B.....E..
-.............
-.......D...H.
-.LI.CN.......
-.........G...
-.......O.J..K
-.....M.......
-..P.Q.....S..
-......R.V..T.
-....U........
-*/
+console.log(count); // 2851 too low, 2856 too low, 4339 too high, 3841 not right
