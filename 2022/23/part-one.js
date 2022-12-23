@@ -102,14 +102,15 @@ class PlantSteps {
 
 const game = new PlantSteps(grid);
 // console.log('== Initial State ==\n');
-for (let i = 0; i < 5; i++) {
+for (let i = 0; i < 10; i++) {
 	// console.log(game.grid.toString());
 	game.tickRound();
 	// console.log(`\n== End of Round ${i + 1} ==\n`);
 }
+// console.log(game.grid.toString());
 
 game.grid.prune(GROUND);
-console.log(game.grid.toString());
+
 const gridJSON = game.grid.toJSON();
 let count = 0;
 for (let y = 0; y < gridJSON.length; y++) {
