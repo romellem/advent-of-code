@@ -12,25 +12,23 @@ const nums = {
 	nine: 9,
 };
 
+const entries = Object.entries(nums);
+
+function strToNum(str) {
+	return entries.map(([word, num]) => (str.startsWith(word) ? num : 0)).filter(Boolean)[0] || 0;
+}
+
 function doThing(input) {
-	debugger;
 	let sum = 0;
 	for (let line of input) {
-		let origline = line;
-		let indices = [];
-		do {
-			indices = Object.keys(nums)
-				.map((n) => [n, line.indexOf(n)])
-				.filter((n) => n[1] !== -1)
-				.sort((a, b) => a[1] - b[1]);
-			for (let [word] of indices) {
-				line = line.replace(word, nums[word]);
-			}
-		} while (indices.length > 0);
-		let nums2 = line.split('').filter((v) => /\d/.test(v));
-		const val = nums2[0] + nums2[nums2.length - 1];
-		console.log(origline, '===\n' + line, '=', nums2.join(''), '=', val);
-		console.log();
+		let numbers = line
+			.split('')
+			.map((c, i) => {
+				return /\d/.test(c) ? +c : strToNum(line.slice(i));
+			})
+			.filter(Boolean);
+
+		const val = '' + numbers[0] + numbers[numbers.length - 1];
 
 		sum += +val;
 	}
