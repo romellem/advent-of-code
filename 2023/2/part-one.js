@@ -38,6 +38,16 @@ function parse(input) {
 	});
 }
 
-// parse(input)
+let val = parse(input)
+	.map((v, i) => {
+		const { maxCubes } = v;
+		if (maxCubes.red <= 12 && maxCubes.green <= 13 && maxCubes.blue <= 14) {
+			return [true, i + 1];
+		} else {
+			return [false, i + 1];
+		}
+	})
+	.filter((v) => v[0] === true)
+	.reduce((sum, o) => sum + o[1], 0);
 
-console.log(JSON.stringify(parse(input)));
+console.log(val);
