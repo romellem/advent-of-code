@@ -47,23 +47,45 @@ for (let [id, num] of nums) {
 		.split('')
 		.map((_, i) => [coord[0] + i, coord[1]]);
 	let neighbors = cells.map(([x, y]) => grid.neighbors(x, y, true));
+	let sym = new Map();
 	const testt = neighbors.some((group) => {
 		return [...group.values()].some(({ id, coord, value }) => {
 			let thing = /[^\.\d]/.test(value);
+			if (thing) {
+				sym.set(value, coord);
+			}
 			return thing;
 		});
 	});
 
 	if (testt) {
-		partNums.push([id, num]);
+		partNums.push([id, num, [...sym].flat()]);
 	}
 }
 
-// for (let [val, [x, y]] of symbols) {
-// 	const n = grid.neighbors(x, y, true);
-// 	if ([...n.values()].some(({ id, coord, value }) => /\d/.test(value))) {
-// 	}
-// }
+let counts = new Map();
+
+for (let [numStartId, num, [sym, [sx, sy]]] of partNums) {
+	if (sym === '*') {
+		let sid = InfiniteGrid.toId(sx, sy);
+		let arr;
+		if (counts.has(sid)) {
+			arr = counts.get(sid);
+		} else {
+			arr = [];
+			counts.set(sid, arr);
+		}
+		arr.push([num, numStartId]);
+	}
+}
+console.log(
+	[...counts.values()]
+		.filter((v) => v.length === 2)
+		.map((v) => v.map((x) => x[0]).reduce((a, b) => a * b))
+		.reduce((a, b) => a + b)
+);
+
+// console.log(JSON.stringify([...counts.values()]));
 
 // console.log(nums);
-console.log(partNums.reduce((sum, a) => sum + a[1], 0));
+// console.log(JSON.stringify(partNums));
