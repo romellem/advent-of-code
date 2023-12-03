@@ -19,7 +19,7 @@ function getNums() {
 			} else {
 				if (in_num) {
 					// pop num
-					numMap.set(InfiniteGrid.toId(x, y), +num);
+					numMap.set(InfiniteGrid.toId(x - num.length, y), +num);
 					in_num = false;
 					num = '';
 				}
@@ -40,11 +40,14 @@ for (let [id, num] of nums) {
 		.split('')
 		.map((_, i) => [coord[0] + i, coord[1]]);
 	let neighbors = cells.map(([x, y]) => grid.neighbors(x, y, true));
-	if (
-		neighbors.some((group) => {
-			return [...group.values()].some(({ id, coord, value }) => /[^\.\d]/.test(value));
-		})
-	) {
+	const testt = neighbors.some((group) => {
+		return [...group.values()].some(({ id, coord, value }) => {
+			let thing = /[^\.\d]/.test(value);
+			return thing;
+		});
+	});
+
+	if (testt) {
 		partNums.push([id, num]);
 	}
 }
@@ -55,4 +58,5 @@ for (let [id, num] of nums) {
 // 	}
 // }
 
+// console.log(nums);
 console.log(partNums.reduce((sum, a) => sum + a[1], 0));
