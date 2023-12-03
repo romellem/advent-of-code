@@ -1,6 +1,6 @@
 const { input } = require('./input');
 
-const nums = {
+const NUM_WORDS = {
 	one: 1,
 	two: 2,
 	three: 3,
@@ -12,29 +12,38 @@ const nums = {
 	nine: 9,
 };
 
-const entries = Object.entries(nums);
+const NUM_WORD_ENTRIES = Object.entries(NUM_WORDS);
 
 function strToNum(str) {
-	return entries.map(([word, num]) => (str.startsWith(word) ? num : 0)).filter(Boolean)[0] || 0;
-}
-
-function doThing(input) {
-	let sum = 0;
-	for (let line of input) {
-		let numbers = line
-			.split('')
-			.map((c, i) => {
-				return /\d/.test(c) ? +c : strToNum(line.slice(i));
-			})
-			.filter(Boolean);
-
-		const val = '' + numbers[0] + numbers[numbers.length - 1];
-
-		sum += +val;
+	for (let [word, num] of NUM_WORD_ENTRIES) {
+		if (str.startsWith(word)) {
+			return num;
+		}
 	}
-	return sum;
+
+	// Will get filtered out
+	return '';
 }
 
-const val = doThing(input);
+const numbersInLines = input.map((line) => {
+	const allNumbers = line
+		.split('')
+		.map((char, i) => {
+			const restOfLineFromChar = line.slice(i);
 
-console.log(val);
+			// If we have a digit, return that. Otherwise, look to see if this char could be the start of a number word
+			return /\d/.test(char) ? char : strToNum(restOfLineFromChar);
+		})
+		.filter(Boolean);
+
+	const firstNumber = allNumbers[0];
+	const lastNumber = allNumbers[allNumbers.length - 1];
+	return parseInt(`${firstNumber}${lastNumber}`, 10);
+});
+
+let sum = 0;
+for (let num of numbersInLines) {
+	sum += num;
+}
+
+console.log(sum);

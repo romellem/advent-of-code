@@ -1,14 +1,16 @@
 const { input } = require('./input');
 
-function doThing(input) {
-	let sum = 0;
-	for (let v of input) {
-		sum += +v;
-	}
+const numbersInLines = input.map((line) => {
+	const allNumbers = line.split('').filter((v) => /\d/.test(v));
 
-	return sum;
+	const firstNumber = allNumbers[0];
+	const lastNumber = allNumbers[allNumbers.length - 1];
+	return parseInt(`${firstNumber}${lastNumber}`, 10);
+});
+
+let sum = 0;
+for (let num of numbersInLines) {
+	sum += num;
 }
 
-const val = doThing(input);
-
-console.log(val);
+console.log(sum);
