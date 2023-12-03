@@ -25,6 +25,13 @@ function getNums() {
 				}
 			}
 		}
+
+		if (in_num) {
+			// pop num
+			numMap.set(InfiniteGrid.toId(tempGrid[y].length - num.length, y), +num);
+			in_num = false;
+			num = '';
+		}
 	}
 
 	return numMap;
