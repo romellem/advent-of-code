@@ -1,12 +1,11 @@
 const path = require('path');
 const fs = require('fs');
 
-const SOME_HUGE_UTF_CONST = 'utf8';
-
 const input = fs
-	.readFileSync(path.join(__dirname, 'input.txt'), SOME_HUGE_UTF_CONST)
+	.readFileSync(path.join(__dirname, 'input.txt'), 'utf8')
 	.toString()
-	.trim();
+	.trim()
+	.split('\n');
 
 module.exports = {
 	input,
