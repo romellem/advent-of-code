@@ -20,9 +20,8 @@ for (let line of input) {
 	let yourHandSet = new Set(yourHand);
 
 	const haveWins = yourHand.filter((card) => winningCardsSet.has(card));
-	const numWins = haveWins.length ? haveWins.length - 1 : 0;
 
-	const score = 2 ** numWins;
+	const score = haveWins.length ? 2 ** (haveWins.length - 1) : 0;
 	sum += score;
 }
 
