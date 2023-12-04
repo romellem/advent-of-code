@@ -1,91 +1,102 @@
 const { input } = require('./input');
 const { InfiniteGrid } = require('./infinite-grid');
 
-function getNums() {
-	let tempGrid = InfiniteGrid.split(input);
-	let in_num = false;
-	let num = '';
-	let numMap = new Map();
-	for (let y = 0; y < tempGrid.length; y++) {
-		for (let x = 0; x < tempGrid[y].length; x++) {
-			let v = tempGrid[y][x];
-			if (/\d/.test(v)) {
-				if (in_num) {
-					num += v;
-				} else {
-					in_num = true;
-					num = v;
-				}
-			} else {
-				if (in_num) {
-					// pop num
-					numMap.set(InfiniteGrid.toId(x - num.length, y), +num);
-					in_num = false;
-					num = '';
-				}
+// Parse out whole numbers from the input and track their position in the grid
+function getNums(input) {
+	const grid = InfiniteGrid.split(input);
+	let inNumber = false;
+	let currentNumStr = '';
+	function popNum(numX, numY) {
+		const currentNumber = parseInt(currentNumStr, 10);
+		// const numX = x - currentNumStr.length;
+		const numId = InfiniteGrid.toId(numX, numY);
+		numMap.set(numId, currentNumber);
+		inNumber = false;
+		currentNumStr = '';
+	}
+
+	const numMap = new Map();
+
+	for (let y = 0; y < grid.length; y++) {
+		for (let x = 0; x < grid[y].length; x++) {
+			const char = grid[y][x];
+			if (/\d/.test(char)) {
+				// Concat the char
+				currentNumStr += char;
+				inNumber = true;
+			} else if (inNumber) {
+				const numX = x - currentNumStr.length;
+				popNum(numX, y);
 			}
 		}
 
-		if (in_num) {
-			// pop num
-			numMap.set(InfiniteGrid.toId(tempGrid[y].length - num.length, y), +num);
-			in_num = false;
-			num = '';
+		// If we were still in a number after parsing this row, make sure to pop it off
+		if (inNumber) {
+			// We were at the end of the row, so calc x position from that
+			const numX = grid[y].length - currentNumStr.length;
+			popNum(numX, y);
 		}
 	}
 
 	return numMap;
 }
 
-const nums = getNums();
+const nums = getNums(input);
 const grid = new InfiniteGrid({ load: input });
 
-let partNums = [];
+const partNums = [];
+
+// Loop through all the numbers to see which are "part" numbers
 for (let [id, num] of nums) {
-	let coord = InfiniteGrid.toCoords(id);
-	let cells = String(num)
+	const coord = InfiniteGrid.toCoords(id);
+	// Get coords of each digit
+	const cells = String(num)
 		.split('')
 		.map((_, i) => [coord[0] + i, coord[1]]);
-	let neighbors = cells.map(([x, y]) => grid.neighbors(x, y, true));
-	let sym = new Map();
-	const testt = neighbors.some((group) => {
+
+	const symbolsMap = new Map();
+	const neighbors = cells.map(([x, y]) => grid.neighbors(x, y, true));
+	const someNeighborIsSymbol = neighbors.some((group) => {
 		return [...group.values()].some(({ id, coord, value }) => {
-			let thing = /[^\.\d]/.test(value);
-			if (thing) {
-				sym.set(value, coord);
+			const isSymbol = /[^\.\d]/.test(value);
+			if (isSymbol) {
+				// Save symbol and its coordinates at the same time in this loop (why not?)
+				symbolsMap.set(value, coord);
 			}
-			return thing;
+			return /[^\.\d]/.test(value);
 		});
 	});
 
-	if (testt) {
-		partNums.push([id, num, [...sym].flat()]);
+	const symbolCoord = [...symbolsMap];
+
+	if (symbolCoord.length > 1) {
+		console.error('More than one symbol is a neighbor of the number, breaking an assumption');
+		console.error(symbolCoord);
+		process.exit(1);
+	}
+
+	if (someNeighborIsSymbol) {
+		partNums.push({ id, num, symbolCoord: symbolCoord.flat() });
 	}
 }
 
-let counts = new Map();
+const counts = new Map();
 
-for (let [numStartId, num, [sym, [sx, sy]]] of partNums) {
+for (let {
+	numStartId,
+	num,
+	symbolCoord: [sym, [sx, sy]],
+} of partNums) {
 	if (sym === '*') {
-		let sid = InfiniteGrid.toId(sx, sy);
-		let arr;
-		if (counts.has(sid)) {
-			arr = counts.get(sid);
-		} else {
-			arr = [];
-			counts.set(sid, arr);
-		}
+		const sid = InfiniteGrid.toId(sx, sy);
+		const arr = counts.has(sid) ? counts.get(sid) : [];
+		counts.set(sid, arr);
 		arr.push([num, numStartId]);
 	}
 }
-console.log(
-	[...counts.values()]
-		.filter((v) => v.length === 2)
-		.map((v) => v.map((x) => x[0]).reduce((a, b) => a * b))
-		.reduce((a, b) => a + b)
-);
 
-// console.log(JSON.stringify([...counts.values()]));
+const ratios = [...counts.values()]
+	.filter((v) => v.length === 2)
+	.map((v) => v.map((x) => x[0]).reduce((a, b) => a * b));
 
-// console.log(nums);
-// console.log(JSON.stringify(partNums));
+console.log(ratios.reduce((a, b) => a + b, 0));
