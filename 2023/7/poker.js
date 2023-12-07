@@ -57,10 +57,45 @@ const CARD_RANKS = '23456789TJQKA'
 		return acc;
 	}, new Map());
 
-function rankHands(handA, handB) {
-	const handAType = getHandType(handA);
-	const handBType = getHandType(handB);
-	if (handAType === handBType) {
+const CARD_RANKS_JOKERS_WILD = 'J23456789TQKA'
+	.split('')
+	.map((v, i) => [v, i + 1])
+	.reduce((acc, [c, r]) => {
+		acc.set(c, r);
+		return acc;
+	}, new Map());
+
+const ALL_CARDS_WITHOUT_JOKERS = '23456789TQKA'.split('');
+function getAllHandsJokersWild(hand) {
+	let newHands = new Set();
+	for (let swapCard of ALL_CARDS_WITHOUT_JOKERS) {
+		let newHand = hand.map((v) => (v === 'J' ? swapCard : v)).join('');
+		newHands.add(newHand);
+	}
+
+	return Array.from(newHands).map((v) => v.split(''));
+}
+
+function rankHands(handA, handB, jokersWild = false) {
+	let ranks = jokersWild ? CARD_RANKS_JOKERS_WILD : CARD_RANKS;
+
+	let handAType;
+	let handBType;
+
+	if (jokersWild && (handA.includes('J') || handB.includes('J'))) {
+		let allHandsA = getAllHandsJokersWild(handA);
+		let bestA = allHandsA.sort((a, b) => rankHands(a, b)).at(-1);
+		let allHandsB = getAllHandsJokersWild(handB);
+		let bestB = allHandsB.sort((a, b) => rankHands(a, b)).at(-1);
+
+		handAType = bestA;
+		handBType = bestB;
+	} else {
+		handAType = getHandType(handA);
+		handBType = getHandType(handB);
+	}
+
+	if (handAType !== handBType) {
 		// Highest hand goes on the bottom
 		return handAType - handBType;
 	} else {
@@ -68,19 +103,15 @@ function rankHands(handA, handB) {
 			let cardA = handA[i];
 			let cardB = handB[i];
 
-			let cardARank = CARD_RANKS.get(cardA);
-			let cardBRank = CARD_RANKS.get(cardB);
+			let cardARank = ranks.get(cardA);
+			let cardBRank = ranks.get(cardB);
 			if (cardARank !== cardBRank) {
 				return cardARank - cardBRank;
 			}
 		}
 	}
 
-	console.log('handA', handA);
-	console.log('handB', handB);
-	throw 'SHould not get here!';
+	return 0;
 }
 
 module.exports = { rankHands };
-
-// 252496178 wrong
