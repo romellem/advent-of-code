@@ -85,11 +85,12 @@ function rankHands(handA, handB, jokersWild = false) {
 	if (jokersWild && (handA.includes('J') || handB.includes('J'))) {
 		let allHandsA = getAllHandsJokersWild(handA);
 		let bestA = allHandsA.sort((a, b) => rankHands(a, b)).at(-1);
+
 		let allHandsB = getAllHandsJokersWild(handB);
 		let bestB = allHandsB.sort((a, b) => rankHands(a, b)).at(-1);
 
-		handAType = bestA;
-		handBType = bestB;
+		handAType = getHandType(bestA);
+		handBType = getHandType(bestB);
 	} else {
 		handAType = getHandType(handA);
 		handBType = getHandType(handB);

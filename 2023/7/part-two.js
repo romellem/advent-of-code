@@ -2,13 +2,11 @@ const { input } = require('./input');
 const { rankHands } = require('./poker');
 
 input.sort((a, b) => {
-	let [handA, wagerA] = a;
-	let [handB, wagerB] = b;
+	let [handA] = a;
+	let [handB] = b;
 
 	return rankHands(handA, handB, true);
 });
-
-console.log(input);
 
 let ans = input
 	.map(([hand, wager], i) => {
