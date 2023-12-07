@@ -67,14 +67,12 @@ const CARD_RANKS = '23456789TJQKA'
 		return acc;
 	}, new Map());
 
-console.log(CARD_RANKS);
-
 function rankHands(handA, handB) {
 	const handAType = getHandType(handA);
 	const handBType = getHandType(handB);
 	console.log(handA.join(''), 'is', HANDS[handAType]);
 	console.log(handB.join(''), 'is', HANDS[handBType]);
-	if (handAType === handBType) {
+	if (handAType !== handBType) {
 		// Highest hand goes on the bottom
 		return handAType - handBType;
 	} else {

@@ -5,7 +5,15 @@ input.sort((a, b) => {
 	let [handA, wagerA] = a;
 	let [handB, wagerB] = b;
 
-	return rankHands(handA, handB);
+	let val = rankHands(handA, handB);
+	if (val > 0) {
+		console.log(handA.join(''), ' > ', handB.join(''));
+	} else if (val < 0) {
+		console.log(handA.join(''), ' < ', handB.join(''));
+	} else {
+		console.log(handA.join(''), ' = ', handB.join(''));
+	}
+	return val;
 });
 
 console.log('sorted input');
