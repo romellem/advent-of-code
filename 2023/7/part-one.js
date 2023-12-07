@@ -8,6 +8,9 @@ input.sort((a, b) => {
 	return rankHands(handA, handB);
 });
 
+console.log('sorted input');
+console.log(JSON.stringify(input));
+
 let ans = input
 	.map(([hand, wager], i) => {
 		return (i + 1) * wager;

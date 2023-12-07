@@ -6,6 +6,16 @@ const TWO_PAIR = 2;
 const ONE_PAIR = 1;
 const HIGH_CARD = 0;
 
+const HANDS = {
+	[FIVE_OF_A_KIND]: 'FIVE_OF_A_KIND',
+	[FOUR_OF_A_KIND]: 'FOUR_OF_A_KIND',
+	[FULL_HOUSE]: 'FULL_HOUSE',
+	[THREE_OF_A_KIND]: 'THREE_OF_A_KIND',
+	[TWO_PAIR]: 'TWO_PAIR',
+	[ONE_PAIR]: 'ONE_PAIR',
+	[HIGH_CARD]: 'HIGH_CARD',
+};
+
 function countCards(hand) {
 	let count = new Map();
 	for (let card of hand) {
@@ -57,9 +67,13 @@ const CARD_RANKS = '23456789TJQKA'
 		return acc;
 	}, new Map());
 
+console.log(CARD_RANKS);
+
 function rankHands(handA, handB) {
 	const handAType = getHandType(handA);
 	const handBType = getHandType(handB);
+	console.log(handA.join(''), 'is', HANDS[handAType]);
+	console.log(handB.join(''), 'is', HANDS[handBType]);
 	if (handAType === handBType) {
 		// Highest hand goes on the bottom
 		return handAType - handBType;
