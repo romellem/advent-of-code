@@ -19,7 +19,7 @@ of manual tinkering.
 
 ## 2023 Puzzles List
 
-Completed: **6 / 25** (24%)
+Completed: **7 / 25** (28%)
 
 *  [✅ Day 1](2023/1/)
 *  [✅ Day 2](2023/2/)
@@ -28,6 +28,8 @@ Completed: **6 / 25** (24%)
 *  Day 5
 *  [✅ Day 6](2023/6/)
 *  [✅ Day 7](2023/7/)
+*  Day 8
+*  [✅ Day 9](2023/9/)
 
 ## 2022 Puzzles List
 
