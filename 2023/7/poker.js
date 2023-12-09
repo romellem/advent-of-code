@@ -1,3 +1,4 @@
+// Use numbers for easy sorting
 const FIVE_OF_A_KIND = 6;
 const FOUR_OF_A_KIND = 5;
 const FULL_HOUSE = 4;
@@ -6,6 +7,9 @@ const TWO_PAIR = 2;
 const ONE_PAIR = 1;
 const HIGH_CARD = 0;
 
+/**
+ * @returns {Array<[string, number]>}
+ */
 function countCards(hand) {
 	let count = new Map();
 	for (let card of hand) {
@@ -76,18 +80,18 @@ function getAllHandsJokersWild(hand) {
 	return Array.from(newHands).map((v) => v.split(''));
 }
 
-function rankHands(handA, handB, jokersWild = false) {
-	let ranks = jokersWild ? CARD_RANKS_JOKERS_WILD : CARD_RANKS;
+function rankHands(handA, handB, { jokersWild = false } = {}) {
+	const ranks = jokersWild ? CARD_RANKS_JOKERS_WILD : CARD_RANKS;
 
 	let handAType;
 	let handBType;
 
 	if (jokersWild && (handA.includes('J') || handB.includes('J'))) {
-		let allHandsA = getAllHandsJokersWild(handA);
-		let bestA = allHandsA.sort((a, b) => rankHands(a, b)).at(-1);
+		const allHandsA = getAllHandsJokersWild(handA);
+		const bestA = allHandsA.sort((a, b) => rankHands(a, b)).at(-1);
 
-		let allHandsB = getAllHandsJokersWild(handB);
-		let bestB = allHandsB.sort((a, b) => rankHands(a, b)).at(-1);
+		const allHandsB = getAllHandsJokersWild(handB);
+		const bestB = allHandsB.sort((a, b) => rankHands(a, b)).at(-1);
 
 		handAType = getHandType(bestA);
 		handBType = getHandType(bestB);
@@ -101,17 +105,18 @@ function rankHands(handA, handB, jokersWild = false) {
 		return handAType - handBType;
 	} else {
 		for (let i = 0; i < handA.length; i++) {
-			let cardA = handA[i];
-			let cardB = handB[i];
+			const cardA = handA[i];
+			const cardB = handB[i];
 
-			let cardARank = ranks.get(cardA);
-			let cardBRank = ranks.get(cardB);
+			const cardARank = ranks.get(cardA);
+			const cardBRank = ranks.get(cardB);
 			if (cardARank !== cardBRank) {
 				return cardARank - cardBRank;
 			}
 		}
 	}
 
+	// Hands are equal
 	return 0;
 }
 

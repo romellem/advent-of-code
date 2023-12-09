@@ -8,10 +8,13 @@ const input = fs
 	.trim()
 	.split('\n')
 	.map((line) => {
-		// 3T3TT 332
+		// @example `AKQJT 123`
 		return line.split(' ').map((v, i) => {
-			if (i === 0) return v.split('');
-			else return parseInt(v);
+			if (i === 0) {
+				return v.split('');
+			} else {
+				return parseInt(v, 10);
+			}
 		});
 	});
 
