@@ -28,13 +28,17 @@ for (let line of input) {
 
 	const haveWins = yourHand.filter((card) => winningCardsSet.has(card));
 	const cardIndex = cardNum - 1;
+	// Get current count of number of copies of the current card
 	const cardCopies = copies[cardIndex];
 
+	// If our scratch card was a winner
 	if (haveWins.length) {
+		// Figure out which cards we need to get copies of
 		const newCopies = Array(haveWins.length)
 			.fill()
 			.map((_, i) => cardIndex + 1 + i); // e.g. `cardNum + i`
 		for (let copy of newCopies) {
+			// Each scratch off wins `(1 copy * number of scratchoffs) = cardCopies`, so add that to counts so far
 			copies[copy] += cardCopies;
 		}
 	}
