@@ -10,16 +10,17 @@ const [time_str, distance_str] = fs
 const time = time_str
 	.slice('Time: '.length)
 	.trim()
-	.split(' ')
-	.filter(Boolean)
-	.map((v) => +v);
+	.split(/\s+/)
+	.map((v) => parseInt(v, 10));
 
 const distance = distance_str
 	.slice('Distance: '.length)
 	.trim()
-	.split(' ')
-	.filter(Boolean)
-	.map((v) => +v);
+	.split(/\s+/)
+	.map((v) => parseInt(v, 10));
+
+// Zip up time and distance
+/** @type Array<[number, number]> */
 const input = time.map((t, i) => [t, distance[i]]);
 
 module.exports = {

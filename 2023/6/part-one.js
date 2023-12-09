@@ -1,14 +1,12 @@
 const { input } = require('./input');
 
-console.log(input);
-
-let results = [];
+const results = [];
 for (let [totalTime, recordDistance] of input) {
 	let waysToWin = 0;
 	for (let t = 0; t < totalTime; t++) {
-		let speed = t;
-		let timeLeft = totalTime - t;
-		let distance = speed * timeLeft;
+		const speed = t;
+		const timeLeft = totalTime - t;
+		const distance = speed * timeLeft;
 		if (distance > recordDistance) {
 			waysToWin++;
 		}
@@ -17,4 +15,4 @@ for (let [totalTime, recordDistance] of input) {
 	results.push(waysToWin);
 }
 
-console.log(results.reduce((a, b) => a * b));
+console.log(results.reduce((a, b) => a * b, 1));
