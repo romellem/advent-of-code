@@ -34,12 +34,12 @@ for (let line of input) {
 	// If our scratch card was a winner
 	if (haveWins.length) {
 		// Figure out which cards we need to get copies of
-		const newCopies = Array(haveWins.length)
+		const nextCardIndices = Array(haveWins.length)
 			.fill()
 			.map((_, i) => cardIndex + 1 + i); // e.g. `cardNum + i`
-		for (let copy of newCopies) {
+		for (let nextCardIndex of nextCardIndices) {
 			// Each scratch off wins `(1 copy * number of scratchoffs) = cardCopies`, so add that to counts so far
-			copies[copy] += cardCopies;
+			copies[nextCardIndex] += cardCopies;
 		}
 	}
 }
