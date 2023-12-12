@@ -2,8 +2,6 @@ const { input } = require('./input');
 const G = require('generatorics');
 const distance = require('manhattan');
 
-const grid = input;
-
 // `true` means it is empty / should be expanded
 const emptyRows = Array(input.length).fill(true);
 const emptyCols = Array(input[0].length).fill(true);
@@ -13,7 +11,7 @@ const galaxyCoords = [];
 // Get all galaxies, and mark which cols / rows are empty
 for (let y = 0; y < input.length; y++) {
 	for (let x = 0; x < input[y].length; x++) {
-		if (grid[y][x] === '#') {
+		if (input[y][x] === '#') {
 			emptyRows[y] = false;
 			emptyCols[x] = false;
 			galaxyCoords.push({ x, y });

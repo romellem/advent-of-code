@@ -2,8 +2,6 @@ const { input } = require('./input');
 const G = require('generatorics');
 const distance = require('manhattan');
 
-const grid = input;
-
 // `true` means it is empty / should be expanded
 const emptyRows = Array(input.length).fill(true);
 const emptyCols = Array(input[0].length).fill(true);
@@ -13,7 +11,7 @@ const galaxyCoords = [];
 // Get all galaxies, and mark which cols / rows are empty
 for (let y = 0; y < input.length; y++) {
 	for (let x = 0; x < input[y].length; x++) {
-		if (grid[y][x] === '#') {
+		if (input[y][x] === '#') {
 			emptyRows[y] = false;
 			emptyCols[x] = false;
 			galaxyCoords.push({ x, y });
@@ -26,8 +24,12 @@ for (let galaxyCoord of galaxyCoords) {
 	const emptyColsBefore = emptyCols.slice(0, galaxyCoord.x).filter(Boolean).length;
 	const emptyRowsBefore = emptyRows.slice(0, galaxyCoord.y).filter(Boolean).length;
 
-	galaxyCoord.x += 1000000 * emptyColsBefore;
-	galaxyCoord.y += 1000000 * emptyRowsBefore;
+	/**
+	 * Expand the galaxies by factor of 1,000,000 (minus 1 to replace the empty row).
+	 * In part one, making the empty *twice as big* only expands it by one (e.g. `2 - 1`).
+	 */
+	galaxyCoord.x += (1000000 - 1) * emptyColsBefore;
+	galaxyCoord.y += (1000000 - 1) * emptyRowsBefore;
 }
 
 let pathSum = 0;
