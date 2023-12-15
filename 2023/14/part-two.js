@@ -1,13 +1,11 @@
 const { input } = require('./input');
 const { InfiniteGrid } = require('./infinite-grid');
-const { C } = require('generatorics');
 
-// Getting fancy here, see part one for a more reasonable way to write these
-// prettier-ignore
-const sortTopToBottomLeftToRight = ({ coords: ac }, { coords: bc }) => ac[1] !== bc[1] ? ac[1] - bc[1] : ac[0] - bc[0],
-	sortBottomToTopLeftToRight = ({ coords: ac }, { coords: bc }) => ac[1] !== bc[1] ? bc[1] - ac[1] : ac[0] - bc[0],
-	sortLeftToRightToptoBottom = ({ coords: ac }, { coords: bc }) => ac[0] !== bc[0] ? ac[0] - bc[0] : ac[1] - bc[1],
-	sortRightToLeftToptoBottom = ({ coords: ac }, { coords: bc }) => ac[0] !== bc[0] ? bc[0] - ac[0] : ac[1] - bc[1];
+// Getting fancy / terse here, see part one for a more reasonable way to write these
+const sortTopToBottomLeftToRight = ({ coords: ac }, { coords: bc }) => ac[1] !== bc[1] ? ac[1] - bc[1] : ac[0] - bc[0];
+const sortBottomToTopLeftToRight = ({ coords: ac }, { coords: bc }) => ac[1] !== bc[1] ? bc[1] - ac[1] : ac[0] - bc[0];
+const sortLeftToRightToptoBottom = ({ coords: ac }, { coords: bc }) => ac[0] !== bc[0] ? ac[0] - bc[0] : ac[1] - bc[1];
+const sortRightToLeftToptoBottom = ({ coords: ac }, { coords: bc }) => ac[0] !== bc[0] ? bc[0] - ac[0] : ac[1] - bc[1];
 
 const spinCycles = [
 	['N', sortTopToBottomLeftToRight],
@@ -22,27 +20,34 @@ const grid = new InfiniteGrid({ load: input });
 const roundRocks = grid.findAll('O');
 
 let foundCycle = false;
-let iteration = 0;
+let cycle = 0;
 
 const seenGrids = new Set();
 
 function runCycle() {
-	const [dir, sortFn] = spinCycles[iteration++ % 4];
-	roundRocks.sort(sortFn);
+	cycle++;
+	for (let [dir, sortFn] of spinCycles) {
+		roundRocks.sort(sortFn);
 
-	for (let rock of roundRocks) {
-		let [x, y] = rock.coords;
-		while (grid.getNeighbor(x, y, dir)?.[0] === EMPTY) {
-			[x, y] = grid.moveViaSwap(x, y, dir);
+		for (let rock of roundRocks) {
+			let [x, y] = rock.coords;
+			while (grid.getNeighbor(x, y, dir)?.[0] === EMPTY) {
+				// Update x values without updating `rock` (just yet)
+				[x, y] = grid.moveViaSwap(x, y, dir);
+			}
+
+			// Update our coord reference so we don't have to continuously grab it from the `grid`
+			rock.coords[0] = x;
+			rock.coords[1] = y;
 		}
-		rock.coords[0] = x;
-		rock.coords[1] = y;
 	}
 
-	if (seenGrids.has(grid.toString())) {
+	const gridStr = grid.toString();
+
+	if (seenGrids.has(gridStr)) {
 		foundCycle = true;
 	} else {
-		seenGrids.add(grid.toString());
+		seenGrids.add(gridStr);
 	}
 }
 
@@ -50,22 +55,28 @@ while (!foundCycle) {
 	runCycle();
 }
 
-while (iteration + 4 < 1000000000) {
-	iteration += 4;
-}
+// Cycles are cyclic but in some period - determine the period now that we've seen a previous state (have entered a stable period somewhere)
+const periodicStates = [];
+do {
+	periodicStates.push(grid.toString());
+	runCycle();
+} while (!periodicStates.includes(grid.toString()));
 
-console.log(iteration);
-for (let i = 0; i < 1000000000 - iteration; i++) {
+console.log(periodicStates.length);
+console.log(cycle);
+console.log();
+
+const cyclesLeft = (1000000000 - cycle) % periodicStates.length;
+
+for (let i = 0; i < cyclesLeft; i++) {
 	runCycle();
 }
 
-console.log(
-	grid
-		.findAll('O')
-		.map(({ coords }) => {
-			return grid.max_y + 1 - coords[1];
-		})
-		.reduce((a, b) => a + b, 0)
-);
+const totalLoad = grid
+	.findAll('O')
+	.map(({ coords }) => {
+		return grid.max_y + 1 - coords[1];
+	})
+	.reduce((a, b) => a + b, 0);
 
-// 107942 too high
+console.log(totalLoad);
