@@ -140,6 +140,7 @@ class InfiniteGrid {
 	/**
 	 * @todo The "wrap around" only really makes sense in a rectangular grid.
 	 * Try to code in the cases where we have some cols/rows that are larger than others.
+	 * @returns {[any, [number, number]]}
 	 */
 	getNeighbor(x, y, direction, { wrap_around = false } = {}) {
 		if (!this.inBounds(x, y)) {
@@ -232,6 +233,29 @@ class InfiniteGrid {
 	}
 
 	/**
+	 * @param {[number, number]} aCoords
+	 * @param {[number, number]} bCoords
+	 */
+	swap([ax, ay], [bx, by]) {
+		const tempA = this.get(ax, ay);
+		this.set(ax, ay, this.get(bx, by));
+		this.set(bx, by, tempA);
+	}
+
+	/**
+	 * @param {number} x
+	 * @param {number} y
+	 * @param {'N' | 'W' | 'E' | 'S' | 'NW' | 'NE' | 'SW' | 'SE'} direction
+	 * @returns {[number, number]} Returns the new coords the cell is now at
+	 */
+	moveViaSwap(x, y, direction) {
+		const newCoord = InfiniteGrid.moveInDirection(x, y, direction);
+		this.swap([x, y], newCoord);
+
+		return newCoord;
+	}
+
+	/**
 	 * @param {Number} x
 	 * @param {Number} y
 	 * @returns {any}
@@ -246,15 +270,14 @@ class InfiniteGrid {
 
 	/**
 	 * @param {RegExp|any} value
-	 * @param {Boolean} [as_coords] - When true, the 2nd element of each array element returned is an Array of `[x, y]` number values, otherwise are string IDs.
-	 * @returns {Array<[any,GridId|Coord]>} - Returns an Array, the first value matching the cell found, and the 2nd the coords or ID.
+	 * @returns {Array<{value: any, id: GridId, coords: [number, number]}>} - Returns an Array, the first value matching the cell found, and the 2nd the coords or ID.
 	 */
-	findAll(value, as_coords = true) {
+	findAll(value) {
 		const found = [];
 		for (let [id, cell] of this.grid) {
 			const check = value instanceof RegExp ? value.test(cell) : value === cell;
 			if (check) {
-				found.push([cell, as_coords ? InfiniteGrid.toCoords(id) : id]);
+				found.push({ value: cell, id, coords: InfiniteGrid.toCoords(id) });
 			}
 		}
 
