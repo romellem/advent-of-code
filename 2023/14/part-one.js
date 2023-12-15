@@ -6,11 +6,13 @@ let roundRocks = grid.findAll('O').sort((a, b) => {
 	const aCoords = a.coords;
 	const bCoords = b.coords;
 
-	if (aCoords[0] === bCoords[0]) {
-		return aCoords[0] - bCoords[0];
+	// If y is different, so by y, top to bottom
+	if (aCoords[1] !== bCoords[1]) {
+		return aCoords[1] - bCoords[1];
 	}
 
-	return aCoords[1] - bCoords[1];
+	// Otherwise we are in the same row, sort by x, left to right
+	return aCoords[0] - bCoords[0];
 });
 
 const EMPTY = '.';
