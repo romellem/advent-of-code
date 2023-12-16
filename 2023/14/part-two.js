@@ -2,10 +2,14 @@ const { input } = require('./input');
 const { InfiniteGrid } = require('./infinite-grid');
 
 // Getting fancy / terse here, see part one for a more reasonable way to write these
-const sortTopToBottomLeftToRight = ({ coords: ac }, { coords: bc }) => ac[1] !== bc[1] ? ac[1] - bc[1] : ac[0] - bc[0];
-const sortBottomToTopLeftToRight = ({ coords: ac }, { coords: bc }) => ac[1] !== bc[1] ? bc[1] - ac[1] : ac[0] - bc[0];
-const sortLeftToRightToptoBottom = ({ coords: ac }, { coords: bc }) => ac[0] !== bc[0] ? ac[0] - bc[0] : ac[1] - bc[1];
-const sortRightToLeftToptoBottom = ({ coords: ac }, { coords: bc }) => ac[0] !== bc[0] ? bc[0] - ac[0] : ac[1] - bc[1];
+const sortTopToBottomLeftToRight = ({ coords: ac }, { coords: bc }) =>
+	ac[1] !== bc[1] ? ac[1] - bc[1] : ac[0] - bc[0];
+const sortBottomToTopLeftToRight = ({ coords: ac }, { coords: bc }) =>
+	ac[1] !== bc[1] ? bc[1] - ac[1] : ac[0] - bc[0];
+const sortLeftToRightToptoBottom = ({ coords: ac }, { coords: bc }) =>
+	ac[0] !== bc[0] ? ac[0] - bc[0] : ac[1] - bc[1];
+const sortRightToLeftToptoBottom = ({ coords: ac }, { coords: bc }) =>
+	ac[0] !== bc[0] ? bc[0] - ac[0] : ac[1] - bc[1];
 
 const spinCycles = [
 	['N', sortTopToBottomLeftToRight],
@@ -61,10 +65,6 @@ do {
 	periodicStates.push(grid.toString());
 	runCycle();
 } while (!periodicStates.includes(grid.toString()));
-
-console.log(periodicStates.length);
-console.log(cycle);
-console.log();
 
 const cyclesLeft = (1000000000 - cycle) % periodicStates.length;
 
