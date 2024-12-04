@@ -5,7 +5,7 @@
 > in any programming language you like.
 
 This is a repo containing my solutions to [Eric Wastl's](http://was.tl/) **Advent of Code**.
-All of the solutions are in JavaScript, meant to be run via [NodeJS](https://nodejs.org/).
+All of the solutions are in JavaScript (or Typescript!), meant to be run via [NodeJS](https://nodejs.org/) (or [Bun](https://bun.sh/)!).
 When I started I had thought I'd have an [accompanying page](https://romellem.github.io/advent-of-code/)
 (that had some level of interaction) for each solution, but I quickly found that I didn't
 have much time for that. Maybe some day I'll complete (brief) write-ups for each of the
