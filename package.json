@@ -35,5 +35,8 @@
     "traverse": "^0.6.6",
     "typescript": "^5.7.2",
     "von-neumann": "^1.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1"
   }
 }

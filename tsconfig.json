@@ -1,12 +1,14 @@
 {
 	"compilerOptions": {
-		"target": "es2016",
+		"target": "ESNext",
 		"lib": ["ESNext", "DOM"],
+
 		// turning this on breaks tsc, the compiler continually crashes
 		// "allowJs": true,
 
-		"module": "node16",
-		"moduleResolution": "node16",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"moduleDetection": "force",
 		"noEmit": true,
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
