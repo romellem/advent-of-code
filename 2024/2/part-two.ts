@@ -7,7 +7,7 @@ import { input } from './input';
  * - Any two adjacent levels differ by _at least one_ and _at most three_.
  */
 
-function tolerableIsReport(report: number[]): boolean {
+function tolerableIsReport(report: number[], badReports = 0): boolean {
 	let [first, second] = report;
 
 	let isIncreasing = first < second;
@@ -15,10 +15,9 @@ function tolerableIsReport(report: number[]): boolean {
 
 	if (!isIncreasing && !isDecreasing) {
 		// Try again but remove the first digit
-		return tolerableIsReport(report.slice(1));
+		return tolerableIsReport(report.slice(1), 1);
 	}
 
-	let badReports = 0;
 	for (let i = 0; i < report.length - 1; i++) {
 		const current = report[i];
 		const next = report[i + 1];
