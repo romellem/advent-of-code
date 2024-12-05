@@ -17,6 +17,12 @@ found it easier to hand-parse my input and create a static JS export for each pr
 trying to use most of these solutions for some other puzzle input will require some level
 of manual tinkering.
 
+## 2024 Puzzles List
+
+Completed: **1 / 25** (4%)
+
+*  [✅ Day 1](2024/1/)
+
 ## 2023 Puzzles List
 
 Completed: **9 / 25** (36%)
