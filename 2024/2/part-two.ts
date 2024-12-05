@@ -1,21 +1,13 @@
 import { input } from './input';
 
-/**
- * So, a report only counts as safe if both of the following are true:
- *
- * - The levels are either _all increasing_ or _all decreasing_.
- * - Any two adjacent levels differ by _at least one_ and _at most three_.
- */
-
-function tolerableIsReport(report: number[], badReports = 0): boolean {
-	let [first, second] = report;
+function isReportSafe(report: number[]): boolean {
+	const [first, second] = report;
 
 	let isIncreasing = first < second;
 	let isDecreasing = second < first;
 
 	if (!isIncreasing && !isDecreasing) {
-		// Try again but remove the first digit
-		return tolerableIsReport(report.slice(1), 1);
+		return false;
 	}
 
 	for (let i = 0; i < report.length - 1; i++) {
@@ -23,26 +15,17 @@ function tolerableIsReport(report: number[], badReports = 0): boolean {
 		const next = report[i + 1];
 
 		if (isIncreasing && !(next > current)) {
-			badReports++;
-			if (badReports > 1) {
-				return false;
-			}
+			return false;
 		}
 
 		if (isDecreasing && !(next < current)) {
-			badReports++;
-			if (badReports > 1) {
-				return false;
-			}
+			return false;
 		}
 
 		const diff = Math.abs(current - next);
 
 		if (diff < 1 || diff > 3) {
-			badReports++;
-			if (badReports > 1) {
-				return false;
-			}
+			return false;
 		}
 	}
 
@@ -50,5 +33,22 @@ function tolerableIsReport(report: number[], badReports = 0): boolean {
 	return true;
 }
 
-const answer = input.filter(tolerableIsReport).length;
+function tolerableIsReportSafe(report: number[]): boolean {
+	if (isReportSafe(report)) {
+		return true;
+	}
+
+	for (let i = 0; i < report.length; i++) {
+		const trimmedReport = report.slice();
+		trimmedReport.splice(i, 1);
+
+		if (isReportSafe(trimmedReport)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+const answer = input.filter(tolerableIsReportSafe).length;
 console.log(answer);
