@@ -1,22 +1,23 @@
 import { input } from './input';
 
+type DoCommand = {
+	index: number;
+	type: 'do';
+};
+type DontCommand = {
+	index: number;
+	type: 'dont';
+};
+type MulCommand = {
+	index: number;
+	type: 'mul';
+	product: number;
+};
+type Commands = DoCommand | DontCommand | MulCommand;
+
+const commands: Array<Commands> = [];
 let match: RegExpExecArray | null;
 
-const commands: Array<
-	| {
-			index: number;
-			type: 'do';
-	  }
-	| {
-			index: number;
-			type: 'dont';
-	  }
-	| {
-			index: number;
-			type: 'mul';
-			product: number;
-	  }
-> = [];
 const doRegEx = /do\(\)/g;
 while ((match = doRegEx.exec(input)) !== null) {
 	commands.push({ index: match.index, type: 'do' });
