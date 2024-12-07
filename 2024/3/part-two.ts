@@ -14,7 +14,7 @@ const commands: Array<
 	| {
 			index: number;
 			type: 'mul';
-			args: [number, number];
+			product: number;
 	  }
 > = [];
 const doRegEx = /do\(\)/g;
@@ -35,7 +35,7 @@ while ((match = mulRegExp.exec(input)) !== null) {
 	commands.push({
 		index: match.index,
 		type: 'mul',
-		args: [parseInt(numA, 10), parseInt(numB, 10)],
+		product: parseInt(numA, 10) * parseInt(numB, 10),
 	});
 }
 
@@ -49,7 +49,7 @@ for (let command of commands) {
 	} else if (command.type === 'dont') {
 		running = false;
 	} else if (command.type === 'mul' && running) {
-		sum += command.args[0] * command.args[1];
+		sum += command.product;
 	}
 }
 
