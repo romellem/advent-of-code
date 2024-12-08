@@ -38,6 +38,7 @@
     "von-neumann": "^1.0.1"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.13",
     "@types/node": "^22.10.1"
   }
 }
