@@ -1,5 +1,4 @@
 import G from 'generatorics';
-import _ from 'lodash';
 
 import { input } from './input';
 
@@ -7,6 +6,16 @@ type Point = {
 	x: number;
 	y: number;
 	char: string;
+};
+
+type Antinode = {
+	x: number;
+	y: number;
+};
+
+type Vect = {
+	dx: number;
+	dy: number;
 };
 
 const points: Array<Point> = input
@@ -28,83 +37,78 @@ function inBounds(x: number, y: number): boolean {
 	return x >= 0 && x < maxX && y >= 0 && y < maxY;
 }
 
-function shift(vecA: readonly [number, number], vecB: readonly [number, number]): [number, number] {
-	return [vecA[0] + vecB[0], vecA[1] + vecB[1]];
+function shift(antinode: Readonly<Antinode>, vec: Readonly<Vect>): Antinode {
+	return { x: antinode.x + vec.dx, y: antinode.y + vec.dy };
 }
 
-// Use singleton pattern for antinodes so they can dedupe within our Set
-const antinodeCache = new Map<string, Point>();
-function getAntinode(x: number, y: number, char: string): Point {
-	const key = `${x},${y},${char}`;
+/**
+ * Use singleton pattern for antinodes so they can dedupe within our Set.
+ * Antinodes aren't unique by frequency types, just coordinates. That is,
+ * two antennas might create an antinode at the same location, but only
+ * a single antinode should be present.
+ */
+const antinodeCache = new Map<string, Antinode>();
+function getAntinode(x: number, y: number): Antinode {
+	const key = `${x},${y}`;
 	if (!antinodeCache.has(key)) {
-		antinodeCache.set(key, { x, y, char });
+		antinodeCache.set(key, { x, y });
 	}
 	return antinodeCache.get(key)!;
 }
 
 // Group antennas by its frequency type
 const antennas = points.filter((point) => point.char !== '.');
-const groups = new Map<string, Array<[number, number]>>();
+const groups = new Map<string, Array<Point>>();
 for (let antenna of antennas) {
 	if (!groups.has(antenna.char)) {
 		groups.set(antenna.char, []);
 	}
-	groups.get(antenna.char)!.push([antenna.x, antenna.y]);
+	groups.get(antenna.char)!.push(antenna);
 }
 
-const uniqueAntennas = Array.from(groups.keys());
+const uniqueAntennaFrequencies = Array.from(groups.keys());
 
-const antinodes = new Set<Point>();
+const antinodes = new Set<Antinode>();
 
-for (let antennaType of uniqueAntennas) {
-	const coords = groups.get(antennaType)!;
+for (let antennaFrequency of uniqueAntennaFrequencies) {
+	const listOfAntennas = groups.get(antennaFrequency)!;
 
 	// If there's only 1 antenna of this frequency, not antinodes can be formed (no pairs can be created)
-	if (coords.length < 2) {
+	if (listOfAntennas.length < 2) {
 		continue;
 	}
 
-	for (let antennaPair of G.combination(coords, 2)) {
-		const [coordA, coordB] = antennaPair;
+	for (let antennaPair of G.combination(listOfAntennas, 2)) {
+		const [antennaA, antennaB] = antennaPair;
 
 		// In part two, antinodes always live on the antennas themselves
-		antinodes.add(getAntinode(...coordA, antennaType));
-		antinodes.add(getAntinode(...coordB, antennaType));
+		antinodes.add(getAntinode(antennaA.x, antennaA.y));
+		antinodes.add(getAntinode(antennaB.x, antennaB.y));
 
-		// Calculate vectors between the two antennas
-		const aToB = [coordB[0] - coordA[0], coordB[1] - coordA[1]] as const;
-		const bToA = [coordA[0] - coordB[0], coordA[1] - coordB[1]] as const;
+		// Calculate vectors between the two antennas. aToB == -1 * bToA
+		const aToB: Vect = { dx: antennaB.x - antennaA.x, dy: antennaB.y - antennaA.y };
+		const bToA: Vect = { dx: antennaA.x - antennaB.x, dy: antennaA.y - antennaB.y };
 
-		// Loop each vector, adding the vector to create new antinodes until we are out of bounds
-		let antinodeA = coordA;
+		// Continue adding the vector to create new antinodes until we are out of bounds
+		let antinodeA: Antinode = antennaA;
 		do {
 			antinodeA = shift(antinodeA, bToA);
-			if (!inBounds(...antinodeA)) {
+			if (!inBounds(antinodeA.x, antinodeA.y)) {
 				break;
 			}
-			antinodes.add(getAntinode(...antinodeA, antennaType));
+			antinodes.add(getAntinode(antinodeA.x, antinodeA.y));
 		} while (true);
 
-		let antinodeB = coordA;
+		// Do the same but in the other direction
+		let antinodeB: Antinode = antennaB;
 		do {
 			antinodeB = shift(antinodeB, aToB);
-			if (!inBounds(...antinodeB)) {
+			if (!inBounds(antinodeB.x, antinodeB.y)) {
 				break;
 			}
-			antinodes.add(getAntinode(...antinodeB, antennaType));
+			antinodes.add(getAntinode(antinodeB.x, antinodeB.y));
 		} while (true);
 	}
 }
 
-/**
- * We might have counted antinodes of different frequencies, but the instructions
- * show that we only care if _any_ antinode exists. So afterward, dedupe our list
- * against the coordinates only.
- *
- * We could have skipped this step by only storing the coords to begin with, but
- * I thought the antinode type might be useful for part two in the puzzle. It wasn't,
- * but no biggie in keeping this as is. It doesn't add that much to the compute time.
- */
-const uniqueAntinodes = _.uniqBy(Array.from(antinodes), (point) => `${point.x},${point.y}`);
-
-console.log(uniqueAntinodes.length);
+console.log(antinodes.size);
