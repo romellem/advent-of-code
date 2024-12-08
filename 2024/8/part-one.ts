@@ -1,5 +1,7 @@
 import G from 'generatorics';
-import { sampleInput as input } from './input';
+import _ from 'lodash';
+
+import { input } from './input';
 
 type Point = {
 	x: number;
@@ -66,27 +68,7 @@ for (let antennaType of uniqueAntennas) {
 		}
 	}
 }
-antinodes.sort((a, b) => a.y - b.y || a.x - b.x);
 
-console.log(
-	antinodes.map((antinode) => `${antinode.char} at ${antinode.x},${antinode.y}`).join('\n')
-);
+const uniqueAntinodes = _.uniqBy(antinodes, (point) => `${point.x},${point.y}`);
 
-console.log(antinodes.length);
-
-/*
-               11
-     012345678901
-   0 ......#....#
-   1 ...#....0...
-   2 ....#0....#.
-   3 ..#....0....
-   4 ....0....#..
-   5 .#....A.....
-   6 ...#........
-   7 #......#....
-   8 ........A...
-   9 .........A..
-  10 ..........#.
-  11 ..........#.
-*/
+console.log(uniqueAntinodes.length);
