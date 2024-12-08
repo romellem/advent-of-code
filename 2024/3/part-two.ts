@@ -28,10 +28,9 @@ while ((match = dontRegEx.exec(input)) !== null) {
 	commands.push({ index: match.index, type: 'dont' });
 }
 
-const mulRegExp = /mul\(\d{1,3},\d{1,3}\)/g;
+const mulRegExp = /mul\((\d{1,3}),(\d{1,3})\)/g;
 while ((match = mulRegExp.exec(input)) !== null) {
-	const [mulCommand] = match;
-	const [, numA, numB] = /mul\((\d{1,3}),(\d{1,3})\)/.exec(mulCommand) || [];
+	const [, numA, numB] = match;
 
 	commands.push({
 		index: match.index,
