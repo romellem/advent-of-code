@@ -1,9 +1,8 @@
 import { input } from './input';
 
-const mulTokens = input.matchAll(/mul\(\d{1,3},\d{1,3}\)/g);
+const mulTokens = input.matchAll(/mul\((\d{1,3}),(\d{1,3})\)/g);
 const numPairs = Array.from(mulTokens).map((capture) => {
-	const [match] = capture;
-	const [, numA, numB] = /mul\((\d{1,3}),(\d{1,3})\)/.exec(match) || [];
+	const [, numA, numB] = capture;
 	return [parseInt(numA, 10), parseInt(numB, 10)];
 });
 
