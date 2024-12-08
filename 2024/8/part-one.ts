@@ -32,6 +32,15 @@ function shift(vecA: readonly [number, number], vecB: readonly [number, number])
 	return [vecA[0] + vecB[0], vecA[1] + vecB[1]];
 }
 
+const antinodeCache = new Map<string, Point>();
+function getAntinode(x: number, y: number, char: string): Point {
+	const key = `${x},${y},${char}`;
+	if (!antinodeCache.has(key)) {
+		antinodeCache.set(key, { x, y, char });
+	}
+	return antinodeCache.get(key)!;
+}
+
 const antennas = points.filter((point) => point.char !== '.');
 const groups = new Map<string, Array<[number, number]>>();
 for (let antenna of antennas) {
@@ -43,7 +52,7 @@ for (let antenna of antennas) {
 
 const uniqueAntennas = Array.from(groups.keys());
 
-let antinodes: Array<Point> = [];
+const antinodes = new Set<Point>();
 
 for (let antennaType of uniqueAntennas) {
 	const coords = groups.get(antennaType)!;
@@ -57,18 +66,17 @@ for (let antennaType of uniqueAntennas) {
 		const bToA = [coordA[0] - coordB[0], coordA[1] - coordB[1]] as const;
 
 		const antinodeA = shift(coordA, bToA);
-		const antinodeB = shift(coordB, aToB);
-
-		if (inBounds(antinodeA[0], antinodeA[1])) {
-			antinodes.push({ x: antinodeA[0], y: antinodeA[1], char: antennaType });
+		if (inBounds(...antinodeA)) {
+			antinodes.add(getAntinode(...antinodeA, antennaType));
 		}
 
-		if (inBounds(antinodeB[0], antinodeB[1])) {
-			antinodes.push({ x: antinodeB[0], y: antinodeB[1], char: antennaType });
+		const antinodeB = shift(coordB, aToB);
+		if (inBounds(...antinodeB)) {
+			antinodes.add(getAntinode(...antinodeB, antennaType));
 		}
 	}
 }
 
-const uniqueAntinodes = _.uniqBy(antinodes, (point) => `${point.x},${point.y}`);
+const uniqueAntinodes = _.uniqBy(Array.from(antinodes), (point) => `${point.x},${point.y}`);
 
 console.log(uniqueAntinodes.length);

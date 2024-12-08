@@ -63,8 +63,8 @@ for (let antennaType of uniqueAntennas) {
 	for (let antennaPair of G.combination(coords, 2)) {
 		const [coordA, coordB] = antennaPair;
 
-		antinodes.add(getAntinode(coordA[0], coordA[1], antennaType));
-		antinodes.add(getAntinode(coordB[0], coordB[1], antennaType));
+		antinodes.add(getAntinode(...coordA, antennaType));
+		antinodes.add(getAntinode(...coordB, antennaType));
 
 		const aToB = [coordB[0] - coordA[0], coordB[1] - coordA[1]] as const;
 		const bToA = [coordA[0] - coordB[0], coordA[1] - coordB[1]] as const;
@@ -72,19 +72,19 @@ for (let antennaType of uniqueAntennas) {
 		let antinodeA = coordA;
 		do {
 			antinodeA = shift(antinodeA, bToA);
-			if (!inBounds(antinodeA[0], antinodeA[1])) {
+			if (!inBounds(...antinodeA)) {
 				break;
 			}
-			antinodes.add(getAntinode(antinodeA[0], antinodeA[1], antennaType));
+			antinodes.add(getAntinode(...antinodeA, antennaType));
 		} while (true);
 
 		let antinodeB = coordA;
 		do {
 			antinodeB = shift(antinodeB, aToB);
-			if (!inBounds(antinodeB[0], antinodeB[1])) {
+			if (!inBounds(...antinodeB)) {
 				break;
 			}
-			antinodes.add(getAntinode(antinodeB[0], antinodeB[1], antennaType));
+			antinodes.add(getAntinode(...antinodeB, antennaType));
 		} while (true);
 	}
 }
