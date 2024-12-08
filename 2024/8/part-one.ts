@@ -1,5 +1,5 @@
 import G from 'generatorics';
-import { input } from './input';
+import { sampleInput as input } from './input';
 
 type Point = {
 	x: number;
@@ -54,21 +54,39 @@ for (let antennaType of uniqueAntennas) {
 		const aToB = [coordB[0] - coordA[0], coordB[1] - coordA[1]] as const;
 		const bToA = [coordA[0] - coordB[0], coordA[1] - coordB[1]] as const;
 
-		if (inBounds(aToB[0], aToB[1])) {
-			const antinodeB = shift(coordB, aToB);
-			antinodes.push({ x: antinodeB[0], y: antinodeB[1], char: antennaType });
+		const antinodeA = shift(coordA, bToA);
+		const antinodeB = shift(coordB, aToB);
+
+		if (inBounds(antinodeA[0], antinodeA[1])) {
+			antinodes.push({ x: antinodeA[0], y: antinodeA[1], char: antennaType });
 		}
 
-		if (inBounds(bToA[0], bToA[1])) {
-			const antinodeA = shift(coordA, bToA);
-			antinodes.push({ x: antinodeA[0], y: antinodeA[1], char: antennaType });
+		if (inBounds(antinodeB[0], antinodeB[1])) {
+			antinodes.push({ x: antinodeB[0], y: antinodeB[1], char: antennaType });
 		}
 	}
 }
+antinodes.sort((a, b) => a.y - b.y || a.x - b.x);
 
-// Check to make sure I don't have a dupe problem
-const antinodesSet = new Set(antinodes.map((p) => `${p.char},${p.x},${p.y}`));
-console.log(antinodesSet.size);
+console.log(
+	antinodes.map((antinode) => `${antinode.char} at ${antinode.x},${antinode.y}`).join('\n')
+);
+
 console.log(antinodes.length);
 
-// 154 too low
+/*
+               11
+     012345678901
+   0 ......#....#
+   1 ...#....0...
+   2 ....#0....#.
+   3 ..#....0....
+   4 ....0....#..
+   5 .#....A.....
+   6 ...#........
+   7 #......#....
+   8 ........A...
+   9 .........A..
+  10 ..........#.
+  11 ..........#.
+*/
