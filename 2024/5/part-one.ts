@@ -28,11 +28,13 @@ function isOrdered(page: number[]) {
 	return true;
 }
 
-const orderedPagesMiddleDigit = pages.filter(isOrdered).map((page) => {
-	// return middle digit
-	return page[Math.trunc(page.length / 2)];
-});
+const orderedPagesMiddleDigit = pages
+	.filter((page) => isOrdered(page))
+	.map((page) => {
+		// return middle digit
+		return page[Math.trunc(page.length / 2)];
+	});
+
 const sum = orderedPagesMiddleDigit.reduce((acc, v) => acc + v, 0);
 
-// 11575 too high
 console.log(sum);
