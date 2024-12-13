@@ -1,45 +1,38 @@
 import { orderingRules, pages } from './input';
 
+// a|b means a < b & b > a
 const keyIsLessThan = new Map<number, Set<number>>();
+const keyIsGreaterThan = new Map<number, Set<number>>();
 for (let [a, b] of orderingRules) {
 	if (!keyIsLessThan.has(a)) {
 		keyIsLessThan.set(a, new Set());
 	}
+	if (!keyIsGreaterThan.has(b)) {
+		keyIsGreaterThan.set(b, new Set());
+	}
 	keyIsLessThan.get(a)!.add(b);
+	keyIsGreaterThan.get(b)!.add(a);
 }
 
-const digits = Array.from(new Set(orderingRules.flat()));
-function quicksort(arr: number[]): number[] {
-	// Base case: if the array is length 0 or 1, it's already sorted
-	if (arr.length < 2) {
-		return arr;
-	}
-
-	// Select a pivot (using the middle element here)
-	const pivotIndex = Math.floor(arr.length / 2);
-	const pivot = arr[pivotIndex];
-
-	// Arrays for less and greater elements
-	const less = [];
-	const greater = [];
-
-	// Partition step: compare every element (except the pivot) to the pivot
-	for (let i = 0; i < arr.length; i++) {
-		if (i === pivotIndex) {
-			continue;
-		}
-		const current = arr[i];
-		const currentIsLessThanPivot = keyIsLessThan.get(current)?.has(pivot);
-		if (currentIsLessThanPivot) {
-			less.push(current);
-		} else {
-			greater.push(current);
+function isOrdered(page: number[]) {
+	for (let i = 0; i < page.length - 1; i++) {
+		for (let j = i + 1; j < page.length; j++) {
+			const a = page[i];
+			const b = page[j];
+			if (!keyIsLessThan.get(a)?.has(b) && !keyIsGreaterThan.get(a)?.has(b)) {
+				return false;
+			}
 		}
 	}
 
-	// Recursively apply quicksort to the subarrays and then concatenate
-	return [...quicksort(less), pivot, ...quicksort(greater)];
+	return true;
 }
 
-const sorted = quicksort(digits);
-console.log(sorted);
+const orderedPagesMiddleDigit = pages.filter(isOrdered).map((page) => {
+	// return middle digit
+	return page[Math.trunc(page.length / 2)];
+});
+const sum = orderedPagesMiddleDigit.reduce((acc, v) => acc + v, 0);
+
+// 11575 too high
+console.log(sum);
