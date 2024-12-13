@@ -19,7 +19,7 @@ function isOrdered(page: number[]) {
 		for (let j = i + 1; j < page.length; j++) {
 			const a = page[i];
 			const b = page[j];
-			if (!keyIsLessThan.get(a)?.has(b) && !keyIsGreaterThan.get(a)?.has(b)) {
+			if (!keyIsLessThan.get(a)?.has(b) && !keyIsGreaterThan.get(b)?.has(a)) {
 				return false;
 			}
 		}
