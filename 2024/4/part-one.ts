@@ -50,7 +50,7 @@ function isMatch(
 	return true;
 }
 
-function countDirationalMatches(grid: Grid, chars: string[]): number {
+function countMatches(grid: Grid, chars: string[]): number {
 	let matches = 0;
 	const [firstChar] = chars;
 	for (let y = 0; y < grid.length; y++) {
@@ -69,5 +69,5 @@ function countDirationalMatches(grid: Grid, chars: string[]): number {
 	return matches;
 }
 
-const answer = countDirationalMatches(input, 'XMAS'.split(''));
+const answer = countMatches(input, 'XMAS'.split(''));
 console.log(answer);
