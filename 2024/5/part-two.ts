@@ -14,35 +14,23 @@ for (let [a, b] of orderingRules) {
 	keyIsGreaterThan.get(b)!.add(a);
 }
 
-function isOrdered(page: number[]) {
-	for (let i = 0; i < page.length - 1; i++) {
-		for (let j = i + 1; j < page.length; j++) {
-			const a = page[i];
-			const b = page[j];
-			if (!keyIsLessThan.get(a)?.has(b) && !keyIsGreaterThan.get(b)?.has(a)) {
-				return false;
-			}
-		}
+function sortPage(a: number, b: number): -1 | 1 | 0 {
+	if (keyIsLessThan.get(a)?.has(b) || keyIsGreaterThan.get(b)?.has(a)) {
+		return -1;
 	}
+	if (keyIsLessThan.get(b)?.has(a) || keyIsGreaterThan.get(a)?.has(b)) {
+		return 1;
+	}
+	return 0;
+}
 
-	return true;
+function isOrdered(page: number[]) {
+	const sortedPage = page.toSorted(sortPage);
+	return sortedPage.join(',') === page.join(',');
 }
 
 const unorderedPages = pages.filter((page) => !isOrdered(page));
-
-const newlySortedPages = unorderedPages.map((page) => {
-	const sortedPage = page.slice().sort((a, b) => {
-		if (keyIsLessThan.get(a)?.has(b) || keyIsGreaterThan.get(b)?.has(a)) {
-			return -1;
-		}
-		if (keyIsLessThan.get(b)?.has(a) || keyIsGreaterThan.get(a)?.has(b)) {
-			return 1;
-		}
-		return 0;
-	});
-	return sortedPage;
-});
-
+const newlySortedPages = unorderedPages.map((page) => page.toSorted(sortPage));
 const newlySortedPagesMiddleDigit = newlySortedPages.map((page) => {
 	// return middle digit
 	return page[Math.trunc(page.length / 2)];
