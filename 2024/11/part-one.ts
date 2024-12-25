@@ -11,7 +11,7 @@ interface Stone {
 	multiplier: number;
 }
 
-function makeStone(value: number | string) {
+function makeStone(value: number | string, multiplier: number = 1) {
 	if (typeof value === 'string') {
 		value = parseInt(value, 10);
 	}
@@ -19,7 +19,7 @@ function makeStone(value: number | string) {
 	return {
 		value,
 		valueStr: value.toString(),
-		multiplier: 1,
+		multiplier,
 	};
 }
 
@@ -63,8 +63,8 @@ for (let i = 0; i < TIMES; i++) {
 			const halfDigits = stone.valueStr.length / 2;
 			let leftStoneValue = stone.valueStr.slice(0, halfDigits);
 			let rightStoneValue = stone.valueStr.slice(halfDigits);
-			let leftStone = makeStone(leftStoneValue);
-			let rightStone = makeStone(rightStoneValue);
+			let leftStone = makeStone(leftStoneValue, stone.multiplier);
+			let rightStone = makeStone(rightStoneValue, stone.multiplier);
 
 			addStone(leftStone, newStonesMap);
 			addStone(rightStone, newStonesMap);
