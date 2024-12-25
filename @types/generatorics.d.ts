@@ -3,7 +3,7 @@ declare module 'generatorics' {
 		replace?: boolean;
 		ordered?: boolean;
 	}
-	type ArrLike<T> = T[] | string;
+	type ArrLike<T> = ReadonlyArray<T> | string;
 	interface GInterface {
 		clones: boolean;
 		factorial(n: number): number;
