@@ -19,12 +19,19 @@ of manual tinkering.
 
 ## 2024 Puzzles List
 
-Completed: **4 / 25** (16%)
+Completed: **6 / 25** (24%)
 
 *  [✅ Day 1](2024/1/)
 *  [✅ Day 2](2024/2/)
 *  [✅ Day 3](2024/3/)
 *  [✅ Day 4](2024/4/)
+*  Day 5
+*  Day 6
+*  [✅ Day 7](2024/7/)
+*  Day 8
+*  Day 9
+*  Day 10
+*  [✅ Day 11](2024/11/)
 
 ## 2023 Puzzles List
 
