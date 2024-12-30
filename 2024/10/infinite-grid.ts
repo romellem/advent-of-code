@@ -1,6 +1,11 @@
 import Heap from 'heap';
 
-type GridId = `${number},${number}`;
+export type GridId = `${number},${number}`;
+export type Coord = [number, number];
+export type CoordObj = { x: number; y: number };
+
+export type CardinalDirections = 'N' | 'S' | 'E' | 'W';
+export type CardinalDirectionsWithDiagonals = CardinalDirections | 'NW' | 'NE' | 'SW' | 'SE';
 
 /**
  * @typedef {String} GridId - Two numbers separated by a comma.
@@ -74,7 +79,10 @@ export class InfiniteGrid<TValidValues = unknown> {
 	 * @param {Boolean} [return_as_object=false]
 	 * @returns {{x: Number, y: Number} | [Number, Number]}
 	 */
-	static toCoords(id: GridId, return_as_object = false) {
+	static toCoords(id: GridId, return_as_object?: false): Coord;
+	static toCoords(id: GridId, return_as_object: true): CoordObj;
+	static toCoords(id: GridId, return_as_object?: boolean): Coord | CoordObj;
+	static toCoords(id: GridId, return_as_object?: boolean) {
 		let [_x, _y] = id.split(',');
 		let x = parseInt(_x, 10);
 		let y = parseInt(_y, 10);
@@ -103,11 +111,15 @@ export class InfiniteGrid<TValidValues = unknown> {
 	 * @param {String} two_dimensional_string
 	 * @returns {any[][]}
 	 */
-	static split(two_dimensional_string) {
+	static split(two_dimensional_string: string): Array2D<string> {
 		return two_dimensional_string.split('\n').map((row) => row.split(''));
 	}
 
-	static moveInDirection(x, y, direction) {
+	static moveInDirection(
+		x: number,
+		y: number,
+		direction: CardinalDirectionsWithDiagonals
+	): [number, number] {
 		switch (direction) {
 			case 'N':
 				return [x, y - 1];
@@ -147,7 +159,7 @@ export class InfiniteGrid<TValidValues = unknown> {
 	load(
 		input: string | Array2D<string>,
 		parseAs: ParseAs<TValidValues> = String as unknown as ParseAs<TValidValues>
-	) {
+	): void {
 		this.reset();
 		let grid = input;
 		if (typeof input === 'string') {
@@ -192,7 +204,12 @@ export class InfiniteGrid<TValidValues = unknown> {
 	 * Try to code in the cases where we have some cols/rows that are larger than others.
 	 * @returns {[any, [number, number]]}
 	 */
-	getNeighbor(x, y, direction, { wrap_around = false } = {}) {
+	getNeighbor(
+		x: number,
+		y: number,
+		direction: CardinalDirectionsWithDiagonals,
+		{ wrap_around = false } = {}
+	): undefined | [TValidValues, Coord] {
 		if (!this.inBounds(x, y)) {
 			return;
 		}
@@ -229,13 +246,20 @@ export class InfiniteGrid<TValidValues = unknown> {
 	 * @param {Boolean} [diagonals=false]
 	 * @returns {Map} Return a map with optional keys N, W, E, S (and NW, NE, SW, SE if `diagonals` is true) if those neighbors are within the bounds of the map.
 	 */
-	neighbors(x, y, diagonals = false) {
-		const neighboring_cells = new Map();
+	neighbors(
+		x: number,
+		y: number,
+		diagonals = false
+	): Map<CardinalDirectionsWithDiagonals, { id: GridId; coord: Coord; value: TValidValues }> {
+		const neighboring_cells: Map<
+			CardinalDirectionsWithDiagonals,
+			{ id: GridId; coord: Coord; value: TValidValues }
+		> = new Map();
 		if (!this.inBounds(x, y)) {
 			return neighboring_cells;
 		}
 
-		const neighbors_lookup = [
+		const neighbors_lookup: Array<[CardinalDirectionsWithDiagonals, Coord]> = [
 			['N', [x, y - 1]],
 			['W', [x - 1, y]],
 			['E', [x + 1, y]],
@@ -270,7 +294,7 @@ export class InfiniteGrid<TValidValues = unknown> {
 	 * @param {Number} y
 	 * @param {any} value
 	 */
-	set(x, y, value) {
+	set(x: number, y: number, value: TValidValues): void {
 		if (typeof x !== 'number' || typeof y !== 'number') {
 			throw new Error(`x and y must be numbers, got (${typeof x})${x} and (${typeof y})${y}`);
 		}
@@ -286,7 +310,7 @@ export class InfiniteGrid<TValidValues = unknown> {
 	 * @param {[number, number]} aCoords
 	 * @param {[number, number]} bCoords
 	 */
-	swap([ax, ay], [bx, by]) {
+	swap([ax, ay]: Coord, [bx, by]: Coord) {
 		const tempA = this.get(ax, ay);
 		this.set(ax, ay, this.get(bx, by));
 		this.set(bx, by, tempA);
@@ -298,7 +322,7 @@ export class InfiniteGrid<TValidValues = unknown> {
 	 * @param {'N' | 'W' | 'E' | 'S' | 'NW' | 'NE' | 'SW' | 'SE'} direction
 	 * @returns {[number, number]} Returns the new coords the cell is now at
 	 */
-	moveViaSwap(x, y, direction) {
+	moveViaSwap(x: number, y: number, direction: CardinalDirectionsWithDiagonals) {
 		const newCoord = InfiniteGrid.moveInDirection(x, y, direction);
 		this.swap([x, y], newCoord);
 
@@ -310,22 +334,22 @@ export class InfiniteGrid<TValidValues = unknown> {
 	 * @param {Number} y
 	 * @returns {any}
 	 */
-	get(x, y) {
+	get(x: number, y: number): TValidValues {
 		const id = InfiniteGrid.toId(x, y);
 		if (!this.grid.has(id)) {
 			this.set(x, y, this.defaultFactory(x, y));
 		}
-		return this.grid.get(id);
+		return this.grid.get(id)!;
 	}
 
 	/**
 	 * @param {RegExp|any} value
 	 * @returns {Array<{value: any, id: GridId, coords: [number, number]}>} - Returns an Array, the first value matching the cell found, and the 2nd the coords or ID.
 	 */
-	findAll(value) {
+	findAll(value: TValidValues | RegExp) {
 		const found = [];
 		for (let [id, cell] of this.grid) {
-			const check = value instanceof RegExp ? value.test(cell) : value === cell;
+			const check = value instanceof RegExp ? value.test(cell as string) : value === cell;
 			if (check) {
 				found.push({ value: cell, id, coords: InfiniteGrid.toCoords(id) });
 			}
@@ -334,7 +358,11 @@ export class InfiniteGrid<TValidValues = unknown> {
 		return found;
 	}
 
-	inBounds(x, y) {
+	inBounds(x: number, y: number): boolean;
+	inBounds(x: number | undefined, y: number): boolean;
+	inBounds(x: number, y?: number): boolean;
+	inBounds(x?: number, y?: number): boolean;
+	inBounds(x?: number, y?: number): boolean {
 		if (x !== undefined && y !== undefined) {
 			return x >= this.min_x && x <= this.max_x && y >= this.min_y && y <= this.max_y;
 		} else if (x !== undefined && y === undefined) {
@@ -342,6 +370,8 @@ export class InfiniteGrid<TValidValues = unknown> {
 		} else if (x === undefined && y !== undefined) {
 			return y >= this.min_y && y <= this.max_y;
 		}
+
+		return false;
 	}
 
 	clone({ empty = false } = {}) {
@@ -366,7 +396,7 @@ export class InfiniteGrid<TValidValues = unknown> {
 	sum() {
 		let sum = 0;
 		for (let value of this.grid.values()) {
-			sum += value;
+			sum += value as number;
 		}
 
 		return sum;
@@ -387,7 +417,7 @@ export class InfiniteGrid<TValidValues = unknown> {
 		}
 	}
 
-	buildDijkstrasFrontier(from_x, from_y) {
+	buildDijkstrasFrontier(from_x: number, from_y: number) {
 		const from_id = InfiniteGrid.toId(from_x, from_y);
 
 		// Sort our frontier by its priority, so we pick nodes to visit that have the lowest cost.
