@@ -475,6 +475,11 @@ colors@^1.3.3:
   resolved "https://registry.yarnpkg.com/colors/-/colors-1.4.0.tgz#c50491479d4c1bdaed2c9ced32cf7c7dc2360f78"
   integrity sha512-a+UqTh4kgZg/SlGvfbzDHpgRu7AAQOmmqRHJnxhRZICKFUT91brVhNNt58CMWU9PsBbv3PDCZUHbVxuDiH2mtA==
 
+combinatorial-generators@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/combinatorial-generators/-/combinatorial-generators-1.1.2.tgz#4be8e54784d799116b33054c7b600088c9ee0bcc"
+  integrity sha512-3dMye87xRejFz2ZySj1TMIBavMy792v0Dnwzjn8kuxN1tTPKA7Joh3V8i5UyxWJOCmKygSVSClJUeAh6+Cy+1g==
+
 concurrently@^6.2.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/concurrently/-/concurrently-6.2.0.tgz#587e2cb8afca7234172d8ea55176088632c4c56d"

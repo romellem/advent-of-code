@@ -1,5 +1,5 @@
 import { input } from './input';
-import G from 'generatorics';
+import { cartesianProduct } from 'combinatorial-generators';
 
 interface Equation {
 	result: number;
@@ -36,7 +36,8 @@ function couldBeTrue({ result, numbers }: Equation): boolean {
 	// It is OK to fill with the same reference
 	const spaces: Array<typeof VALID_OPERATIONS> = Array(numbers.length - 1).fill(VALID_OPERATIONS);
 
-	for (const operations of G.cartesian(...spaces)) {
+	for (const operations of cartesianProduct(...spaces)) {
+		// for (const operations of G.cartesian(...spaces)) {
 		const evaluation = evaluate(numbers, operations);
 		if (evaluation === result) {
 			return true;
