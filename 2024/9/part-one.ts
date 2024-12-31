@@ -31,8 +31,6 @@ for (let i = 0; i < input.length; i++) {
 let start = disk.indexOf(undefined);
 let end = disk.length - 1;
 
-// console.log({ start, end }, disk.map((v) => (v === undefined ? '.' : String(v))).join(''));
-
 while (start < end) {
 	if (disk[start] !== undefined) {
 		start++;
