@@ -1,141 +1,155 @@
 import { sampleInput as input } from './input';
+const totalDiskSize = input.reduce((acc, v) => acc + v, 0);
 
-type File = {
-	type: 'file';
-	data: Array<number>;
-	index: number;
-};
+const disk: Array<number | undefined> = Array(totalDiskSize).fill(undefined);
 
-type FreeSpace = {
-	type: 'free-space';
-	data: Array<undefined>;
-	index: number;
-};
-
-const disk: Array<File | FreeSpace> = [];
-
-// Fill the disk with contiguous chunks
+// Fill the disk
 let id = 0;
+let index = 0;
 for (let i = 0; i < input.length; i++) {
 	const num = input[i];
 
 	const isFile = i % 2 === 0;
 
 	if (isFile) {
-		disk.push({
-			type: 'file',
-			data: Array(num).fill(id),
-			index: i,
-		});
+		for (let n = 0; n < num; n++) {
+			disk[index + n] = id;
+		}
 	} else {
+		// Free space
 		id++;
-		disk.push({
-			type: 'free-space',
-			data: Array(num).fill(undefined),
-			index: i,
-		});
 	}
+
+	index += num;
 }
 
-const freeSpaces = disk.filter((v) => v.type === 'free-space');
-freeSpaces.sort((a, b) => {
-	if (a.data.length === b.data.length) {
-		// sort by index if size is the same
-		return a.index - b.index;
-	}
-	return a.data.length - b.data.length;
-});
+let start = disk.indexOf(undefined);
+let end = disk.length;
 
-const freeSpaceMap = new Map<number, Array<FreeSpace>>();
-for (let freeSpace of freeSpaces) {
-	const size = freeSpace.data.length;
-	if (!freeSpaceMap.has(size)) {
-		freeSpaceMap.set(size, []);
+function findLastFullFile(): undefined | [number, number] {
+	let beginning = end - 1;
+	if (start > beginning) {
+		return undefined;
 	}
-	freeSpaceMap.get(size)!.push(freeSpace);
+
+	let fileId = disk[beginning];
+	while (disk[beginning] !== fileId) {
+		beginning--;
+	}
+
+	if (start > beginning) {
+		return undefined;
+	}
+
+	return [beginning, end];
 }
 
-function getFirstFreeSpaceThatCanFit(size: number): FreeSpace | undefined {
-	const possibleFreeSpaces: Array<FreeSpace> = [];
-	for (let [freeSize, freeSpaces] of freeSpaceMap) {
-		if (freeSize >= size) {
-			possibleFreeSpaces.push(freeSpaces[0]);
+function getFreeSpaceBlocks(): Map<number, number> {
+	if (start > end) {
+		return new Map();
+	}
+
+	let available = disk.slice(start, end);
+
+	// Array of indices for free space
+	let freespace: Array<number> = [];
+	for (let i = 0; i < available.length; i++) {
+		if (available[i] === undefined) {
+			freespace.push(i);
 		}
 	}
 
-	possibleFreeSpaces.sort((a, b) => a.index - b.index);
-	return possibleFreeSpaces[0];
-}
-
-function tryToMoveFileToFreeSpace(file: File) {
-	const freespace = getFirstFreeSpaceThatCanFit(file.data.length);
-	if (!freespace) {
-		return;
+	if (freespace.length === 0) {
+		return new Map();
+	} else if (freespace.length === 1) {
+		return new Map([[1, freespace[0]]]);
 	}
 
-	// Remove file from the end
-	disk.splice(file.index, 1);
+	// Key is the size, and value is the start index of the block
+	let blocks = new Map<number, number>();
+	let size = 0;
+	for (let i = 0; i < freespace.length; i++) {
+		size++;
+		let current = freespace[i];
+		let next: number | undefined = freespace[i + 1];
 
-	// Insert file before free space, potentially shifting all subsequent indices
-	disk.splice(freespace.index, 0, file);
-
-	// Resize freespace
-	const newFreespaceSize = freespace.data.length - file.data.length;
-	if (newFreespaceSize === 0) {
-		// Remove free space entirely, no need to update other objects' indices
-		freeSpaceMap.get(freespace.data.length)!.shift();
-		disk.splice(freespace.index + 1, 1);
-	} else {
-		// Remove free space from current size, it will change
-		freeSpaceMap.get(freespace.data.length)!.shift();
-		freespace.data.length = newFreespaceSize;
-
-		// Update indices of all other objects, include currently resize freespace
-		for (let i = freespace.index; i < disk.length; i++) {
-			disk[i].index++;
+		// We'll end this case for the last block as well (e.g., when `next` is `undefined`)
+		if (next !== current + 1) {
+			if (!blocks.has(size)) {
+				/**
+				 * Let's say we have a disk that looks like
+				 *
+				 *   index: 0123456789
+				 *    disk: 11...22..3
+				 *
+				 * So we'd have freespace array that looks like
+				 *
+				 *   [2,3,4,7,8]
+				 *
+				 * In this example, the first time we his this `else` block,
+				 * `current = 4`, and `next = 7`. So, we want to record a block size
+				 * of 3, starting at index 2.
+				 *
+				 * To calculate that, take the fact that `current` is the last index of the block,
+				 * and subtract the size to move over the just before the start of the block.
+				 * Add 1 to bump the pointer to the actual start point.
+				 *
+				 * The math in this example then is `4 - 3 + 1` = 2, which is the start of the 3 sized block!
+				 */
+				blocks.set(size, current - size + 1);
+			}
+			size = 0;
 		}
-
-		// Update lookup map
-		if (!freeSpaceMap.has(newFreespaceSize)) {
-			freeSpaceMap.set(newFreespaceSize, []);
-		}
-
-		freeSpaceMap.get(newFreespaceSize)!.push(freespace);
-
-		// Heap
-		freeSpaceMap.get(newFreespaceSize)!.sort((a, b) => a.index - b.index);
 	}
+
+	return blocks;
 }
+let q = 0;
 
-// We update the `disk` when moving files, so use a different list that is stable
-const files = disk.filter((v) => v.type === 'file');
+// Move our file IDs to chunks of free space!
+while (true) {
+	if (q++ > 300) {
+		break;
+	}
+	let startStr = ' '.repeat(start) + 's';
+	let endStr = ' '.repeat(end - start - 1) + 'e';
+	console.log(startStr + endStr);
+	console.log(disk.map((v) => v ?? '.').join(''));
 
-console.log(
-	disk
-		.flatMap((v) => v.data)
-		.map((v) => v ?? '.')
-		.join('')
-);
-for (let i = files.length - 1; i >= 0; i--) {
-	const file = files[i];
-	tryToMoveFileToFreeSpace(file);
-	console.log(
-		disk
-			.flatMap((v) => v.data)
-			.map((v) => v ?? '.')
-			.join('')
-	);
+	const fileParts = findLastFullFile();
+	if (fileParts === undefined) {
+		break;
+	}
+
+	const [startFile, endFile] = fileParts;
+	const fileId = disk[startFile];
+	const size = endFile - startFile;
+	const freespace = getFreeSpaceBlocks();
+
+	if (freespace.has(size)) {
+		const startFree = freespace.get(size)!;
+		for (let i = 0; i < size; i++) {
+			let freeIndex = startFree + i;
+			let fileIndex = startFile + i;
+
+			disk[freeIndex] = fileId;
+			disk[fileIndex] = undefined;
+		}
+
+		end = startFile;
+		start = startFree + size;
+	}
 }
 
 // Compute checksum
-// let checksum = 0;
-// for (let i = 0; i < flatDisk.length; i++) {
-// 	let block = flatDisk[i];
-// 	if (block === undefined) {
-// 		continue;
-// 	}
+let checksum = 0;
+for (let i = 0; i < disk.length; i++) {
+	let block = disk[i];
+	if (block === undefined) {
+		continue;
+	}
 
-// 	checksum += block * i;
-// }
+	checksum += block * i;
+}
 
-// console.log(checksum);
+console.log(checksum);
