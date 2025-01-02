@@ -1,4 +1,4 @@
-import { sampleInput as input } from './input';
+import { input } from './input';
 const totalDiskSize = input.reduce((acc, v) => acc + v, 0);
 import util from 'util';
 const blue = (s: string) => util.format('\x1b[34m%s\x1b[0m', s);
@@ -48,8 +48,7 @@ function findLastFullFile(): undefined | [number, number] {
 }
 
 function getFreeSpaceBlocks(): Map<number, number> {
-	let firstFreeSpaceIndex = disk.indexOf(undefined);
-	if (firstFreeSpaceIndex > end) {
+	if (start > end) {
 		return new Map();
 	}
 
@@ -120,23 +119,23 @@ while (true) {
 	let startStr = ' '.repeat(start > 0 ? start : 0) + 's';
 	let endStr = ' '.repeat(end - start - 1 > 0 ? end - start - 1 : 0) + 'e';
 
-	console.log(startStr + endStr);
-	console.log(
-		blue(
-			Array(disk.length)
-				.fill(undefined)
-				.map((_, i) => i % 10)
-				.join('')
-		)
-	);
-	console.log(disk.map((v) => v ?? '.').join(''));
+	// console.log(startStr + endStr);
+	// console.log(
+	// 	blue(
+	// 		Array(disk.length)
+	// 			.fill(undefined)
+	// 			.map((_, i) => i % 10)
+	// 			.join('')
+	// 	)
+	// );
+	// console.log(disk.map((v) => v ?? '.').join(''));
 
 	const fileParts = findLastFullFile();
 	if (fileParts === undefined) {
 		break;
 	}
 
-	console.log(fileParts.join(','), disk.slice(...fileParts));
+	// console.log(fileParts.join(','), disk.slice(...fileParts));
 
 	const [startFile, endFile] = fileParts;
 	const fileId = disk[startFile];
@@ -154,7 +153,7 @@ while (true) {
 		}
 
 		end = startFile;
-		start = startFree + size;
+		start = disk.indexOf(undefined);
 	} else {
 		// Skip this file, couldn't move it
 		end = startFile;
@@ -177,3 +176,5 @@ for (let i = 0; i < disk.length; i++) {
 }
 
 console.log(checksum);
+
+// 15618464832081 too high
