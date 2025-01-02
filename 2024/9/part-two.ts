@@ -33,9 +33,10 @@ function findLastFullFile(): undefined | [number, number] {
 	}
 
 	let fileId = disk[beginning];
-	while (disk[beginning] !== fileId) {
+	while (disk[beginning] === fileId) {
 		beginning--;
 	}
+	beginning++;
 
 	if (start > beginning) {
 		return undefined;
@@ -49,12 +50,10 @@ function getFreeSpaceBlocks(): Map<number, number> {
 		return new Map();
 	}
 
-	let available = disk.slice(start, end);
-
 	// Array of indices for free space
 	let freespace: Array<number> = [];
-	for (let i = 0; i < available.length; i++) {
-		if (available[i] === undefined) {
+	for (let i = start; i < end; i++) {
+		if (disk[i] === undefined) {
 			freespace.push(i);
 		}
 	}
@@ -108,7 +107,7 @@ let q = 0;
 
 // Move our file IDs to chunks of free space!
 while (true) {
-	if (q++ > 300) {
+	if (q++ > 50) {
 		break;
 	}
 	let startStr = ' '.repeat(start) + 's';
@@ -120,6 +119,8 @@ while (true) {
 	if (fileParts === undefined) {
 		break;
 	}
+
+	console.log(fileParts.join(','), disk.slice(...fileParts));
 
 	const [startFile, endFile] = fileParts;
 	const fileId = disk[startFile];
