@@ -1,5 +1,7 @@
 import { sampleInput as input } from './input';
 const totalDiskSize = input.reduce((acc, v) => acc + v, 0);
+import util from 'util';
+const blue = (s: string) => util.format('\x1b[34m%s\x1b[0m', s);
 
 const disk: Array<number | undefined> = Array(totalDiskSize).fill(undefined);
 
@@ -46,7 +48,8 @@ function findLastFullFile(): undefined | [number, number] {
 }
 
 function getFreeSpaceBlocks(): Map<number, number> {
-	if (start > end) {
+	let firstFreeSpaceIndex = disk.indexOf(undefined);
+	if (firstFreeSpaceIndex > end) {
 		return new Map();
 	}
 
@@ -74,35 +77,39 @@ function getFreeSpaceBlocks(): Map<number, number> {
 
 		// We'll end this case for the last block as well (e.g., when `next` is `undefined`)
 		if (next !== current + 1) {
-			if (!blocks.has(size)) {
-				/**
-				 * Let's say we have a disk that looks like
-				 *
-				 *   index: 0123456789
-				 *    disk: 11...22..3
-				 *
-				 * So we'd have freespace array that looks like
-				 *
-				 *   [2,3,4,7,8]
-				 *
-				 * In this example, the first time we his this `else` block,
-				 * `current = 4`, and `next = 7`. So, we want to record a block size
-				 * of 3, starting at index 2.
-				 *
-				 * To calculate that, take the fact that `current` is the last index of the block,
-				 * and subtract the size to move over the just before the start of the block.
-				 * Add 1 to bump the pointer to the actual start point.
-				 *
-				 * The math in this example then is `4 - 3 + 1` = 2, which is the start of the 3 sized block!
-				 */
-				blocks.set(size, current - size + 1);
+			/**
+			 * Let's say we have a disk that looks like
+			 *
+			 *   index: 0123456789
+			 *    disk: 11...22..3
+			 *
+			 * So we'd have freespace array that looks like
+			 *
+			 *   [2,3,4,7,8]
+			 *
+			 * In this example, the first time we his this `else` block,
+			 * `current = 4`, and `next = 7`. So, we want to record a block size
+			 * of 3, starting at index 2.
+			 *
+			 * To calculate that, take the fact that `current` is the last index of the block,
+			 * and subtract the size to move over the just before the start of the block.
+			 * Add 1 to bump the pointer to the actual start point.
+			 *
+			 * The math in this example then is `4 - 3 + 1` = 2, which is the start of the 3 sized block!
+			 */
+			for (let j = 0; j < size; j++) {
+				if (!blocks.has(size - j)) {
+					blocks.set(size - j, current - size + 1);
+				}
 			}
+
 			size = 0;
 		}
 	}
 
 	return blocks;
 }
+
 let q = 0;
 
 // Move our file IDs to chunks of free space!
@@ -148,6 +155,13 @@ while (true) {
 
 		end = startFile;
 		start = startFree + size;
+	} else {
+		// Skip this file, couldn't move it
+		end = startFile;
+	}
+
+	while (disk[end - 1] === undefined) {
+		end--;
 	}
 }
 
