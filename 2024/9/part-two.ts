@@ -110,9 +110,18 @@ while (true) {
 	if (q++ > 50) {
 		break;
 	}
-	let startStr = ' '.repeat(start) + 's';
-	let endStr = ' '.repeat(end - start - 1) + 'e';
+	let startStr = ' '.repeat(start > 0 ? start : 0) + 's';
+	let endStr = ' '.repeat(end - start - 1 > 0 ? end - start - 1 : 0) + 'e';
+
 	console.log(startStr + endStr);
+	console.log(
+		blue(
+			Array(disk.length)
+				.fill(undefined)
+				.map((_, i) => i % 10)
+				.join('')
+		)
+	);
 	console.log(disk.map((v) => v ?? '.').join(''));
 
 	const fileParts = findLastFullFile();
