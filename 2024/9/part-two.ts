@@ -25,11 +25,6 @@ for (let i = 0; i < input.length; i++) {
 	const isFile = i % 2 === 0;
 	id += isFile ? 0 : 1;
 
-	/**
-	 * Based on the input, we never have a file of size 0,
-	 * but check it anyway for correctness. If we did,
-	 * skip it.
-	 */
 	if (num === 0) {
 		continue;
 	}
@@ -44,12 +39,11 @@ for (let i = 0; i < input.length; i++) {
 	} else {
 		/**
 		 * Based on the input, we never have a file of size 0, only freespace
-		 * of 0 size. For completeness sake, if we had a 0 size file that we
-		 * skipped, then expand the last freespace block to include this one.
-		 *
-		 * Debugging the code, this never happens.
+		 * of 0 size. For completeness sake, if we had a 0 size file, then
+		 * expand the last freespace block to include this one rather than
+		 * pushing on a new block.
 		 */
-		const lastFreespace = freespace[freespace.length - 1];
+		const lastFreespace = freespace.at(-1);
 		if (lastFreespace?.end === index) {
 			lastFreespace!.end += num;
 			lastFreespace!.size += num;
@@ -65,6 +59,7 @@ for (let i = 0; i < input.length; i++) {
 	index += num;
 }
 
+// Initialize all possible sizes to guarantee that we'll have an array
 const freespaceMap = new Map<number, Array<Freespace>>(
 	Array(9)
 		.fill(0)
@@ -72,13 +67,28 @@ const freespaceMap = new Map<number, Array<Freespace>>(
 );
 
 for (let block of freespace) {
+	// These lists will be intially sorted since freespace was ordered when it was generated
 	freespaceMap.get(block.size)!.push(block);
 }
 
+/**
+ * The one bit of complex overengineering I added.
+ * By keeping track of the sorted freespace blocks by size,
+ * we can improve on "linearly search freespaces for first valid one"
+ * by:
+ *
+ * 1. Take the first freespace block of each size, since these lists are sorted.
+ * 2. Filter out the ones that do not exist before the file.
+ * 3. Filter out the ones that are too small for the file.
+ * 4. Finally, make sure to take the earliest valid ones.
+ *
+ * The only thing we need to do afterward is to update the freespace map.
+ */
 function findFreeSpace(file: File): Freespace | undefined {
 	const validFreespaces = Array.from(freespaceMap.entries())
 		.map(([, blocks]) => blocks[0])
 		.filter((block: Freespace | undefined) => {
+			// We might not have a freespace of a certain size left
 			if (!block) {
 				return false;
 			}
@@ -90,6 +100,26 @@ function findFreeSpace(file: File): Freespace | undefined {
 	return validFreespaces[0];
 }
 
+// Original (and more simple) way of finding the first available freespace.
+function findFreeSpaceSlow(file: File): Freespace | undefined {
+	for (let block of freespace) {
+		/**
+		 * If we are at a freespace block that is after the file,
+		 * exit early. We won't find a valid freespace to move the file
+		 * into.
+		 */
+		if (block.start > file.start) {
+			return undefined;
+		}
+
+		if (block.size >= file.size) {
+			return block;
+		}
+	}
+
+	return undefined;
+}
+
 function partialChecksumForFile(file: File): number {
 	let partialChecksum = 0;
 	for (let i = file.start; i < file.end; i++) {
@@ -99,8 +129,13 @@ function partialChecksumForFile(file: File): number {
 	return partialChecksum;
 }
 
+/**
+ * Compute checksum and move files at the same time.
+ * This makes the whole thing much easier. I don't need
+ * to "replace" a file with free space. I only need to
+ * update the indices of the file and "shrink" the freespace.
+ */
 let checksum = 0;
-// Compute checksum and move files at the same time
 for (let i = files.length - 1; i >= 0; i--) {
 	const endFile = files[i];
 	const freeSpace = findFreeSpace(endFile);
