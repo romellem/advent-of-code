@@ -25,23 +25,26 @@ for (let i = 0; i < input.length; i++) {
 	const isFile = i % 2 === 0;
 	id += isFile ? 0 : 1;
 
+	/**
+	 * Based on the input, we never have a file of size 0,
+	 * but check it anyway for correctness. If we did,
+	 * skip it.
+	 */
+	if (num === 0) {
+		continue;
+	}
+
 	if (isFile) {
-		/**
-		 * Based on the input, we never have a file of size 0,
-		 * but check it anyway for correctness. If we did,
-		 * skip it.
-		 */
-		if (num > 0) {
-			files.push({
-				id,
-				start: index,
-				end: index + num,
-				size: num,
-			});
-		}
+		files.push({
+			id,
+			start: index,
+			end: index + num,
+			size: num,
+		});
 	} else {
 		/**
-		 * For completeness sake, if we had a 0 size file previously that we
+		 * Based on the input, we never have a file of size 0, only freespace
+		 * of 0 size. For completeness sake, if we had a 0 size file that we
 		 * skipped, then expand the last freespace block to include this one.
 		 *
 		 * Debugging the code, this never happens.
@@ -62,30 +65,23 @@ for (let i = 0; i < input.length; i++) {
 	index += num;
 }
 
-/**
- * Loop free space in order until we find one that is
- * at least the size of the file we care about.
- *
- * This is a bit unoptimized. A better way would be to have
- * a sorted list of each freespace block
- */
+const freespaceMap = new Map<number, Array<Freespace>>(
+	Array(9)
+		.fill(0)
+		.map((_, i) => [i + 1, []])
+);
+
+for (let block of freespace) {
+	freespaceMap.get(block.size)!.push(block);
+}
+
 function findFreeSpace(file: File): Freespace | undefined {
-	for (let block of freespace) {
-		/**
-		 * If we are at a freespace block that is after the file,
-		 * exit early. We won't find a valid freespace to move the file
-		 * into.
-		 */
-		if (block.start > file.start) {
-			return undefined;
-		}
+	const validFreespaces = Array.from(freespaceMap.entries())
+		.filter(([size]) => size >= file.size)
+		.map(([, blocks]) => blocks[0])
+		.sort((a, b) => a.start - b.start);
 
-		if (block.size >= file.size) {
-			return block;
-		}
-	}
-
-	return undefined;
+	return validFreespaces[0];
 }
 
 function partialChecksumForFile(file: File): number {
@@ -107,11 +103,20 @@ for (let i = files.length - 1; i >= 0; i--) {
 		endFile.start = freeSpace.start;
 		endFile.end = freeSpace.start + endFile.size;
 
+		const oldSize = freeSpace.size;
 		freeSpace.start = endFile.end;
 		freeSpace.size -= endFile.size;
+
+		// Rebalance the freespace map
+		freespaceMap.get(oldSize)!.shift();
+		if (freeSpace.size > 0) {
+			freespaceMap.get(freeSpace.size)!.push(freeSpace);
+			freespaceMap.get(freeSpace.size)!.sort((a, b) => a.start - b.start);
+		}
 	}
 
 	checksum += partialChecksumForFile(endFile);
+	// console.log(checksum);
 }
 
 console.log(checksum);
