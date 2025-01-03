@@ -1,5 +1,4 @@
 import { input } from './input';
-console.time('part-two');
 
 type File = {
 	id: number;
@@ -13,7 +12,7 @@ type Freespace = {
 	size: number;
 };
 
-const freespace: Array<Freespace> = [];
+const freespaces: Array<Freespace> = [];
 const files: Array<File> = [];
 
 // Fill the disk, but keep track of freespace and files separately
@@ -43,12 +42,12 @@ for (let i = 0; i < input.length; i++) {
 		 * expand the last freespace block to include this one rather than
 		 * pushing on a new block.
 		 */
-		const lastFreespace = freespace.at(-1);
+		const lastFreespace = freespaces.at(-1);
 		if (lastFreespace?.end === index) {
 			lastFreespace!.end += num;
 			lastFreespace!.size += num;
 		} else {
-			freespace.push({
+			freespaces.push({
 				start: index,
 				end: index + num,
 				size: num,
@@ -66,7 +65,7 @@ const freespaceMap = new Map<number, Array<Freespace>>(
 		.map((_, i) => [i + 1, []])
 );
 
-for (let block of freespace) {
+for (let block of freespaces) {
 	// These lists will be intially sorted since freespace was ordered when it was generated
 	freespaceMap.get(block.size)!.push(block);
 }
@@ -84,7 +83,7 @@ for (let block of freespace) {
  *
  * The only thing we need to do afterward is to update the freespace map.
  */
-function findFreeSpace(file: File): Freespace | undefined {
+function findFreespace(file: File): Freespace | undefined {
 	const validFreespaces = Array.from(freespaceMap.entries())
 		.map(([, blocks]) => blocks[0])
 		.filter((block: Freespace | undefined) => {
@@ -101,8 +100,8 @@ function findFreeSpace(file: File): Freespace | undefined {
 }
 
 // Original (and more simple) way of finding the first available freespace.
-function findFreeSpaceSlow(file: File): Freespace | undefined {
-	for (let block of freespace) {
+function findFreespaceSlow(file: File): Freespace | undefined {
+	for (let block of freespaces) {
 		/**
 		 * If we are at a freespace block that is after the file,
 		 * exit early. We won't find a valid freespace to move the file
@@ -129,6 +128,24 @@ function partialChecksumForFile(file: File): number {
 	return partialChecksum;
 }
 
+const moveFile = (file: File, freespace: Freespace) => {
+	file.start = freespace.start;
+	file.end = freespace.start + file.size;
+};
+
+const rebalanceFreespace = (freespace: Freespace, file: File) => {
+	// Pop the freespace off before we change its size
+	freespaceMap.get(freespace.size)!.shift();
+
+	freespace.start = file.end;
+	freespace.size -= file.size;
+
+	if (freespace.size > 0) {
+		freespaceMap.get(freespace.size)!.push(freespace);
+		freespaceMap.get(freespace.size)!.sort((a, b) => a.start - b.start);
+	}
+};
+
 /**
  * Compute checksum and move files at the same time.
  * This makes the whole thing much easier. I don't need
@@ -138,26 +155,14 @@ function partialChecksumForFile(file: File): number {
 let checksum = 0;
 for (let i = files.length - 1; i >= 0; i--) {
 	const endFile = files[i];
-	const freeSpace = findFreeSpace(endFile);
+	const freeSpace = findFreespace(endFile);
 
 	if (freeSpace !== undefined) {
-		endFile.start = freeSpace.start;
-		endFile.end = freeSpace.start + endFile.size;
-
-		const oldSize = freeSpace.size;
-		freeSpace.start = endFile.end;
-		freeSpace.size -= endFile.size;
-
-		// Rebalance the freespace map
-		freespaceMap.get(oldSize)!.shift();
-		if (freeSpace.size > 0) {
-			freespaceMap.get(freeSpace.size)!.push(freeSpace);
-			freespaceMap.get(freeSpace.size)!.sort((a, b) => a.start - b.start);
-		}
+		moveFile(endFile, freeSpace);
+		rebalanceFreespace(freeSpace, endFile);
 	}
 
 	checksum += partialChecksumForFile(endFile);
 }
 
 console.log(checksum);
-console.timeEnd('part-two');
