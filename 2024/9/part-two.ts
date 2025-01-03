@@ -77,8 +77,14 @@ for (let block of freespace) {
 
 function findFreeSpace(file: File): Freespace | undefined {
 	const validFreespaces = Array.from(freespaceMap.entries())
-		.filter(([size]) => size >= file.size)
 		.map(([, blocks]) => blocks[0])
+		.filter((block: Freespace | undefined) => {
+			if (!block) {
+				return false;
+			}
+
+			return block.start < file.start && block.size >= file.size;
+		})
 		.sort((a, b) => a.start - b.start);
 
 	return validFreespaces[0];
@@ -96,8 +102,8 @@ function partialChecksumForFile(file: File): number {
 let checksum = 0;
 // Compute checksum and move files at the same time
 for (let i = files.length - 1; i >= 0; i--) {
-	let endFile = files[i];
-	let freeSpace = findFreeSpace(endFile);
+	const endFile = files[i];
+	const freeSpace = findFreeSpace(endFile);
 
 	if (freeSpace !== undefined) {
 		endFile.start = freeSpace.start;
@@ -116,7 +122,6 @@ for (let i = files.length - 1; i >= 0; i--) {
 	}
 
 	checksum += partialChecksumForFile(endFile);
-	// console.log(checksum);
 }
 
 console.log(checksum);
