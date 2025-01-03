@@ -1,4 +1,5 @@
 import { input } from './input';
+console.time('part-two');
 
 type File = {
 	id: number;
@@ -24,35 +25,62 @@ for (let i = 0; i < input.length; i++) {
 	const isFile = i % 2 === 0;
 	id += isFile ? 0 : 1;
 
-	if (num === 0) {
-		continue;
-	}
-
 	if (isFile) {
-		files.push({
-			id,
-			start: index,
-			end: index + num,
-			size: num,
-		});
+		/**
+		 * Based on the input, we never have a file of size 0,
+		 * but check it anyway for correctness. If we did,
+		 * skip it.
+		 */
+		if (num > 0) {
+			files.push({
+				id,
+				start: index,
+				end: index + num,
+				size: num,
+			});
+		}
 	} else {
-		freespace.push({
-			start: index,
-			end: index + num,
-			size: num,
-		});
+		/**
+		 * For completeness sake, if we had a 0 size file previously that we
+		 * skipped, then expand the last freespace block to include this one.
+		 *
+		 * Debugging the code, this never happens.
+		 */
+		const lastFreespace = freespace[freespace.length - 1];
+		if (lastFreespace?.end === index) {
+			lastFreespace!.end += num;
+			lastFreespace!.size += num;
+		} else {
+			freespace.push({
+				start: index,
+				end: index + num,
+				size: num,
+			});
+		}
 	}
 
 	index += num;
 }
 
 /**
- * Unoptimized, loop free space in order until we find one that is
+ * Loop free space in order until we find one that is
  * at least the size of the file we care about.
+ *
+ * This is a bit unoptimized. A better way would be to have
+ * a sorted list of each freespace block
  */
 function findFreeSpace(file: File): Freespace | undefined {
 	for (let block of freespace) {
-		if (block.start < file.start && block.size >= file.size) {
+		/**
+		 * If we are at a freespace block that is after the file,
+		 * exit early. We won't find a valid freespace to move the file
+		 * into.
+		 */
+		if (block.start > file.start) {
+			return undefined;
+		}
+
+		if (block.size >= file.size) {
 			return block;
 		}
 	}
@@ -87,3 +115,4 @@ for (let i = files.length - 1; i >= 0; i--) {
 }
 
 console.log(checksum);
+console.timeEnd('part-two');
