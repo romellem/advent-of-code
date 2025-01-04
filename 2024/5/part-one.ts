@@ -1,26 +1,30 @@
 import { orderingRules, pages } from './input';
 
-// a|b means a < b & b > a
+// a|b means a < b
 const keyIsLessThan = new Map<number, Set<number>>();
-const keyIsGreaterThan = new Map<number, Set<number>>();
 for (let [a, b] of orderingRules) {
 	if (!keyIsLessThan.has(a)) {
 		keyIsLessThan.set(a, new Set());
 	}
-	if (!keyIsGreaterThan.has(b)) {
-		keyIsGreaterThan.set(b, new Set());
-	}
 	keyIsLessThan.get(a)!.add(b);
-	keyIsGreaterThan.get(b)!.add(a);
+}
+
+function isLessThan(a: number, b: number) {
+	return keyIsLessThan.get(a)?.has(b) ?? false;
 }
 
 function sortPage(a: number, b: number): -1 | 1 | 0 {
-	if (keyIsLessThan.get(a)?.has(b) || keyIsGreaterThan.get(b)?.has(a)) {
+	// a < b
+	if (isLessThan(a, b)) {
 		return -1;
 	}
-	if (keyIsLessThan.get(b)?.has(a) || keyIsGreaterThan.get(a)?.has(b)) {
+
+	// a > b
+	if (isLessThan(b, a)) {
 		return 1;
 	}
+
+	// a == b
 	return 0;
 }
 
