@@ -54,7 +54,7 @@ Completed: **9 / 25** (36%)
 
 ## 2022 Puzzles List
 
-Completed: **13 / 25** (52%)
+Completed: **14 / 25** (56%)
 
 *  [✅ Day 1](2022/1/)
 *  [✅ Day 2](2022/2/)
@@ -69,6 +69,16 @@ Completed: **13 / 25** (52%)
 *  [✅ Day 11](2022/11/)
 *  [✅ Day 12](2022/12/)
 *  [✅ Day 13](2022/13/)
+*  Day 14
+*  Day 15
+*  Day 16
+*  Day 17
+*  Day 18
+*  Day 19
+*  Day 20
+*  Day 21
+*  Day 22
+*  [✅ Day 23](2022/23/)
 
 ## 2021 Puzzles List
 
