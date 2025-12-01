@@ -1,4 +1,4 @@
-import { input as _input, sampleInput as input, type Direction } from './input';
+import { input, type Direction } from './input';
 
 type RotateOptions = {
 	currentNumber: number;
@@ -53,8 +53,6 @@ for (let { direction, degree } of input) {
 
 	dialValues.push(nextNumber);
 }
-
-console.log(dialValues);
 
 // > The actual password is the number of times the dial is left
 // > pointing at 0 after any rotation in the sequence.
