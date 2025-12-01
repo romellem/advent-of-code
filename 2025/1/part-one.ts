@@ -1,4 +1,4 @@
-import { input, type Direction } from './input';
+import { input as _input, sampleInput as input, type Direction } from './input';
 
 type RotateOptions = {
 	currentNumber: number;
@@ -8,13 +8,14 @@ type RotateOptions = {
 	max?: number;
 };
 
-function rotate({ currentNumber, direction, degree, min = 0, max = 100 }: RotateOptions) {
+function rotate({ currentNumber, direction, degree, min = 0, max = 99 }: RotateOptions) {
 	// Rotating left is subtracting the degree
 	if (direction === 'L') {
 		degree *= -1;
 	}
 
-	const modulus = max - min;
+	// Range of values in the difference plus 1 (e.g. 0-9 includes 10 numbers)
+	const modulus = max - min + 1;
 
 	// Remove any full turns from input
 	degree %= modulus;
@@ -22,9 +23,18 @@ function rotate({ currentNumber, direction, degree, min = 0, max = 100 }: Rotate
 	// Rotate current number
 	let newNumber = currentNumber + degree;
 
-	// Map negative values to positive ones
+	// Map wrap-around values to ones within the min/max range
 	if (newNumber < min) {
-		newNumber = max + newNumber;
+		const difference = min - newNumber;
+		/**
+		 * A value of `-2` with a min of `0` and max of `99` maps to `98` not `99 - 2 = 97`,
+		 * so include an extra 1 to account for wrap around
+		 */
+		newNumber = max - difference + 1;
+	} else if (newNumber > max) {
+		const difference = newNumber - max;
+		// Similarly here
+		newNumber = min + difference - 1;
 	}
 
 	return newNumber;
@@ -43,6 +53,8 @@ for (let { direction, degree } of input) {
 
 	dialValues.push(nextNumber);
 }
+
+console.log(dialValues);
 
 // > The actual password is the number of times the dial is left
 // > pointing at 0 after any rotation in the sequence.
