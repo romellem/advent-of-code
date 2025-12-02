@@ -1,4 +1,4 @@
-import { sampleInput as input, type Direction } from './input';
+import { input, type Direction } from './input';
 
 type RotateOptions = {
 	currentNumber: number;
@@ -37,8 +37,8 @@ function rotate({ currentNumber, direction, degree }: RotateOptions) {
 let currentNumber = 50;
 let zeroes = 0;
 
-let i = 0;
 for (let { direction, degree } of input) {
+	// A full 360° rotation *always* passes 0 (since it passes every number)
 	const fullRotations = Math.floor(degree / MODULUS);
 	zeroes += fullRotations;
 
@@ -48,15 +48,16 @@ for (let { direction, degree } of input) {
 		degree,
 	});
 
-	const wentToZero = currentNumber !== 0 && nextNumber === 0;
-	const rightPastZero = direction === 'R' && currentNumber !== 0 && nextNumber < currentNumber;
-	const leftPastZero = direction === 'L' && currentNumber !== 0 && nextNumber > currentNumber;
+	// If we start at 0, we can only pass 0 by a full rotation, not a partial rotation
+	if (currentNumber !== 0) {
+		const wentToZero = nextNumber === 0;
+		const rightPastZero = direction === 'R' && nextNumber < currentNumber;
+		const leftPastZero = direction === 'L' && nextNumber > currentNumber;
 
-	if (wentToZero || rightPastZero || leftPastZero) {
-		zeroes++;
+		if (wentToZero || rightPastZero || leftPastZero) {
+			zeroes++;
+		}
 	}
-
-	console.log(++i, `${direction}${degree}`.padEnd(4, ' '), '->', nextNumber, ' Zeroes:', zeroes);
 
 	currentNumber = nextNumber;
 }
@@ -64,5 +65,4 @@ for (let { direction, degree } of input) {
 // > You're actually supposed to count the number of times *any click* causes
 // > the dial to point at 0, regardless of whether it happens during a rotation
 // > or at the end of one.
-
 console.log('Part 2:', zeroes);
