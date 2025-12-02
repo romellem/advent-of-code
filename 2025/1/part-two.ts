@@ -54,6 +54,8 @@ for (let { direction, degree } of input) {
 	if (atZero || rightPastZero || leftPastZero) {
 		zeroes++;
 	}
+
+	currentNumber = nextNumber;
 }
 
 // > You're actually supposed to count the number of times *any click* causes
