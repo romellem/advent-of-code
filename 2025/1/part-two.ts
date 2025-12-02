@@ -4,77 +4,60 @@ type RotateOptions = {
 	currentNumber: number;
 	direction: Direction;
 	degree: number;
-	min?: number;
-	max?: number;
 };
 
-function rotate({
-	currentNumber,
-	direction,
-	degree,
-	passThrough = 0,
-	min = 0,
-	max = 99,
-}: RotateOptions) {
-	const originalNumber = currentNumber;
+/**
+ * `%` operator is more accurately the "remainder" operator, not the modulo operator
+ * (negative dividends return negative results). Create a true modulo operator
+ * so results are always positive.
+ */
+function mod(a: number, n: number): number {
+	// `remainder` is a number between -n and n (exclusive)
+	const remainder = a % n;
 
-	// Rotating left is subtracting the degree
-	if (direction === 'L') {
-		degree *= -1;
-	}
+	// `shiftByModulus` is now a number between 0 and 2n (exclusive)
+	const shiftByModulus = remainder + n;
 
-	// Range of values in the difference plus 1 (e.g. 0-9 includes 10 numbers)
-	const modulus = max - min + 1;
+	// `result` is now a number between 0 and n
+	const result = shiftByModulus % n;
 
-	// Count how many turns we _would_ have if we kept them around
-	const fullTurns = Math.floor(degree / modulus);
-
-	let passThroughs = fullTurns;
-
-	// Remove any full turns from input
-	degree %= modulus;
-
-	// Rotate current number
-	let newNumber = currentNumber + degree;
-
-	// Map wrap-around values to ones within the min/max range
-	if (newNumber < min) {
-		const difference = min - newNumber;
-		/**
-		 * A value of `-2` with a min of `0` and max of `99` maps to `98` not `99 - 2 = 97`,
-		 * so include an extra 1 to account for wrap around
-		 */
-		newNumber = max - difference + 1;
-	} else if (newNumber > max) {
-		const difference = newNumber - max;
-		// Similarly here
-		newNumber = min + difference - 1;
-
-		if (newNumber !== passThrough)
-	} else if (newNumber === passThrough) {
-		passThroughs += 1;
-	}
-
-	return { newNumber, passThroughs };
+	return result;
 }
 
-// Dial starts at 50
-const dial = { value: 50, passThrough: 0 };
+const MODULUS = 100 as const;
+
+function rotate({ currentNumber, direction, degree }: RotateOptions) {
+	// Rotating left is subtracting the degree
+	const rawRotation = direction === 'L' ? currentNumber - degree : currentNumber + degree;
+
+	const equivalenceNumber = mod(rawRotation, MODULUS);
+	return equivalenceNumber;
+}
+
+let currentNumber = 50;
+let zeroes = 0;
 
 for (let { direction, degree } of input) {
-	const currentNumber = dialValues.at(-1)!;
+	const fullRotations = Math.floor(degree / MODULUS);
+	zeroes += fullRotations;
+
 	const nextNumber = rotate({
 		currentNumber,
 		direction,
 		degree,
 	});
 
-	dialValues.push(nextNumber);
+	const atZero = nextNumber === 0;
+	const rightPastZero = direction === 'R' && nextNumber < currentNumber;
+	const leftPastZero = direction === 'L' && nextNumber > currentNumber;
+
+	if (atZero || rightPastZero || leftPastZero) {
+		zeroes++;
+	}
 }
 
-// > The actual password is the number of times the dial is left
-// > pointing at 0 after any rotation in the sequence.
-const dialZeroes = dialValues.filter((v) => v === 0);
-const numZeroes = dialZeroes.length;
+// > You're actually supposed to count the number of times *any click* causes
+// > the dial to point at 0, regardless of whether it happens during a rotation
+// > or at the end of one.
 
-console.log('Part 1:', numZeroes);
+console.log('Part 2:', zeroes);
