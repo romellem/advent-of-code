@@ -1,4 +1,4 @@
-import { input, type Direction } from './input';
+import { sampleInput as input, type Direction } from './input';
 
 type RotateOptions = {
 	currentNumber: number;
@@ -37,6 +37,7 @@ function rotate({ currentNumber, direction, degree }: RotateOptions) {
 let currentNumber = 50;
 let zeroes = 0;
 
+let i = 0;
 for (let { direction, degree } of input) {
 	const fullRotations = Math.floor(degree / MODULUS);
 	zeroes += fullRotations;
@@ -47,13 +48,15 @@ for (let { direction, degree } of input) {
 		degree,
 	});
 
-	const atZero = nextNumber === 0;
-	const rightPastZero = direction === 'R' && nextNumber < currentNumber;
-	const leftPastZero = direction === 'L' && nextNumber > currentNumber;
+	const wentToZero = currentNumber !== 0 && nextNumber === 0;
+	const rightPastZero = direction === 'R' && currentNumber !== 0 && nextNumber < currentNumber;
+	const leftPastZero = direction === 'L' && currentNumber !== 0 && nextNumber > currentNumber;
 
-	if (atZero || rightPastZero || leftPastZero) {
+	if (wentToZero || rightPastZero || leftPastZero) {
 		zeroes++;
 	}
+
+	console.log(++i, `${direction}${degree}`.padEnd(4, ' '), '->', nextNumber, ' Zeroes:', zeroes);
 
 	currentNumber = nextNumber;
 }
