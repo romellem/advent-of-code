@@ -4,40 +4,34 @@ type RotateOptions = {
 	currentNumber: number;
 	direction: Direction;
 	degree: number;
-	min?: number;
-	max?: number;
 };
 
-function rotate({ currentNumber, direction, degree, min = 0, max = 99 }: RotateOptions) {
+/**
+ * `%` operator is more accurately the "remainder" operator, not the modulo operator
+ * (negative dividends return negative results). Create a true modulo operator
+ * so results are always positive.
+ */
+function mod(a: number, n: number): number {
+	// `remainder` is a number between -n and n (exclusive)
+	const remainder = a % n;
+
+	// `shiftByModulus` is now a number between 0 and 2n (exclusive)
+	const shiftByModulus = remainder + n;
+
+	// `result` is now a number between 0 and n
+	const result = shiftByModulus % n;
+
+	return result;
+}
+
+const MODULUS = 100 as const;
+
+function rotate({ currentNumber, direction, degree }: RotateOptions) {
 	// Rotating left is subtracting the degree
-	if (direction === 'L') {
-		degree *= -1;
-	}
+	const rawRotation = direction === 'L' ? currentNumber - degree : currentNumber + degree;
 
-	// Range of values in the difference plus 1 (e.g. 0-9 includes 10 numbers)
-	const modulus = max - min + 1;
-
-	// Remove any full turns from input
-	degree %= modulus;
-
-	// Rotate current number
-	let newNumber = currentNumber + degree;
-
-	// Map wrap-around values to ones within the min/max range
-	if (newNumber < min) {
-		const difference = min - newNumber;
-		/**
-		 * A value of `-2` with a min of `0` and max of `99` maps to `98` not `99 - 2 = 97`,
-		 * so include an extra 1 to account for wrap around
-		 */
-		newNumber = max - difference + 1;
-	} else if (newNumber > max) {
-		const difference = newNumber - max;
-		// Similarly here
-		newNumber = min + difference - 1;
-	}
-
-	return newNumber;
+	const equivalenceNumber = mod(rawRotation, MODULUS);
+	return equivalenceNumber;
 }
 
 // Dial starts at 50
