@@ -1,6 +1,4 @@
-import { sampleInput as input } from './input';
-
-console.log(input);
+import { input } from './input';
 
 function findMaxInRow(
 	row: number[],
