@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { sampleInput as input } from './input';
+import { input } from './input';
 
 const getDivisors = _.memoize((num: number): Array<number> => {
 	const divisors: Array<number> = [];
@@ -15,6 +15,11 @@ const getDivisors = _.memoize((num: number): Array<number> => {
 });
 
 function isDuplicate(num: number, numChunks: number) {
+	// We purposefully only want to test numbers that have more than a single chunk (e.g. has *repeated* digits)
+	if (numChunks === 1) {
+		return false;
+	}
+
 	const numStr = num.toString();
 
 	const chunkSize = numStr.length / numChunks;
@@ -50,7 +55,6 @@ function getDuplicateNumbers(lower: number, upper: number): Array<number> {
 }
 
 const dupes = input.flatMap(({ first, last }) => getDuplicateNumbers(first, last));
-console.log(dupes);
 const sum = dupes.reduce((a, b) => a + b, 0);
 
 console.log('Part 2:', sum);
