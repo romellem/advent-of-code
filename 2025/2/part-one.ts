@@ -1,33 +1,15 @@
 import { input } from './input';
+import { buildPrefixSums, generateRepeatedNumbers, sumInRange } from './utils';
 
-function isDuplicate(num: number) {
-	const numStr = num.toString();
-	if (numStr.length % 2 !== 0) {
-		return false;
-	}
+// Precompute every number that repeats a chunk exactly twice up to the global max.
+// Example: chunk=123 -> 123123. We only build this list once.
+const maxValue = Math.max(...input.map(({ last }) => last));
+const repeatedTwice = generateRepeatedNumbers(maxValue, { minRepeats: 2, maxRepeats: 2 });
+const prefix = buildPrefixSums(repeatedTwice);
 
-	const mid = numStr.length / 2;
-
-	const first = numStr.slice(0, mid);
-	const last = numStr.slice(mid);
-
-	return first === last;
-}
-
-function getDuplicateNumbers(lower: number, upper: number): Array<number> {
-	let invalid: Array<number> = [];
-
-	// Naive loop, fast enough for my inputs
-	for (let i = lower; i <= upper; i++) {
-		if (isDuplicate(i)) {
-			invalid.push(i);
-		}
-	}
-
-	return invalid;
-}
-
-const dupes = input.flatMap(({ first, last }) => getDuplicateNumbers(first, last));
-const sum = dupes.reduce((a, b) => a + b, 0);
+// Each range can now be answered in O(log n) (binary search + prefix sums).
+const sum = input.reduce((total, { first, last }) => {
+	return total + sumInRange(repeatedTwice, prefix, first, last);
+}, 0);
 
 console.log('Part 1:', sum);
