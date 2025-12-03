@@ -1,13 +1,61 @@
+import _ from 'lodash';
 import { input } from './input';
-import { buildPrefixSums, generateRepeatedNumbers, sumInRange } from './utils';
 
-// Same idea as part 1, but allow any number of repeats >= 2 (e.g. 7 copies of "1").
-const maxValue = Math.max(...input.map(({ last }) => last));
-const repeatedIds = generateRepeatedNumbers(maxValue, { minRepeats: 2 });
-const prefix = buildPrefixSums(repeatedIds);
+// Does not include 1 or num
+const getDivisors = _.memoize((num: number): Array<number> => {
+	const divisors: Array<number> = [];
 
-const sum = input.reduce((total, { first, last }) => {
-	return total + sumInRange(repeatedIds, prefix, first, last);
-}, 0);
+	// Simple loop, probably a faster way but good enough for my small values
+	for (let i = 2; i < num; i++) {
+		if (num % i === 0) {
+			divisors.push(i);
+		}
+	}
+
+	return divisors;
+});
+
+function isDuplicate(num: number, numChunks: number) {
+	// We purposefully only want to test numbers that have more than a single chunk (e.g. has *repeated* digits)
+	if (numChunks === 1) {
+		return false;
+	}
+
+	const numStr = num.toString();
+
+	const chunkSize = numStr.length / numChunks;
+	const chunks = _.chunk(numStr.split(''), chunkSize).map((parts) => parts.join(''));
+	const uniqueChunks = new Set(chunks);
+
+	return uniqueChunks.size === 1;
+}
+
+function isSomeDuplicate(num: number) {
+	const numStr = num.toString();
+	const allChunks = getDivisors(numStr.length);
+	for (let chunk of allChunks) {
+		if (isDuplicate(num, chunk)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+function getDuplicateNumbers(lower: number, upper: number): Array<number> {
+	let invalid: Array<number> = [];
+
+	// Naive loop, fast enough for my inputs
+	for (let i = lower; i <= upper; i++) {
+		if (isSomeDuplicate(i)) {
+			invalid.push(i);
+		}
+	}
+
+	return invalid;
+}
+
+const dupes = input.flatMap(({ first, last }) => getDuplicateNumbers(first, last));
+const sum = dupes.reduce((a, b) => a + b, 0);
 
 console.log('Part 2:', sum);
