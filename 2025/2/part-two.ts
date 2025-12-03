@@ -1,11 +1,12 @@
 import _ from 'lodash';
 import { input } from './input';
 
+// Does not include 1 or num
 const getDivisors = _.memoize((num: number): Array<number> => {
 	const divisors: Array<number> = [];
 
 	// Simple loop, probably a faster way but good enough for my small values
-	for (let i = 1; i <= num; i++) {
+	for (let i = 2; i < num; i++) {
 		if (num % i === 0) {
 			divisors.push(i);
 		}
