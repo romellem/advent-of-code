@@ -21,7 +21,7 @@ function findMaxBatteryTuple(row: number[], size: number) {
 	const batteryCells: Array<Battery> = [];
 	for (let i = 0; i < size; i++) {
 		const currentBatteryCount = i + 1;
-		const previousBatteryIndex = batteryCells[0]?.index ?? 0;
+		const previousBatteryIndex = batteryCells.at(-1)?.index ?? 0;
 		const batteryCell = findMaxInRow(
 			row,
 			previousBatteryIndex,
