@@ -16,6 +16,8 @@ function isDuplicate(num: number) {
 
 function getDuplicateNumbers(lower: number, upper: number): Array<number> {
 	let invalid: Array<number> = [];
+
+	// Naive loop, fast enough for my inputs
 	for (let i = lower; i <= upper; i++) {
 		if (isDuplicate(i)) {
 			invalid.push(i);
