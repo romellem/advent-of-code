@@ -13,7 +13,7 @@ function parse(filename: string): Array<IdRange> {
 		.trim()
 		.split(',')
 		.map((numberPairs: string) => {
-			const [firstStr, lastStr] = numberPairs.split(',');
+			const [firstStr, lastStr] = numberPairs.split('-');
 			const first = parseInt(firstStr, 10);
 			const last = parseInt(lastStr, 10);
 			return { first, last };
