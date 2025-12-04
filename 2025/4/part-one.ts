@@ -15,7 +15,7 @@ function countCells(cells: Array<CellType | undefined>, cellType: CellType): num
 	return count;
 }
 
-let rollsAvailableByForklist: Array<[number, number]> = [];
+let rollsAccessibleByForklift: Array<[number, number]> = [];
 for (let cell of grid.cellsImpure()) {
 	if (cell.value !== PAPER) {
 		continue;
@@ -27,8 +27,8 @@ for (let cell of grid.cellsImpure()) {
 	);
 
 	if (paperNeighbors < 4) {
-		rollsAvailableByForklist.push([cell.x, cell.y]);
+		rollsAccessibleByForklift.push([cell.x, cell.y]);
 	}
 }
 
-console.log('Part 1:', rollsAvailableByForklist.length);
+console.log('Part 1:', rollsAccessibleByForklift.length);

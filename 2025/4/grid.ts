@@ -31,6 +31,22 @@ export class Grid<TCell = string | number> {
 		this.grid = structuredClone(grid);
 	}
 
+	inBounds(x: number, y: number): boolean {
+		return x >= 0 && x < this.grid[0].length && y >= 0 && y < this.grid.length;
+	}
+
+	set(x: number, y: number, value: TCell): void {
+		if (!this.inBounds(x, y)) {
+			throw new Error('Invalid bounds for Grid.set', { cause: { x, y } });
+		}
+
+		this.grid[y][x] = value;
+	}
+
+	get(x: number, y: number): TCell | undefined {
+		return this.grid[y]?.[x];
+	}
+
 	getNeighbors(
 		x: number,
 		y: number,
