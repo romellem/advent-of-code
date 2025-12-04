@@ -1,0 +1,97 @@
+/**
+ * Remaking my grid class *without* infinite support. Hoping to simplify some things
+ */
+
+type NestedArray<T> = Array<Array<T>>;
+
+const DIRECTIONS = {
+	N: [0, -1],
+	NE: [1, -1],
+	E: [1, 0],
+	SE: [1, 1],
+	S: [0, 1],
+	SW: [-1, 1],
+	W: [-1, 0],
+	NW: [-1, -1],
+} as const;
+const { N, NE, E, SE, S, SW, W, NW } = DIRECTIONS;
+type EnumDirections = keyof typeof DIRECTIONS;
+
+type CellLookup<TCell> = { x: number; y: number; value: TCell | undefined };
+
+export class Grid<TCell = string | number> {
+	grid: NestedArray<TCell>;
+
+	static fourCardinalTuples = [N, E, S, W] as const;
+	static fourCardinalDirections = ['N', 'E', 'S', 'W'] as const;
+	static eightCardinalTuples = [N, NE, E, SE, S, SW, W, NW] as const;
+	static eightCardinalDirections = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'] as const;
+
+	constructor(grid: NestedArray<TCell>) {
+		this.grid = structuredClone(grid);
+	}
+
+	getNeighbors(
+		x: number,
+		y: number,
+		directions: ReadonlyArray<EnumDirections>,
+		options: {
+			asMap: true;
+		}
+	): Map<EnumDirections, TCell | undefined>;
+	getNeighbors(
+		x: number,
+		y: number,
+		directions: ReadonlyArray<EnumDirections>,
+		options?: {
+			asMap: false | undefined;
+		}
+	): Array<undefined | TCell>;
+
+	getNeighbors(
+		x: number,
+		y: number,
+		directions: ReadonlyArray<EnumDirections>,
+		options?: Partial<{
+			asMap: boolean;
+		}>
+	): Map<EnumDirections, TCell | undefined> | Array<undefined | TCell> {
+		if (options?.asMap) {
+			return directions.reduce((dirLookup, dir) => {
+				const [dx, dy] = DIRECTIONS[dir];
+				dirLookup.set(dir, this.grid[y + dy]?.[x + dx]);
+				return dirLookup;
+			}, new Map<EnumDirections, TCell | undefined>());
+		}
+
+		return directions.map((dir) => {
+			const [dx, dy] = DIRECTIONS[dir];
+			return this.grid[y + dy]?.[x + dx];
+		});
+	}
+
+	*cellsImpure() {
+		const tempCellObj: CellLookup<TCell> = {
+			x: -1,
+			y: -1,
+			value: undefined,
+		};
+
+		for (let y = 0; y < this.grid.length; y++) {
+			for (let x = 0; x < this.grid[y].length; x++) {
+				tempCellObj.x = x;
+				tempCellObj.y = y;
+				tempCellObj.value = this.grid[y][x];
+
+				yield tempCellObj as Readonly<CellLookup<TCell>>;
+			}
+		}
+	}
+
+	static parse2d(gridStr: string): NestedArray<string> {
+		return gridStr
+			.trim()
+			.split('\n')
+			.map((row) => row.split(''));
+	}
+}
