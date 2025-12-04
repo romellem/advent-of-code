@@ -1,4 +1,4 @@
-import { sampleInput as input, PAPER, type Paper, type Empty } from './input';
+import { input, PAPER, type Paper, type Empty } from './input';
 import { Grid } from './grid';
 
 type CellType = Paper | Empty;
@@ -17,10 +17,15 @@ function countCells(cells: Array<CellType | undefined>, cellType: CellType): num
 
 let rollsAvailableByForklist: Array<[number, number]> = [];
 for (let cell of grid.cellsImpure()) {
+	if (cell.value !== PAPER) {
+		continue;
+	}
+
 	const paperNeighbors = countCells(
 		grid.getNeighbors(cell.x, cell.y, Grid.eightCardinalDirections),
 		PAPER
 	);
+
 	if (paperNeighbors < 4) {
 		rollsAvailableByForklist.push([cell.x, cell.y]);
 	}
