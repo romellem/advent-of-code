@@ -27,7 +27,7 @@ do {
 
 	rollsAccessibleByForklift = [];
 
-	for (let cell of grid.cellsImpure()) {
+	for (let cell of grid.cells()) {
 		if (cell.value !== PAPER) {
 			continue;
 		}

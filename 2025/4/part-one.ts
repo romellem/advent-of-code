@@ -16,7 +16,7 @@ function countCells(cells: Array<CellType | undefined>, cellType: CellType): num
 }
 
 let rollsAccessibleByForklift: Array<[number, number]> = [];
-for (let cell of grid.cellsImpure()) {
+for (let cell of grid.cells()) {
 	if (cell.value !== PAPER) {
 		continue;
 	}
