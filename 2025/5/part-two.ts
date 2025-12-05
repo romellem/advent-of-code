@@ -1,12 +1,15 @@
 import { input } from './input';
 
-const { ranges: unsortedRanges, ingredients } = input;
+const { ranges: unsortedRanges } = input;
+
+/**
+ * Sorting the ranges ahead of time (by its "low" end) is the trick.
+ * After sorting, you can iterate these in order to compact them.
+ */
 const ranges = unsortedRanges.sort((a, z) => a.low - z.low);
 
 type Range = (typeof ranges)[number];
 
-// Add in first range to ensure easier looping
-// since we won't have to deal with the empty array edge case
 const compactRanges: Array<Range> = [];
 
 for (let i = 0; i < ranges.length; i++) {
@@ -21,7 +24,12 @@ for (let i = 0; i < ranges.length; i++) {
 	}
 }
 
-const counts = compactRanges.map(({ low, high }) => high - low + 1);
+const counts = compactRanges.map(({ low, high }) => {
+	// Range of `1 - 5` doesn't include `5 - 1 = 4` numbers:
+	// 1 2 3 4 5
+	// It includes 5. Aka, `(5 - 1) + 1`.
+	return high - low + 1;
+});
 const sumOfCounts = counts.reduce((a, b) => a + b, 0);
 
 console.log('Part 2:', sumOfCounts);
