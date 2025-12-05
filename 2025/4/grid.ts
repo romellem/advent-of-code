@@ -26,6 +26,7 @@ export class Grid<TCell = string | number> {
 	static fourCardinalDirections = ['N', 'E', 'S', 'W'] as const;
 	static eightCardinalTuples = [N, NE, E, SE, S, SW, W, NW] as const;
 	static eightCardinalDirections = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'] as const;
+	static DIRECTIONS = DIRECTIONS;
 
 	constructor(grid: NestedArray<TCell>) {
 		this.grid = structuredClone(grid);
