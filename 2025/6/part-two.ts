@@ -1,37 +1,48 @@
 import { input, type Operations } from './input';
 
-const { problems } = input;
+const { textBlock } = input;
 
-const columnwiseProblems = problems.map((problem) => {
-	const { digits, operation } = problem;
+/**
+ * All operations characters ('+' and '*') are aligned to the left-most digit of the largest number.
+ * Leverage this fact and find all indices of the operations, then use those to slice out text block chunks.
+ */
+const textBlocksRows = textBlock.split('\n').filter((v) => v);
+const lastRow = textBlocksRows.at(-1)!;
+const digitBlocks = textBlocksRows.slice(0, -1);
 
+const operationIndices: number[] = [];
+for (let i = 0; i < lastRow.length; i++) {
+	const char = lastRow[i];
+	if (char !== ' ') {
+		operationIndices.push(i);
+	}
+}
+
+const problemBlocks = operationIndices.map((currentIndex, i) => {
 	/**
-	 * Calcuate the number with the most digits. This value will be used to ...
-	 * Shit this won't work. Consider
+	 * Being at the last index means there is no "next" index, so set this to `undefined` which
+	 * when used with `slice` means "slice until the end of the string".
+	 *
+	 * Otherwise, use the next index *minus 1* so we don't grab the space in between the problems
 	 *
 	 *   1     1
 	 *   23   23
 	 *   456 456
 	 *   +   +
+	 *   -------
+	 *   0123456 <- index
+	 *   ^   ^
 	 *
-	 * Those should be parsed to `6 + 35 + 124` and `136 + 25 + 4`. By parsing to
-	 * regular numbers, I lose where the padding existed. I need to parse the raw text block.
+	 *   Slicing each row from `(0, 4)` would grab (say from the last row) `"456 "`, but I don't want
+	 *   the trailing space, so slice `(0, 4 - 1)`
 	 */
-	const digitsStr = digits.map((v) => v.toString());
-	const maxDigitLength = Math.max(...digitsStr.map((digitStr) => digitStr.length));
+	const nextIndex = i !== operationIndices.length - 1 ? operationIndices[i + 1] : undefined;
+	const currentBlock = digitBlocks.map((digitBlock) => digitBlock.slice(currentIndex, nextIndex));
+	return currentBlock;
 });
 
-function evaluateProblem(problem: { digits: number[]; operation: Operations }) {
-	const { digits, operation } = problem;
-	if (operation === '*') {
-		return digits.reduce((a, b) => a * b, 1);
-	}
-
-	// Otherwise its addition
-	return digits.reduce((a, b) => a + b, 0);
-}
-
-const answers = problems.map((problem) => evaluateProblem(problem));
-const answersSum = answers.reduce((a, b) => a + b, 0);
-
-console.log('Part 2:', answersSum);
+// console.log(JSON.stringify(problemBlocks[0], null, '  '));
+// console.log(JSON.stringify(problemBlocks[1], null, '  '));
+console.log(JSON.stringify(problemBlocks[5], null, '  '));
+console.log(JSON.stringify(problemBlocks[36], null, '  '));
+// console.log(JSON.stringify(problemBlocks[10], null, '  '));
