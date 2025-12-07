@@ -36,13 +36,58 @@ const problemBlocks = operationIndices.map((currentIndex, i) => {
 	 *   Slicing each row from `(0, 4)` would grab (say from the last row) `"456 "`, but I don't want
 	 *   the trailing space, so slice `(0, 4 - 1)`
 	 */
-	const nextIndex = i !== operationIndices.length - 1 ? operationIndices[i + 1] : undefined;
+	const nextIndex = i !== operationIndices.length - 1 ? operationIndices[i + 1] - 1 : undefined;
 	const currentBlock = digitBlocks.map((digitBlock) => digitBlock.slice(currentIndex, nextIndex));
 	return currentBlock;
 });
 
-// console.log(JSON.stringify(problemBlocks[0], null, '  '));
-// console.log(JSON.stringify(problemBlocks[1], null, '  '));
-console.log(JSON.stringify(problemBlocks[5], null, '  '));
-console.log(JSON.stringify(problemBlocks[36], null, '  '));
-// console.log(JSON.stringify(problemBlocks[10], null, '  '));
+/**
+ * Now walk downward to build up new numbers. We walk from left-to-right
+ * for convenience, even though technically the problem says to walk right-to-left.
+ * This doesn't matter because addition and multiplication are commutative (aka,
+ * `124 + 35 + 6` = `6 + 35 + 124`).
+ */
+const cephalopodProblems = problemBlocks.map((problemBlock, i) => {
+	// All strings are same length, grab the first one to see how many columns we need to walk
+	const numColumns = problemBlock[0].length;
+
+	const verticalDigits: Array<Array<string>> = Array(numColumns)
+		.fill(undefined)
+		.map((v) => []);
+	for (let c = 0; c < numColumns; c++) {
+		const colNum = verticalDigits[c];
+		for (let y = 0; y < problemBlock.length; y++) {
+			const row = problemBlock[y];
+			const colChar = row[c];
+			colNum.push(colChar);
+		}
+	}
+
+	const digits = verticalDigits.map((digitList) => {
+		const paddedNumStr = digitList.join('');
+		const numStr = paddedNumStr.trim();
+		return parseInt(numStr);
+	});
+
+	const operation = lastRow[i] as Operations;
+
+	return {
+		digits,
+		operation,
+	};
+});
+
+function evaluateProblem(problem: { digits: number[]; operation: Operations }) {
+	const { digits, operation } = problem;
+	if (operation === '*') {
+		return digits.reduce((a, b) => a * b, 1);
+	}
+
+	// Otherwise its addition
+	return digits.reduce((a, b) => a + b, 0);
+}
+
+const answers = cephalopodProblems.map((problem) => evaluateProblem(problem));
+const answersSum = answers.reduce((a, b) => a + b, 0);
+
+console.log('Part 2:', answersSum);
