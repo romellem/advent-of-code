@@ -58,7 +58,7 @@ function parse(filename: string) {
 		};
 	});
 
-	return { rows, cols, problems };
+	return { rows, cols, problems, textBlock };
 }
 
 export const input = parse('input.txt');
