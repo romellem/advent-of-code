@@ -1,6 +1,6 @@
 import { input, type Operations } from './input';
 
-const { textBlock } = input;
+const { textBlock, problems: originalProblems } = input;
 
 /**
  * All operations characters ('+' and '*') are aligned to the left-most digit of the largest number.
@@ -69,7 +69,7 @@ const cephalopodProblems = problemBlocks.map((problemBlock, i) => {
 		return parseInt(numStr);
 	});
 
-	const operation = lastRow[i] as Operations;
+	const { operation } = originalProblems[i];
 
 	return {
 		digits,
