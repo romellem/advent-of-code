@@ -1,4 +1,5 @@
 import { input } from './input';
+import { combinations } from 'combinatorial-generators';
 
 type Point = { x: number; y: number };
 
@@ -71,6 +72,8 @@ class CompressedGrid {
 			 * > also connected to the last red tile.
 			 */
 			const currentTile = this.tiles[i];
+
+			// Use modulo trick to loop back to beginning when `currentTile` is the last one
 			const nextTile = this.tiles[(i + 1) % this.tiles.length];
 
 			const rect = new Rectangle(currentTile, nextTile);
@@ -82,8 +85,7 @@ class CompressedGrid {
 				const compressedMaxY = this.compressedYMap.get(rect.maxY)!;
 
 				for (let compressedY of range(compressedMinY, compressedMaxY)) {
-					// compressedGrid.set(compressedX, compressedY,
-					compressedGrid[compressedY][compressedX] = CompressedGrid.TILE;
+					compressedGrid.set(compressedX, compressedY, CompressedGrid.TILE);
 				}
 			}
 
@@ -94,7 +96,7 @@ class CompressedGrid {
 				const compressedMaxX = this.compressedXMap.get(rect.maxX)!;
 
 				for (let compressedX of range(compressedMinX, compressedMaxX)) {
-					compressedGrid[compressedY][compressedX] = CompressedGrid.TILE;
+					compressedGrid.set(compressedX, compressedY, CompressedGrid.TILE);
 				}
 			}
 		}
@@ -103,14 +105,14 @@ class CompressedGrid {
 
 		// Start filling from top left corner (this is the corner of our "padding" we added)
 		const pointStack: Point[] = [{ x: 0, y: 0 }];
-		compressedGrid[0][0] = CompressedGrid.EMPTY;
+		compressedGrid.set(0, 0, CompressedGrid.EMPTY);
 
 		while (pointStack.length > 0) {
 			const currentPoint = pointStack.pop()!;
 
 			for (let neighbor of neighbors(currentPoint)) {
-				if (compressedGrid[neighbor.y]?.[neighbor.x] === CompressedGrid.UNMARKED) {
-					compressedGrid[neighbor.y][neighbor.x] = CompressedGrid.EMPTY;
+				if (compressedGrid.get(neighbor) === CompressedGrid.UNMARKED) {
+					compressedGrid.set(neighbor, CompressedGrid.EMPTY);
 					pointStack.push(neighbor);
 				}
 			}
@@ -121,15 +123,36 @@ class CompressedGrid {
 		 * We technically don't need to do this and can leave them UNMARKED, but for completeness
 		 * we fill those in too.
 		 */
-		for (let y = 0; y < compressedGrid.length; y++) {
-			for (let x = 0; x < compressedGrid[y].length; x++) {
-				if (compressedGrid[y][x] === CompressedGrid.UNMARKED) {
-					compressedGrid[y][x] = CompressedGrid.TILE;
+		for (let y = 0; y < compressedGrid.height; y++) {
+			for (let x = 0; x < compressedGrid.width; x++) {
+				if (compressedGrid.get(x, y) === CompressedGrid.UNMARKED) {
+					compressedGrid.set(x, y, CompressedGrid.TILE);
 				}
 			}
 		}
 
 		return compressedGrid;
+	}
+
+	doesRectangleContainAllTiles(rect: Rectangle): boolean {
+		const bottomLeftX = this.compressedXMap.get(rect.minX)!;
+		const bottomleftY = this.compressedYMap.get(rect.minY)!;
+		const compressedMaxX = this.compressedXMap.get(rect.maxX)!;
+		const compressedMaxY = this.compressedYMap.get(rect.maxY)!;
+
+		for (let y of range(bottomleftY, compressedMaxY)) {
+			for (let x of range(bottomLeftX, compressedMaxX)) {
+				if (this.compressedGrid.get(x, y) === CompressedGrid.EMPTY) {
+					return false;
+				}
+			}
+		}
+
+		/**
+		 * We looped all coords within the compressed rectangle and never
+		 * came across an EMPTY cell, it means the rect is full of TILES!
+		 */
+		return true;
 	}
 }
 
@@ -142,29 +165,44 @@ class NumberGrid {
 			.map(() => Array(width).fill(fillWith));
 	}
 
-	get(pt: Point, y: never): number | undefined;
-	get(x: number, y: number): number | undefined;
-	get(x: number | Point, y: number | never): number | undefined {
-		if (typeof x === 'number') {
-			return this.grid[y]?.[x];
-		}
-
-		// `x` is a Point
-		const pt: Point = x;
-		return this.grid[pt.y]?.[pt.x];
+	get width() {
+		return this.grid[0].length;
 	}
 
-	set(pt: Point, value: number, _: never): void;
-	set(x: number, y: number, value: number): void;
-	set(x: number | Point, y: number, value: number | never): void {
-		// Assumes point is in bounds
+	get height() {
+		return this.grid.length;
+	}
 
-		if (typeof x === 'number') {
-			this.grid[y][x] = value;
+	get(pt: Point): number | undefined;
+	get(x: number, y: number): number | undefined;
+	get(xOrPoint: number | Point, y?: number): number | undefined {
+		if (typeof xOrPoint === 'number') {
+			// Called as get(x, y)
+			if (typeof y !== 'number') {
+				return undefined;
+			}
+			return this.grid[y]?.[xOrPoint];
+		}
+
+		// Called as get({ x, y })
+		return this.grid[xOrPoint.y]?.[xOrPoint.x];
+	}
+
+	set(pt: Point, value: number): void;
+	set(x: number, y: number, value: number): void;
+	set(xOrPoint: number | Point, yOrValue: number, value?: number): void {
+		if (typeof xOrPoint === 'number') {
+			// set(x, y, value)
+			const y = yOrValue;
+			const val = value;
+			if (typeof val !== 'number') {
+				throw new Error('Missing value when calling set(x, y, value)');
+			}
+			this.grid[y][xOrPoint] = val;
 		} else {
-			// `x` is a Point, and `y` is the value
-			const pt: Point = x;
-			const val: number = y;
+			// set({ x, y }, value)
+			const pt: Point = xOrPoint;
+			const val: number = yOrValue;
 			this.grid[pt.y][pt.x] = val;
 		}
 	}
@@ -176,11 +214,19 @@ class Rectangle {
 	minY: number;
 	maxY: number;
 
+	width: number;
+	height: number;
+	area: number;
+
 	constructor(pt1: Point, pt2: Point) {
 		this.minX = Math.min(pt1.x, pt2.x);
 		this.maxX = Math.max(pt1.x, pt2.x);
 		this.minY = Math.min(pt1.y, pt2.y);
 		this.maxY = Math.max(pt1.y, pt2.y);
+
+		this.width = Math.abs(this.maxX - this.minX + 1);
+		this.height = Math.abs(this.maxY - this.minY + 1);
+		this.area = this.width * this.height;
 	}
 }
 
@@ -214,5 +260,15 @@ function* neighbors(pt: Point) {
 	}
 }
 
-const cc = new CompressedGrid(input);
-cc.markTilesOnCompressedGrid();
+const grid = new CompressedGrid(input);
+
+let maxArea = -1;
+for (let pair of combinations(input, 2)) {
+	let [pt1, pt2] = pair;
+	const rect = new Rectangle(pt1, pt2);
+	if (grid.doesRectangleContainAllTiles(rect)) {
+		maxArea = Math.max(maxArea, rect.area);
+	}
+}
+
+console.log('Part 2:', maxArea);
