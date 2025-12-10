@@ -35,8 +35,8 @@ class CompressedGrid {
 		const uniqueValues = new Set(values);
 
 		/**
-		 * Add "padding" and start / end of the unique values, which in turn
-		 * will create a thin layer of "padding" around of 2D compressed grid.
+		 * Add "padding" to start / end of the unique values, which in turn
+		 * will create a thin layer of "padding" around our 2D compressed grid.
 		 * This is needed to ensure we can flood fill it later when marking
 		 * which coordinates are empty.
 		 */
@@ -45,6 +45,10 @@ class CompressedGrid {
 		uniqueValues.add(min - 1);
 		uniqueValues.add(max + 1);
 
+		/**
+		 * Grid compression is essentially mapping specific values to its sorted rank
+		 * within the full list. So sort our values, then map them to their sorted index.
+		 */
 		const sortedValues = Array.from(uniqueValues).sort((a, b) => a - b);
 
 		const compressedMap = new Map<OriginalNumber, MappedIndex>();
@@ -64,7 +68,11 @@ class CompressedGrid {
 			fillWith: CompressedGrid.UNMARKED,
 		});
 
-		// Mark all tiles AND the spaces in between
+		/**
+		 * Mark all tiles AND the spaces in between. Technically I should color
+		 * the corners as red and inner tiles as green, but as far as the puzzle is concerned
+		 * both are treated equally so mark them as a generic TILE for spimplicity.
+		 */
 		for (let i = 0; i < this.tiles.length; i++) {
 			/**
 			 * > In your list, every red tile is connected to the red tile before and after it
@@ -76,8 +84,13 @@ class CompressedGrid {
 			// Use modulo trick to loop back to beginning when `currentTile` is the last one
 			const nextTile = this.tiles[(i + 1) % this.tiles.length];
 
+			// Create rectangle using two tiles as corner points.
 			const rect = new Rectangle(currentTile, nextTile);
 
+			/**
+			 * Because our input is formatted such that every subsequent tile is connected,
+			 * we know the rectangle between them will have either a width of 1 or a height of 1.
+			 */
 			if (currentTile.x === nextTile.x) {
 				// Fill a vertical line of tiles between the points on the compressed grid
 				const compressedX = this.compressedXMap.get(currentTile.x)!;
@@ -119,7 +132,7 @@ class CompressedGrid {
 		}
 
 		/**
-		 * Finally, any UNMARKED cells left must a TILE since they are inside our TILE perimeter.
+		 * Finally, any UNMARKED cells left must be a TILE since they are inside our TILE perimeter.
 		 * We technically don't need to do this and can leave them UNMARKED, but for completeness
 		 * we fill those in too.
 		 */
@@ -135,16 +148,11 @@ class CompressedGrid {
 	}
 
 	doesRectangleContainAllTiles(rect: Rectangle): boolean {
-		const bottomLeftX = this.compressedXMap.get(rect.minX)!;
-		const bottomleftY = this.compressedYMap.get(rect.minY)!;
-		const compressedMaxX = this.compressedXMap.get(rect.maxX)!;
-		const compressedMaxY = this.compressedYMap.get(rect.maxY)!;
+		const compressedRect = this.mapRectangleToCompressedGrid(rect);
 
-		for (let y of range(bottomleftY, compressedMaxY)) {
-			for (let x of range(bottomLeftX, compressedMaxX)) {
-				if (this.compressedGrid.get(x, y) === CompressedGrid.EMPTY) {
-					return false;
-				}
+		for (let { x, y } of compressedRect) {
+			if (this.compressedGrid.get(x, y) === CompressedGrid.EMPTY) {
+				return false;
 			}
 		}
 
@@ -153,6 +161,21 @@ class CompressedGrid {
 		 * came across an EMPTY cell, it means the rect is full of TILES!
 		 */
 		return true;
+	}
+
+	mapRectangleToCompressedGrid(rect: Rectangle) {
+		const compressedPt1: Point = {
+			x: this.compressedXMap.get(rect.minX)!,
+			y: this.compressedYMap.get(rect.minY)!,
+		};
+		const compressedPt2: Point = {
+			x: this.compressedXMap.get(rect.maxX)!,
+			y: this.compressedYMap.get(rect.maxY)!,
+		};
+
+		const compressedRect = new Rectangle(compressedPt1, compressedPt2);
+
+		return compressedRect;
 	}
 }
 
@@ -173,6 +196,10 @@ class NumberGrid {
 		return this.grid.length;
 	}
 
+	/**
+	 * Fancy overloads just because I felt like it. You can call `set` (and `get`)
+	 * with individual `(x, y)` values or a Point obejct of `({x, y})`.
+	 */
 	get(pt: Point): number | undefined;
 	get(x: number, y: number): number | undefined;
 	get(xOrPoint: number | Point, y?: number): number | undefined {
@@ -228,6 +255,14 @@ class Rectangle {
 		this.height = Math.abs(this.maxY - this.minY + 1);
 		this.area = this.width * this.height;
 	}
+
+	*[Symbol.iterator](): Generator<Point, void, unknown> {
+		for (let y of range(this.minY, this.maxY)) {
+			for (let x of range(this.minX, this.maxX)) {
+				yield { x, y };
+			}
+		}
+	}
 }
 
 /**
@@ -266,6 +301,8 @@ let maxArea = -1;
 for (let pair of combinations(input, 2)) {
 	let [pt1, pt2] = pair;
 	const rect = new Rectangle(pt1, pt2);
+
+	// The core new requirement in part two!
 	if (grid.doesRectangleContainAllTiles(rect)) {
 		maxArea = Math.max(maxArea, rect.area);
 	}
